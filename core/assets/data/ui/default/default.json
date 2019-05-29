@@ -1,0 +1,23 @@
+{
+
+com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
+	default: {
+		up: button,
+		down: button-pressed
+	}
+}
+
+com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: {
+		up: button
+		down: button-pressed
+	}
+}
+
+com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+	default: {
+		background: window
+	}
+}
+
+}
