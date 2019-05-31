@@ -44,6 +44,7 @@ public class CreatureFactory {
 			generateRandomStatValue(),
 			generateRandomStatValue(),
 			generateRandomStatValue(),
+			generateRandomStatValue(),
 			generateRandomStatValue()
 		);
 	}

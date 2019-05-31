@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters.creature;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.ccode.alchemonsters.combat.Catalyst;
 import com.ccode.alchemonsters.combat.Move;
@@ -48,11 +49,20 @@ public class Creature {
 		this.nature = nature;
 		this.stats = stats;
 		
+		//TODO: remove, this is test only (include actual health calculation)
+		currentHealth = 50;
+		maxHealth = 50;
+		currentMana = 50;
+		maxMana = 50;
+		
 		personalName = base.name;
 		moves = new ArrayList<Move>();
 		currentXP = 0;
 		nextLevelXP = 1000000; //TODO: 
 		currentLevel = 1;
+		
+		buffs = new StatBuffs();
+		ailments = new ArrayList<StatusAilment>();
 	}
 	
 	public void enterCombat() {
@@ -64,8 +74,15 @@ public class Creature {
 	}
 	
 	public void turnTick() {
-		for(StatusAilment a : ailments) {
-			a.turnTick();
+		Iterator<StatusAilment> iter = ailments.iterator();
+		while(iter.hasNext()) {
+			StatusAilment ailment = iter.next();
+			if(!ailment.isExpired()) {
+				ailment.turnTick();
+			}
+			else {
+				iter.remove();
+			}
 		}
 	}
 	

@@ -2,16 +2,28 @@ package com.ccode.alchemonsters.combat;
 
 import com.ccode.alchemonsters.creature.Creature;
 
-public abstract class StatusAilment {
+public class StatusAilment {
 
+	public StatusAilmentEffect effect;
 	public Creature source;
 	public Creature target;
+	public int duration;
 	
-	public StatusAilment(Creature source, Creature target) {
+	public StatusAilment(String ailment, Creature source, Creature target, int duration) {
 		this.source = source;
 		this.target = target;
+		this.duration = duration;
+		
+		effect = StatusAilmentDictionary.getAilment(ailment);
 	}
-
-	public abstract void turnTick();
+	
+	public void turnTick() {
+		effect.turnTick(source, target);
+		duration -= 1;
+	}
+	
+	public boolean isExpired() {
+		return duration <= 0;
+	}
 	
 }

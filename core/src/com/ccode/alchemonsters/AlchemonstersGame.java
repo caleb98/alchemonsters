@@ -2,7 +2,13 @@ package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.ccode.alchemonsters.combat.IMoveAction;
+import com.ccode.alchemonsters.combat.Move;
+import com.ccode.alchemonsters.combat.MoveDictionary;
+import com.ccode.alchemonsters.combat.StatusAilmentDictionary;
+import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.CreatureDictionary;
+import com.ccode.alchemonsters.creature.CreatureFactory;
 
 public class AlchemonstersGame extends Game {
 	
@@ -23,17 +29,30 @@ public class AlchemonstersGame extends Game {
 	@Override
 	public void create () {
 		
-		//Load Creatures
+		//Load dictionaries
 		CreatureDictionary.initAndLoad();
+		MoveDictionary.initAndLoad();
+		StatusAilmentDictionary.init();
+		
+		//Test
+		Creature c = CreatureFactory.generateRandomLevelOne("Base.Examplant");
+		c.moves.add(MoveDictionary.getMove("Toxify"));
+		Move toxify = c.moves.get(0);
+		for(IMoveAction a : toxify.actions) {
+			a.activate(toxify, null, c, c);
+		}
+		
+		while(c.ailments.size() > 0) {
+			c.turnTick();
+			System.out.println(c.currentHealth);
+		}
 		
 		//Rendering setup
 		batch = new SpriteBatch();
 		UI.initAndLoad();
 		
 		//Set initial screen
-		//setScreen(mainMenu);
-		
-		setScreen(new TestWorldScreen());
+		setScreen(mainMenu);
 		
 	}
 	

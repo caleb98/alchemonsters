@@ -8,7 +8,7 @@ public enum ElementType {
 	LIGHTNING,
 	AIR,
 	VOID,
-	DARK,
+	UNDEAD,
 	FEY,
 	ARCANUM,
 	SYNTHETIC,

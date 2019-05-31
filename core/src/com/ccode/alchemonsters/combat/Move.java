@@ -12,11 +12,13 @@ public class Move {
 	public static final int PRIORITY_FASTER = 2;
 	public static final int PRIORITY_FASTEST = 3;
 
+	public String name;
+	public String desc;
 	public float accuracy;
 	public int power;
 	public int manaCost;
-	public ElementType eType;
-	public MoveType mType;
+	public ElementType elementType;
+	public MoveType moveType;
 	public IMoveAction[] actions;
 
 	public int priority;
