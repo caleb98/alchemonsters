@@ -11,12 +11,19 @@ public class Move {
 	public static final int PRIORITY_FAST = 1;
 	public static final int PRIORITY_FASTER = 2;
 	public static final int PRIORITY_FASTEST = 3;
+	
+	public static final int CRIT_STAGE_0 = 0; //never crits
+	public static final int CRIT_STAGE_1 = 1;
+	public static final int CRIT_STAGE_2 = 2;
+	public static final int CRIT_STAGE_3 = 3;
+	public static final int CRIT_STAGE_4 = 4;
 
 	public String name;
 	public String desc;
 	public float accuracy;
 	public int power;
 	public int manaCost;
+	public int critStage;
 	public ElementType elementType;
 	public MoveType moveType;
 	public IMoveAction[] actions;
@@ -27,7 +34,8 @@ public class Move {
 	public static enum TurnType {
 		INSTANT,
 		CHARGE,
-		RECHARGE
+		RECHARGE,
+		DELAYED
 	}
 	
 }

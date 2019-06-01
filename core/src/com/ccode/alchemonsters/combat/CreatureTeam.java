@@ -7,4 +7,8 @@ public class CreatureTeam {
 	public int active;
 	public Creature[] creatures;
 	
+	public Creature active() {
+		return creatures[active];
+	}
+	
 }

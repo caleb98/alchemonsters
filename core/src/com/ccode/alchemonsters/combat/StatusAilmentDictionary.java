@@ -19,6 +19,18 @@ public class StatusAilmentDictionary {
 			public void startPhase(Creature source, Creature target) {
 				target.currentHealth -= target.maxHealth / 8;
 			}
+
+			@Override
+			public void battlePhase(Creature source, Creature target) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void endPhase(Creature source, Creature target) {
+				// TODO Auto-generated method stub
+				
+			}
 		}
 				
 		);

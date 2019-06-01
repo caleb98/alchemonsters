@@ -34,19 +34,6 @@ public class AlchemonstersGame extends Game {
 		MoveDictionary.initAndLoad();
 		StatusAilmentDictionary.init();
 		
-		//Test
-		Creature c = CreatureFactory.generateRandomLevelOne("Base.Examplant");
-		c.moves.add(MoveDictionary.getMove("Toxify"));
-		Move toxify = c.moves.get(0);
-		for(IMoveAction a : toxify.actions) {
-			a.activate(toxify, null, c, c);
-		}
-		
-		while(c.ailments.size() > 0) {
-			c.turnTick();
-			System.out.println(c.currentHealth);
-		}
-		
 		//Rendering setup
 		batch = new SpriteBatch();
 		UI.initAndLoad();

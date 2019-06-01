@@ -8,7 +8,6 @@ public enum StatType {
 	MAGIC_DEF,
 	PHYS_ATK,
 	PHYS_DEF,
-	SPEED,
-	CRIT
+	SPEED
 	
 }

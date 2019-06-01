@@ -1,8 +1,5 @@
 package com.ccode.alchemonsters.creature;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import com.ccode.alchemonsters.combat.Catalyst;
 import com.ccode.alchemonsters.combat.Move;
 import com.ccode.alchemonsters.combat.PassiveAbility;
@@ -23,10 +20,10 @@ public class Creature {
 	public int maxMana;
 	
 	public StatBuffs buffs;
-	public ArrayList<StatusAilment> ailments;
+	public StatusAilment currentAilment;
 	
 	//Moves/Abilities
-	public ArrayList<Move> moves;
+	public Move[] moves;
 	public PassiveAbility ability;
 	
 	//Equipment
@@ -56,13 +53,12 @@ public class Creature {
 		maxMana = 50;
 		
 		personalName = base.name;
-		moves = new ArrayList<Move>();
+		moves = new Move[4];
 		currentXP = 0;
 		nextLevelXP = 1000000; //TODO: 
 		currentLevel = 1;
 		
 		buffs = new StatBuffs();
-		ailments = new ArrayList<StatusAilment>();
 	}
 	
 	public void enterCombat() {
@@ -71,19 +67,6 @@ public class Creature {
 	
 	public void exitCombat() {
 		
-	}
-	
-	public void turnTick() {
-		Iterator<StatusAilment> iter = ailments.iterator();
-		while(iter.hasNext()) {
-			StatusAilment ailment = iter.next();
-			if(!ailment.isExpired()) {
-				ailment.turnTick();
-			}
-			else {
-				iter.remove();
-			}
-		}
 	}
 	
 }
