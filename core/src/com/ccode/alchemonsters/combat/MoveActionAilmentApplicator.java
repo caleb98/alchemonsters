@@ -18,11 +18,11 @@ public class MoveActionAilmentApplicator implements IMoveAction {
 		
 		switch(this.target) {
 		
-		case SOURCE:
+		case SELF:
 			source.ailments.add(new StatusAilment(ailmentName, source, source, duration));
 			break;
 			
-		case SOURCE_TEAM:
+		case SELF_TEAM:
 			CreatureTeam sourceTeam = null;
 			for(Creature c : context.teamA.creatures) {
 				if(c == source) {
@@ -38,11 +38,11 @@ public class MoveActionAilmentApplicator implements IMoveAction {
 			}
 			break;
 			
-		case TARGET:
+		case OPPONENT:
 			target.ailments.add(new StatusAilment(ailmentName, source, target, duration));
 			break;
 			
-		case TARGET_TEAM:
+		case OPPONENT_TEAM:
 			CreatureTeam targetTeam = null;
 			for(Creature c : context.teamA.creatures) {
 				if(c == target) {

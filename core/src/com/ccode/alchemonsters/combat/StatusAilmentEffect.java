@@ -10,6 +10,8 @@ public abstract class StatusAilmentEffect {
 		this.name = name;
 	}
 	
-	public abstract void turnTick(Creature source, Creature target);
+	public abstract void startPhase(Creature source, Creature target);
+	public abstract void battlePhase(Creature source, Creature target);
+	public abstract void endPhase(Creature source, Creature target);
 	
 }

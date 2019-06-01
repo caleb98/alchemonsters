@@ -16,7 +16,7 @@ public class StatusAilmentDictionary {
 		registerAilments(
 		
 		new StatusAilmentEffect("Toxic") {
-			public void turnTick(Creature source, Creature target) {
+			public void startPhase(Creature source, Creature target) {
 				target.currentHealth -= target.maxHealth / 8;
 			}
 		}

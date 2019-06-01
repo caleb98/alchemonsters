@@ -2,6 +2,7 @@ package com.ccode.alchemonsers.server;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Scanner;
 
 import com.ccode.alchemonsters.online.KryoRegistration;
 import com.esotericsoftware.kryonet.Client;
@@ -10,6 +11,8 @@ import com.esotericsoftware.kryonet.Listener;
 
 public class ClientTest {
 
+	private static Scanner keyboard = new Scanner(System.in);
+	
 	public static void main(String[] args) throws IOException, InterruptedException {
 		
 		for(int i = 0 ; i < 10; ++i) {
@@ -28,11 +31,11 @@ public class ClientTest {
 			@Override
 			public void received(Connection connection, Object object) {
 				if(object instanceof HashMap) {
-					HashMap<String, RoomInfo> map = (HashMap<String, RoomInfo>) object;
+					HashMap<Integer, RoomInfo> map = (HashMap<Integer, RoomInfo>) object;
 					
-					for(String s : map.keySet()) {
+					for(Integer s : map.keySet()) {
 						RoomInfo i = map.get(s);
-						System.out.printf("%s\t%s\t%s\n", i.roomID, s, i.isPrivate ? "private" : "public");
+						System.out.printf("%s\t%s\t%s\n", i.roomID, i.name, i.isPrivate ? "private" : "public");
 					}
 				}
 			}
@@ -41,8 +44,16 @@ public class ClientTest {
 		client.start();
 		client.connect(5000, "localhost", 31798);
 		client.sendTCP(new ActionRequestRoomList());
+		System.out.println();
+		System.out.println("Which room would you like to join?");
+		int roomID = keyboard.nextInt();
+		
+		client.sendTCP(new ActionJoinGameRoom(roomID, ""));
+		
+		client.sendTCP(new ActionRequestRoomList());
 		
 		Thread.sleep(10000);
+		client.close();
 		
 	}
 

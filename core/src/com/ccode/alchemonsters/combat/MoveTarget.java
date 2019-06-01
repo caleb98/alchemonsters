@@ -1,8 +1,10 @@
 package com.ccode.alchemonsters.combat;
 
 public enum MoveTarget {
-	SOURCE,
-	TARGET,
-	SOURCE_TEAM,
-	TARGET_TEAM,
+	
+	SELF,
+	OPPONENT,
+	SELF_TEAM,
+	OPPONENT_TEAM,
+	
 }

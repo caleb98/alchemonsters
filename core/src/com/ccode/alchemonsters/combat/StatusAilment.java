@@ -18,7 +18,7 @@ public class StatusAilment {
 	}
 	
 	public void turnTick() {
-		effect.turnTick(source, target);
+		effect.startPhase(source, target);
 		duration -= 1;
 	}
 	
