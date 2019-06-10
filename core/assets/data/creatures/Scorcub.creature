@@ -1,0 +1,11 @@
+{
+	id: Base.Scorcub
+	name: Scorcub,
+	desc: "A playful feline-like creature with specialized glands used to produce intense heats.",
+	minBaseHealth: 16,
+	maxBaseHealth: 18,
+	minBaseMana: 16,
+	maxBaseMana: 23,
+	types: [ FIRE ],
+	componentCost: { FIRE: 1 }
+}

@@ -1,0 +1,11 @@
+{
+	id: Base.Gubble
+	name: Gubble,
+	desc: "A small fish that can use its large mouth to disrupt small swimming creatures.",
+	minBaseHealth: 16,
+	maxBaseHealth: 21,
+	minBaseMana: 16,
+	maxBaseMana: 20,
+	types: [ WATER ],
+	componentCost: { WATER: 1 }
+}

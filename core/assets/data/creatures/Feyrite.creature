@@ -1,0 +1,11 @@
+{
+	id: Base.Feyrite
+	name: Feyrite,
+	desc: "Known worldwide as an quiet observer, Feyrite seem to be capable of rational thought to some degree, recording what they see in an ever changing language.",
+	minBaseHealth: 10,
+	maxBaseHealth: 12,
+	minBaseMana: 22,
+	maxBaseMana: 29,
+	types: [ FEY ],
+	componentCost: { FEY: 1 }
+}

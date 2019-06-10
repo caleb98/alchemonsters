@@ -1,0 +1,11 @@
+{
+	id: Base.Aerockoo
+	name: Aerockoo,
+	desc: "What most people would call a chick, the Aeroch often has a parasitic relationship to mother birds, hiding in their nests and stealing food.",
+	minBaseHealth: 13,
+	maxBaseHealth: 19,
+	minBaseMana: 19,
+	maxBaseMana: 22,
+	types: [ AIR ],
+	componentCost: { AIR: 1 }
+}

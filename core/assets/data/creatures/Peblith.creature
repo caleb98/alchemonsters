@@ -1,0 +1,11 @@
+{
+	id: Base.Peblith
+	name: Peblith,
+	desc: "A minute organism that resembles a small rock. It is often compared to a rodent because of its large front teeth.",
+	minBaseHealth: 24,
+	maxBaseHealth: 30,
+	minBaseMana: 8,
+	maxBaseMana: 11,
+	types: [ GROUND ],
+	componentCost: { GROUND: 1 }
+}

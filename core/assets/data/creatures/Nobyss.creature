@@ -1,0 +1,11 @@
+{
+	id: Base.Nobyss
+	name: Nobyss,
+	desc: "Nobyss is the source of much interest. No one has been able to determine what this wispy creature eats, leading many to believe is is powered by some form of magic.",
+	minBaseHealth: 16,
+	maxBaseHealth: 20,
+	minBaseMana: 16,
+	maxBaseMana: 21,
+	types: [ VOID ],
+	componentCost: { VOID: 1 }
+}

@@ -1,0 +1,11 @@
+{
+	id: Base.Ghodama
+	name: Ghodoma,
+	desc: "Helpful souls, the Ghodama are often called 'Wayfinders of the Forest,' as they guide lost travellers through the dense woodlands.",
+	minBaseHealth: 14,
+	maxBaseHealth: 15,
+	minBaseMana: 18,
+	maxBaseMana: 26,
+	types: [ UNDEAD ],
+	componentCost: { UNDEAD: 1 }
+}
