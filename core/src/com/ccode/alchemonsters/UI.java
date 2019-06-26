@@ -38,16 +38,16 @@ public class UI {
 		
 		//TODO: include fonts in the ui itself
 		//Load and setup default UI skin
-		DEFAULT_SKIN = new Skin(Gdx.files.internal("data/ui/default/default.json"));
-		Window.WindowStyle ws = DEFAULT_SKIN.get(Window.WindowStyle.class);
-		ws.titleFont = DEFAULT_FONT_MED;
-		TextButton.TextButtonStyle tbs = DEFAULT_SKIN.get(TextButton.TextButtonStyle.class);
-		tbs.font = DEFAULT_FONT_SMALL;
-		tbs.overFontColor = Color.WHITE;
-		
-		//TODO: include this in skin
-		Label.LabelStyle ls = new Label.LabelStyle(DEFAULT_FONT_SMALL, Color.BLACK);
-		DEFAULT_SKIN.add("default", ls);
+		DEFAULT_SKIN = new Skin(Gdx.files.internal("data/ui/temp/uiskin.json"));
+//		Window.WindowStyle ws = DEFAULT_SKIN.get(Window.WindowStyle.class);
+//		ws.titleFont = DEFAULT_FONT_MED;
+//		TextButton.TextButtonStyle tbs = DEFAULT_SKIN.get(TextButton.TextButtonStyle.class);
+//		tbs.font = DEFAULT_FONT_SMALL;
+//		tbs.overFontColor = Color.WHITE;
+//		
+//		//TODO: include this in skin
+//		Label.LabelStyle ls = new Label.LabelStyle(DEFAULT_FONT_SMALL, Color.BLACK);
+//		DEFAULT_SKIN.add("default", ls);
 		
 		isInitialized = true;
 	}

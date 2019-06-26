@@ -42,27 +42,8 @@ public class AlchemonstersGame extends Game {
 		UI.initAndLoad();
 		
 		//Set initial screen
-		setScreen(mainMenu);
-		
-		//TEST
-		int MESSAGE_A = 0;
-		int MESSAGE_B = 1;
-		EventMessagingSystem.subscribe(MESSAGE_A, (m)->{
-			System.out.println("MESSAGE_A detected! Sending message B...");
-			EventMessagingSystem.publishMessage(new Message(MESSAGE_B));
-		});
-		
-		MessageCallback callbackB = new MessageCallback() {
-			@Override
-			public void callback(Message message) {
-				System.out.println("A message of type B was detected. Sending message A and removing this callback.");
-				EventMessagingSystem.publishMessage(new Message(MESSAGE_A));
-				EventMessagingSystem.unsubscribe(MESSAGE_B, this);
-			}
-		};
-		EventMessagingSystem.subscribe(MESSAGE_B, callbackB);
-		
-		EventMessagingSystem.publishMessage(new Message(MESSAGE_A));
+		//setScreen(mainMenu);
+		setScreen(new TestCombatScreen(this));
 		
 	}
 	

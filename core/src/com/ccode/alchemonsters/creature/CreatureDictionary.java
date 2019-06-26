@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters.creature;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -63,6 +64,10 @@ public class CreatureDictionary {
 		else {
 			return CREATURE_DICTIONARY.get(baseID);
 		}
+	}
+	
+	public static Set<String> getAvailableCreatureIDs() {
+		return CREATURE_DICTIONARY.keySet();
 	}
 	
 }

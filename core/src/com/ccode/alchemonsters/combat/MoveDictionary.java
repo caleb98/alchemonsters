@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters.combat;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -67,6 +68,14 @@ public class MoveDictionary {
 		else {
 			return MOVE_DICTIONARY.get(moveName);
 		}
+	}
+	
+	public static Set<String> getLoadedMoveNames() {
+		if(!isInitialized) {
+			throw new IllegalStateException("Move dictionary not initialized.");
+		}
+		
+		return MOVE_DICTIONARY.keySet();
 	}
 	
 }

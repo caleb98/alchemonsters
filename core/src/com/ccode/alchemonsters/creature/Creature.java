@@ -12,6 +12,8 @@ public class Creature {
 	public CreatureBase base;
 	public CreatureNature nature;
 	public CreatureStats stats;
+	public int baseHealth;
+	public int baseMana;
 	
 	//Combat
 	public int currentHealth;
@@ -33,6 +35,10 @@ public class Creature {
 	public int currentXP;
 	public int nextLevelXP;
 	public int currentLevel;
+	
+	public Creature() {
+		
+	}
 	
 	/**
 	 * Creates a new level one creature from the given base with the given nature
