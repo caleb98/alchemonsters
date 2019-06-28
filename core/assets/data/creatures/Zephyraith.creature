@@ -1,0 +1,11 @@
+{
+	id: Base.Zephyraith
+	name: Zephyraith,
+	desc: "The voice you hear in the wind? A Zephyraith. These ghoulish creatures resemble incorporeal birds and are often quite hostile. They attack by generating vicous winds with their ghostly wings, often pinning their target against trees and the like.",
+	minBaseHealth: 20,
+	maxBaseHealth: 23,
+	minBaseMana: 32,
+	maxBaseMana: 38,
+	types: [ AIR, UNDEAD ],
+	componentCost: { AIR: 1, UNDEAD: 1 }
+}

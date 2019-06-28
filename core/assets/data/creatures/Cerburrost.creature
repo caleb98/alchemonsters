@@ -1,0 +1,11 @@
+{
+	id: Base.Cerburrost
+	name: Cerburrost,
+	desc: "The ability to quickly reduce temperatures makes Cerburrost a popular companion around the world; its loyalty is not found in many other creatures either. Cerburrost are easy to distinguish, especially at night, due to their glowing blue eyes.",
+	minBaseHealth: 32,
+	maxBaseHealth: 35,
+	minBaseMana: 20,
+	maxBaseMana: 26,
+	types: [ FIRE, VOID ],
+	componentCost: { FIRE: 1, VOID: 1 }
+}

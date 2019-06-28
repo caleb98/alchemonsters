@@ -623,12 +623,7 @@ public class TestCombatScreen extends InputAdapter implements Screen {
 			
 			c.baseHealth = (int) baseHealthSlider.getValue();
 			c.baseMana = (int) baseManaSlider.getValue();
-			
-			Array<Move> moves = new Array<>();
-			for(String m : movesActiveList.getItems()) {
-				moves.add(MoveDictionary.getMove(m));
-			}
-			c.moves = moves.toArray(Move.class);
+			c.moves = movesActiveList.getItems().toArray(String.class);
 			
 			currentTeam.creatures[currentId] = c;
 		}
@@ -663,12 +658,8 @@ public class TestCombatScreen extends InputAdapter implements Screen {
 			physATKEdit.setText(String.valueOf(c.stats.physATK));
 			physDEFEdit.setText(String.valueOf(c.stats.physDEF));
 			speedEdit.setText(String.valueOf(c.stats.speed));
-			
-			Array<String> activeMoves = new Array<>();
-			for(Move m : c.moves) {
-				activeMoves.add(m.name);
-			}
-			movesActiveList.setItems(activeMoves);
+
+			movesActiveList.setItems(c.moves);
 		}
 		else {
 			resetCreatureStatsDisplay();

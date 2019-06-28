@@ -1,0 +1,11 @@
+{
+	id: Base.Spirignit
+	name: Spirignit,
+	desc: "In ages far past, those who saw the flames within their fireplace take the form of a being were outcasts, ridiculed as liars. In recent times, however, people have learned that these forms, Spirignits, as they are known, are vengeful spirits empowered by the flames that they inhabit.",
+	minBaseHealth: 29,
+	maxBaseHealth: 35,
+	minBaseMana: 23,
+	maxBaseMana: 26,
+	types: [ FIRE, UNDEAD ],
+	componentCost: { FIRE: 1, UNDEAD: 1 }
+}

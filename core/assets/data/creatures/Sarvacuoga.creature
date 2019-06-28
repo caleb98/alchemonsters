@@ -1,0 +1,11 @@
+{
+	id: Base.Sarvacuoga
+	name: Sarvacuoga,
+	desc: "A haunting space, the opening of a casket is, but if you see one with teeth, watch out, for it is most likely a Sarvacuoga. Sarvacuoga appear in urban areas, hungry for spirits to feed them, attacking anyone who approaches them in the catacombs with their disembodied hands.",
+	minBaseHealth: 29,
+	maxBaseHealth: 34,
+	minBaseMana: 23,
+	maxBaseMana: 27,
+	types: [ VOID, UNDEAD ],
+	componentCost: { VOID: 1, UNDEAD: 1 }
+}

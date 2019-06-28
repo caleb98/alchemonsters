@@ -1,0 +1,11 @@
+{
+	id: Base.Aqueelectrix
+	name: Aqueelectrix,
+	desc: "A speedy aquatic creature, the Aqueelectrix chases down its prey and releases high voltage shocks to subdue it.",
+	minBaseHealth: 25,
+	maxBaseHealth: 30,
+	minBaseMana: 27,
+	maxBaseMana: 31,
+	types: [ LIGHTNING, WATER ],
+	componentCost: { LIGHTNING: 1, WATER: 1 }
+}

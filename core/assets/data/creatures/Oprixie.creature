@@ -1,0 +1,11 @@
+{
+	id: Base.Oprixie
+	name: Oprixie,
+	desc: "The echoing sounds of singing is usually a welcome sign to any from the region, as it means Oprixie have taken residence nearby. Oprixie are brilliant musicians and often attract tourists from neighboring cities.",
+	minBaseHealth: 13,
+	maxBaseHealth: 16,
+	minBaseMana: 38,
+	maxBaseMana: 45,
+	types: [ AIR, FEY ],
+	componentCost: { AIR: 1, FEY: 1 }
+}

@@ -1,0 +1,11 @@
+{
+	id: Base.Cavernus
+	name: Cavernus,
+	desc: "A gaping mouth that leads to an enveloping darkness is the first thing that explorers see when facing a Cavernus. Extremely hostile creatures, Cavernus's use their rocky teeth to bite anything that invades their territory.",
+	minBaseHealth: 33,
+	maxBaseHealth: 39,
+	minBaseMana: 19,
+	maxBaseMana: 22,
+	types: [ GROUND, VOID ],
+	componentCost: { GROUND: 1, VOID: 1 }
+}

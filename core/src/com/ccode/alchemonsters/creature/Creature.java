@@ -25,7 +25,7 @@ public class Creature {
 	public StatusAilment currentAilment;
 	
 	//Moves/Abilities
-	public Move[] moves;
+	public String[] moves;
 	public PassiveAbility ability;
 	
 	//Equipment
@@ -59,7 +59,7 @@ public class Creature {
 		maxMana = 50;
 		
 		personalName = base.name;
-		moves = new Move[4];
+		moves = new String[4];
 		currentXP = 0;
 		nextLevelXP = 1000000; //TODO: 
 		currentLevel = 1;
