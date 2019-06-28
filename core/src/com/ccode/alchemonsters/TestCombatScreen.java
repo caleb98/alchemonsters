@@ -5,16 +5,19 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
@@ -34,6 +37,10 @@ import com.ccode.alchemonsters.creature.CreatureDictionary;
 import com.ccode.alchemonsters.creature.CreatureNature;
 import com.ccode.alchemonsters.creature.CreatureStats;
 import com.ccode.alchemonsters.creature.StatType;
+import com.ccode.alchemonsters.event.BasicPublisher;
+import com.ccode.alchemonsters.event.ListSubscriber;
+import com.ccode.alchemonsters.event.Message;
+import com.ccode.alchemonsters.event.Publisher;
 
 public class TestCombatScreen extends InputAdapter implements Screen {
 
@@ -92,6 +99,10 @@ public class TestCombatScreen extends InputAdapter implements Screen {
 	private List<String> movesAvailableList;
 	
 	//TODO: Combat window UI
+	private Window combatWindow;
+	private Table teamADisplay;
+	private Table teamBDisplay;
+	private TextArea combatTextDisplay;
 	
 	//Scene2d ui
 	private Stage ui;
@@ -115,7 +126,7 @@ public class TestCombatScreen extends InputAdapter implements Screen {
 		Window teamBuilder = new Window("Team Setup", UI.DEFAULT_SKIN);
 		teamBuilder.top();
 		teamBuilder.setMovable(false);
-		table.add(teamBuilder).expand().left().top().fillY().prefWidth(300);
+		table.add(teamBuilder).expandY().left().top().fillY().prefWidth(300);
 		
 		teamATitle = new Label("Team A", UI.DEFAULT_SKIN);
 		teamBuilder.add(teamATitle).center().padTop(10).left();
@@ -365,6 +376,228 @@ public class TestCombatScreen extends InputAdapter implements Screen {
 		moveSelectWindow.pack();
 		ui.addActor(moveSelectWindow);
 		
+		//COMBAT WINDOW SETUP
+		combatWindow = new Window("Combat Display", UI.DEFAULT_SKIN);
+		combatWindow.setMovable(false);
+		
+		teamADisplay = new Table(UI.DEFAULT_SKIN);
+		teamADisplay.top();
+		teamADisplay.add(new Label("Team A", UI.DEFAULT_SKIN));
+		teamADisplay.row();
+		
+		//creates upper part of team ui that displays info about active mon
+		Table teamAActiveTable = new Table(UI.DEFAULT_SKIN);
+		teamAActiveTable.left();
+		Label teamAActiveLabel = new Label("Active", UI.DEFAULT_SKIN);
+		Label teamAActiveName = new Label("ActiveName", UI.DEFAULT_SKIN);
+		//TODO: sub to combat events
+		Label teamAActiveHPLabel = new Label("HP", UI.DEFAULT_SKIN);
+		ProgressBar teamAActiveHPDisplay = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamAActiveHPDisplay.setColor(Color.RED);
+		Label teamAActiveHPDisplayLabel = new Label("X/X", UI.DEFAULT_SKIN);
+		Label teamAActiveMPLabel = new Label("MP", UI.DEFAULT_SKIN);
+		ProgressBar teamAActiveMPDisplay = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamAActiveMPDisplay.setColor(Color.BLUE);
+		Label teamAActiveMPDisplayLabel = new Label("X/X", UI.DEFAULT_SKIN);
+		teamAActiveTable.add(teamAActiveLabel);
+		teamAActiveTable.row();
+		teamAActiveTable.add();
+		teamAActiveTable.add(teamAActiveName);
+		teamAActiveTable.row();
+		teamAActiveTable.add(teamAActiveHPLabel, teamAActiveHPDisplay, teamAActiveHPDisplayLabel);
+		teamAActiveTable.row();
+		teamAActiveTable.add(teamAActiveMPLabel, teamAActiveMPDisplay, teamAActiveMPDisplayLabel);
+		
+		Table teamABenchTable = new Table(UI.DEFAULT_SKIN);
+		teamABenchTable.left();
+		Label teamAInactive1Name = new Label("Inactive 1", UI.DEFAULT_SKIN);
+		ProgressBar teamAInactive1HP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		ProgressBar teamAInactive1MP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamAInactive1HP.setColor(Color.RED);
+		teamAInactive1MP.setColor(Color.BLUE);
+		Label teamAInactive2Name = new Label("Inactive 2", UI.DEFAULT_SKIN);
+		ProgressBar teamAInactive2HP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		ProgressBar teamAInactive2MP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamAInactive1HP.setColor(Color.RED);
+		teamAInactive1MP.setColor(Color.BLUE);
+		Label teamAInactive3Name = new Label("Inactive 3", UI.DEFAULT_SKIN);
+		ProgressBar teamAInactive3HP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		ProgressBar teamAInactive3MP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamAInactive1HP.setColor(Color.RED);
+		teamAInactive1MP.setColor(Color.BLUE);
+		teamABenchTable.add(new Label("Team", UI.DEFAULT_SKIN));
+		teamABenchTable.row();
+		teamABenchTable.add();
+		teamABenchTable.add(teamAInactive1Name, teamAInactive1HP);
+		teamABenchTable.row();
+		teamABenchTable.add();
+		teamABenchTable.add();
+		teamABenchTable.add(teamAInactive1MP);
+		teamABenchTable.row();
+		teamAInactive2HP.setColor(Color.RED);
+		teamAInactive2MP.setColor(Color.BLUE);
+		teamABenchTable.add(new Label("Team", UI.DEFAULT_SKIN));
+		teamABenchTable.row();
+		teamABenchTable.add();
+		teamABenchTable.add(teamAInactive2Name, teamAInactive2HP);
+		teamABenchTable.row();
+		teamABenchTable.add();
+		teamABenchTable.add();
+		teamABenchTable.add(teamAInactive2MP);
+		teamABenchTable.row();
+		teamAInactive3HP.setColor(Color.RED);
+		teamAInactive3MP.setColor(Color.BLUE);
+		teamABenchTable.add(new Label("Team", UI.DEFAULT_SKIN));
+		teamABenchTable.row();
+		teamABenchTable.add();
+		teamABenchTable.add(teamAInactive3Name, teamAInactive3HP);
+		teamABenchTable.row();
+		teamABenchTable.add();
+		teamABenchTable.add();
+		teamABenchTable.add(teamAInactive3MP);
+		teamABenchTable.row();
+		
+		Table teamAActionSelectTable = new Table(UI.DEFAULT_SKIN);
+		teamAActionSelectTable.left();
+		Label teamASelectActionLabel = new Label("Select Action:", UI.DEFAULT_SKIN);
+		SelectBox<String> teamAActions = new SelectBox<>(UI.DEFAULT_SKIN);
+		teamAActions.setItems("Action 1", "Action 2", "Action 3", "...and so on...");
+		TextButton teamAConfirmActionButton = new TextButton("Submit Action", UI.DEFAULT_SKIN);
+		teamAActionSelectTable.add(teamASelectActionLabel).left();
+		teamAActionSelectTable.row();
+		teamAActionSelectTable.add(teamAActions).left();
+		teamAActionSelectTable.row();
+		teamAActionSelectTable.add(teamAConfirmActionButton);
+		
+		teamADisplay.add(teamAActiveTable).expandX().fillX();
+		teamADisplay.row();
+		teamADisplay.add(new Label("", UI.DEFAULT_SKIN));
+		teamADisplay.row();
+		teamADisplay.add(teamABenchTable).expandX().fillX();
+		teamADisplay.row();
+		teamADisplay.add(new Label("", UI.DEFAULT_SKIN));
+		teamADisplay.row();
+		teamADisplay.add(teamAActionSelectTable).expandX().fillX();
+		
+		teamBDisplay = new Table(UI.DEFAULT_SKIN);
+		teamBDisplay.top();
+		teamBDisplay.add(new Label("Team A", UI.DEFAULT_SKIN));
+		teamBDisplay.row();
+		
+		//creates upper part of team ui that displays info about active mon
+		Table teamBActiveTable = new Table(UI.DEFAULT_SKIN);
+		teamBActiveTable.left();
+		Label teamBActiveLabel = new Label("Active", UI.DEFAULT_SKIN);
+		Label teamBActiveName = new Label("ActiveName", UI.DEFAULT_SKIN);
+		//TODO: sub to combat events
+		Label teamBActiveHPLabel = new Label("HP", UI.DEFAULT_SKIN);
+		ProgressBar teamBActiveHPDisplay = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamBActiveHPDisplay.setColor(Color.RED);
+		Label teamBActiveHPDisplayLabel = new Label("X/X", UI.DEFAULT_SKIN);
+		Label teamBActiveMPLabel = new Label("MP", UI.DEFAULT_SKIN);
+		ProgressBar teamBActiveMPDisplay = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamBActiveMPDisplay.setColor(Color.BLUE);
+		Label teamBActiveMPDisplayLabel = new Label("X/X", UI.DEFAULT_SKIN);
+		teamBActiveTable.add(teamBActiveLabel);
+		teamBActiveTable.row();
+		teamBActiveTable.add();
+		teamBActiveTable.add(teamBActiveName);
+		teamBActiveTable.row();
+		teamBActiveTable.add(teamBActiveHPLabel, teamBActiveHPDisplay, teamBActiveHPDisplayLabel);
+		teamBActiveTable.row();
+		teamBActiveTable.add(teamBActiveMPLabel, teamBActiveMPDisplay, teamBActiveMPDisplayLabel);
+		
+		Table teamBBenchTable = new Table(UI.DEFAULT_SKIN);
+		teamBBenchTable.left();
+		Label teamBInactive1Name = new Label("Inactive 1", UI.DEFAULT_SKIN);
+		ProgressBar teamBInactive1HP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		ProgressBar teamBInactive1MP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamBInactive1HP.setColor(Color.RED);
+		teamBInactive1MP.setColor(Color.BLUE);
+		Label teamBInactive2Name = new Label("Inactive 2", UI.DEFAULT_SKIN);
+		ProgressBar teamBInactive2HP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		ProgressBar teamBInactive2MP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamBInactive1HP.setColor(Color.RED);
+		teamBInactive1MP.setColor(Color.BLUE);
+		Label teamBInactive3Name = new Label("Inactive 3", UI.DEFAULT_SKIN);
+		ProgressBar teamBInactive3HP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		ProgressBar teamBInactive3MP = new ProgressBar(0, 100, 0.01f, false, UI.DEFAULT_SKIN);
+		teamBInactive1HP.setColor(Color.RED);
+		teamBInactive1MP.setColor(Color.BLUE);
+		teamBBenchTable.add(new Label("Team", UI.DEFAULT_SKIN));
+		teamBBenchTable.row();
+		teamBBenchTable.add();
+		teamBBenchTable.add(teamBInactive1Name, teamBInactive1HP);
+		teamBBenchTable.row();
+		teamBBenchTable.add();
+		teamBBenchTable.add();
+		teamBBenchTable.add(teamBInactive1MP);
+		teamBBenchTable.row();
+		teamBInactive2HP.setColor(Color.RED);
+		teamBInactive2MP.setColor(Color.BLUE);
+		teamBBenchTable.add(new Label("Team", UI.DEFAULT_SKIN));
+		teamBBenchTable.row();
+		teamBBenchTable.add();
+		teamBBenchTable.add(teamBInactive2Name, teamBInactive2HP);
+		teamBBenchTable.row();
+		teamBBenchTable.add();
+		teamBBenchTable.add();
+		teamBBenchTable.add(teamBInactive2MP);
+		teamBBenchTable.row();
+		teamBInactive3HP.setColor(Color.RED);
+		teamBInactive3MP.setColor(Color.BLUE);
+		teamBBenchTable.add(new Label("Team", UI.DEFAULT_SKIN));
+		teamBBenchTable.row();
+		teamBBenchTable.add();
+		teamBBenchTable.add(teamBInactive3Name, teamBInactive3HP);
+		teamBBenchTable.row();
+		teamBBenchTable.add();
+		teamBBenchTable.add();
+		teamBBenchTable.add(teamBInactive3MP);
+		teamBBenchTable.row();
+		
+		Table teamBActionSelectTable = new Table(UI.DEFAULT_SKIN);
+		teamBActionSelectTable.left();
+		Label teamBSelectActionLabel = new Label("Select Action:", UI.DEFAULT_SKIN);
+		SelectBox<String> teamBActions = new SelectBox<>(UI.DEFAULT_SKIN);
+		teamBActions.setItems("Action 1", "Action 2", "Action 3", "...and so on...");
+		TextButton teamBConfirmActionButton = new TextButton("Submit Action", UI.DEFAULT_SKIN);
+		teamBActionSelectTable.add(teamBSelectActionLabel).left();
+		teamBActionSelectTable.row();
+		teamBActionSelectTable.add(teamBActions).left();
+		teamBActionSelectTable.row();
+		teamBActionSelectTable.add(teamBConfirmActionButton);
+		
+		teamBDisplay.add(teamBActiveTable).expandX().fillX();
+		teamBDisplay.row();
+		teamBDisplay.add(new Label("", UI.DEFAULT_SKIN));
+		teamBDisplay.row();
+		teamBDisplay.add(teamBBenchTable).expandX().fillX();
+		teamBDisplay.row();
+		teamBDisplay.add(new Label("", UI.DEFAULT_SKIN));
+		teamBDisplay.row();
+		teamBDisplay.add(teamBActionSelectTable).expandX().fillX();
+		
+		combatTextDisplay = new TextArea("Combat console!\nCombat text will go in here :)\n", UI.DEFAULT_SKIN);
+		ScrollPane combatTextDisplayPane = new ScrollPane(combatTextDisplay, UI.DEFAULT_SKIN);
+		combatTextDisplayPane.setScrollbarsVisible(true);
+		combatTextDisplayPane.setFadeScrollBars(false);
+		combatTextDisplayPane.setFlickScroll(false);
+		combatTextDisplayPane.setForceScroll(false, true);
+		combatTextDisplay.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				combatTextDisplay.setPrefRows(combatTextDisplay.getLines());
+				combatTextDisplayPane.layout();
+			}
+		});
+		
+		combatWindow.add(teamADisplay).expand().fillY();
+		combatWindow.add(combatTextDisplayPane).expand().fill().minWidth(400);
+		combatWindow.add(teamBDisplay).expand().fillY();
+		
+		table.add(combatWindow).expand().fill();
+		
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
 		
@@ -373,7 +606,6 @@ public class TestCombatScreen extends InputAdapter implements Screen {
 		creatureSelectBox.setSelectedIndex(0);
 		
 	}
-	
 	private void acceptCreatureAdd() {
 		try {
 			CreatureBase base = CreatureDictionary.getBase(creatureSelectBox.getSelected());

@@ -1,14 +1,14 @@
 package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.ccode.alchemonsters.combat.MoveDictionary;
 import com.ccode.alchemonsters.combat.StatusAilmentDictionary;
 import com.ccode.alchemonsters.creature.CreatureDictionary;
-import com.ccode.alchemonsters.event.EventMessagingSystem;
+import com.ccode.alchemonsters.event.BasicPublisher;
+import com.ccode.alchemonsters.event.EventManager;
+import com.ccode.alchemonsters.event.ListSubscriber;
 import com.ccode.alchemonsters.event.Message;
-import com.ccode.alchemonsters.event.MessageCallback;
 
 public class AlchemonstersGame extends Game {
 	
@@ -29,8 +29,8 @@ public class AlchemonstersGame extends Game {
 	@Override
 	public void create () {
 		
-		//Initialize Event Messaging
-		EventMessagingSystem.init();
+		//Init event system
+		EventManager.init();
 		
 		//Load dictionaries
 		CreatureDictionary.initAndLoad();
@@ -44,6 +44,7 @@ public class AlchemonstersGame extends Game {
 		//Set initial screen
 		//setScreen(mainMenu);
 		setScreen(new TestCombatScreen(this));
+		
 		
 	}
 	
@@ -62,7 +63,6 @@ public class AlchemonstersGame extends Game {
 			
 		}
 		
-		EventMessagingSystem.update(Gdx.graphics.getDeltaTime());
 		super.render();
 	}
 	
