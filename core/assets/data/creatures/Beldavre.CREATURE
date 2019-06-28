@@ -1,0 +1,11 @@
+{
+	id: Base.Beldavre
+	name: Beldavre,
+	desc: "A soul linked to the ocean, Beldavre consist of dark bubbles floating into a bulbous helmet, remniscient of a diver's suit. Rarely encountered by humans, the motives of Beldavre largely remain a mystery.",
+	minBaseHealth: 32,
+	maxBaseHealth: 39,
+	minBaseMana: 20,
+	maxBaseMana: 22,
+	types: [ FEY, WATER ],
+	componentCost: { FEY: 1, WATER: 1 }
+}

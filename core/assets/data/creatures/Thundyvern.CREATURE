@@ -1,0 +1,11 @@
+{
+	id: Base.Thundyvern
+	name: Thundyvern,
+	desc: "The sound of thunder crashes above, yet no lightning is seen. Birds soon scatter and the air feels charged with energy. At this point, it is time to prepare for battle, as a Thundyvern is near, and there is no running from it.",
+	minBaseHealth: 26,
+	maxBaseHealth: 28,
+	minBaseMana: 26,
+	maxBaseMana: 33,
+	types: [ AIR, LIGHTNING ],
+	componentCost: { AIR: 1, LIGHTNING: 1 }
+}

@@ -1,0 +1,11 @@
+{
+	id: Base.Ectovire
+	name: Ectovire,
+	desc: "Many are in agreement that Ectovire are born from those who perish during storms. From a distance, these beings look like glowing orbs and oft lead travelling ships to safety through incliment conditions.",
+	minBaseHealth: 19,
+	maxBaseHealth: 20,
+	minBaseMana: 33,
+	maxBaseMana: 41,
+	types: [ LIGHTNING, UNDEAD ],
+	componentCost: { LIGHTNING: 1, UNDEAD: 1 }
+}

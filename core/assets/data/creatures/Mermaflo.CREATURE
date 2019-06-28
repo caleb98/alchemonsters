@@ -1,0 +1,11 @@
+{
+	id: Base.Mermaflo
+	name: Mermaflo,
+	desc: "Small creatures with features of both humans and fish, the Mermaflo are often found building small structures in the coral reefs outside of the main land. No one knows how the structures are used, but they seem to amplify the Mermaflo's calls.",
+	minBaseHealth: 16,
+	maxBaseHealth: 21,
+	minBaseMana: 36,
+	maxBaseMana: 40,
+	types: [ FEY, WATER ],
+	componentCost: { FEY: 1, WATER: 1 }
+}

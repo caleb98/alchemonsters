@@ -1,0 +1,11 @@
+{
+	id: Base.Sandorno
+	name: Sandorno,
+	desc: "Often in the deserts beneath the grand mountains, winds will whip up into spinning masses. Sometimes, this is a phenomenon caused by the weather, other times it is caused by a Sandorno, a large flightless bird that uses its speed to capture its prey within it's sand walls. Legend says that if a Sandorno ever stops running, it will perish.",
+	minBaseHealth: 24,
+	maxBaseHealth: 30,
+	minBaseMana: 26,
+	maxBaseMana: 31,
+	types: [ AIR, GROUND ],
+	componentCost: { AIR: 1, GROUND: 1 }
+}

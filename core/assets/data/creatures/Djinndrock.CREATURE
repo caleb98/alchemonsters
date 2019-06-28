@@ -1,0 +1,11 @@
+{
+	id: Base.Djinndrock
+	name: Djinndrock,
+	desc: "A wanderer of the sands, Djinndrock often cross the paths of weary travelers. Usually they will help them in small ways, but if you ask too much, they will take offense and proceed to attack.",
+	minBaseHealth: 34,
+	maxBaseHealth: 40,
+	minBaseMana: 18,
+	maxBaseMana: 21,
+	types: [ GROUND, FEY ],
+	componentCost: { GROUND: 1, FEY: 1 }
+}

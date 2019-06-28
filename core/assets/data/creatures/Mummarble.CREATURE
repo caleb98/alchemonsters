@@ -1,0 +1,11 @@
+{
+	id: Base.Mummarble
+	name: Mummarble,
+	desc: "Deserts are inhospitable places, but those who make their eternal home there are destined to become one with it. This happens through a transformation that creates a Mummarble, a humanoid figure wreathed in sand. Behind the sand is a totemic pillar of marble with faces engraved into it. These faces are said to be the faces of the spirits empowering it.",
+	minBaseHealth: 37,
+	maxBaseHealth: 42,
+	minBaseMana: 15,
+	maxBaseMana: 19,
+	types: [ GROUND, UNDEAD ],
+	componentCost: { GROUND: 1, UNDEAD: 1 }
+}

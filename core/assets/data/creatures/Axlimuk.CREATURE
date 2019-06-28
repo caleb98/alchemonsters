@@ -1,0 +1,11 @@
+{
+	id: Base.Axlimuk
+	name: Axlimuk,
+	desc: "The frills on the head of an Axlimuk allow for it to breath even when completely submerged, as they act like gills. These appendages also help them to dig through the mud where they find their food.",
+	minBaseHealth: 30,
+	maxBaseHealth: 36,
+	minBaseMana: 23,
+	maxBaseMana: 25,
+	types: [ GROUND, WATER ],
+	componentCost: { GROUND: 1, WATER: 1 }
+}

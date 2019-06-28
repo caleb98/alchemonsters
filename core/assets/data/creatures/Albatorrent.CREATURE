@@ -1,0 +1,11 @@
+{
+	id: Base.Albatorrent
+	name: Albatorrent,
+	desc: "Albatorrents are adept anglers, using their wings made of water to corral fish to a place where they can eat them easier. These large birds are known for their ability to fly long distances without landing on solid ground.",
+	minBaseHealth: 32,
+	maxBaseHealth: 36,
+	minBaseMana: 20,
+	maxBaseMana: 25,
+	types: [ WATER, VOID ],
+	componentCost: { WATER: 1, VOID: 1 }
+}

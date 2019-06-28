@@ -1,0 +1,11 @@
+{
+	id: Base.Zaproggl
+	name: Zaproggl,
+	desc: "A furry little creature with the ability to open up small portals, the Zaproggl is quite an annoyance. While it uses these portals to safely pick fruits from trees, it has another use for them, irritating humans. If you ever receive a nasty shock while walking along the roadways, you can assume a Zaproggl is nearby, taking pleasure in your anger.",
+	minBaseHealth: 14,
+	maxBaseHealth: 16,
+	minBaseMana: 38,
+	maxBaseMana: 45,
+	types: [ FEY, LIGHTNING ],
+	componentCost: { FEY: 1, LIGHTNING: 1 }
+}
