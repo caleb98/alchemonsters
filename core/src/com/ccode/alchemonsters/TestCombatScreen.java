@@ -37,10 +37,10 @@ import com.ccode.alchemonsters.creature.CreatureDictionary;
 import com.ccode.alchemonsters.creature.CreatureNature;
 import com.ccode.alchemonsters.creature.CreatureStats;
 import com.ccode.alchemonsters.creature.StatType;
-import com.ccode.alchemonsters.event.BasicPublisher;
-import com.ccode.alchemonsters.event.ListSubscriber;
-import com.ccode.alchemonsters.event.Message;
-import com.ccode.alchemonsters.event.Publisher;
+import com.ccode.alchemonsters.engine.event.BasicPublisher;
+import com.ccode.alchemonsters.engine.event.ListSubscriber;
+import com.ccode.alchemonsters.engine.event.Message;
+import com.ccode.alchemonsters.engine.event.Publisher;
 
 public class TestCombatScreen extends InputAdapter implements Screen {
 

@@ -1,3 +1,3 @@
-package com.ccode.alchemonsters.event;
+package com.ccode.alchemonsters.engine.event;
 
 public class BasicPublisher implements Publisher {}

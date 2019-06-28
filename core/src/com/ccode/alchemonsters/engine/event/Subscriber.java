@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters.event;
+package com.ccode.alchemonsters.engine.event;
 
 public interface Subscriber {
 
