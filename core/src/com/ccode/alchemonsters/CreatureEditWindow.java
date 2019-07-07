@@ -213,10 +213,14 @@ public class CreatureEditWindow extends Window {
 							Byte.parseByte(speedEdit.getText())
 					);
 					CreatureNature nature = new CreatureNature(positiveNature.getSelected(), negativeNature.getSelected());
-					Creature c = new Creature(base, nature, stats);
+					Creature c = new Creature(
+						base, 
+						nature, 
+						stats, 
+						(int) baseHealthSlider.getValue(), 
+						(int) baseManaSlider.getValue()
+					);
 					
-					c.baseHealth = (int) baseHealthSlider.getValue();
-					c.baseMana = (int) baseManaSlider.getValue();
 					c.moves = movesActiveList.getItems().toArray(String.class);
 					
 					editedCreature = c;

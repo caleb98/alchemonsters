@@ -2,6 +2,8 @@ package com.ccode.alchemonsters.creature;
 
 import java.util.Random;
 
+import com.ccode.alchemonsters.util.GameRandom;
+
 public class CreatureFactory {
 
 	private static Random rand = new Random();
@@ -15,7 +17,10 @@ public class CreatureFactory {
 		CreatureNature nature = generateRandomCreatureNature();
 		CreatureStats stats = generateRandomCreatureStats();
 		
-		return new Creature(base, nature, stats);
+		int baseHealth = base.minBaseHealth + GameRandom.nextInt(base.maxBaseHealth - base.minBaseHealth);
+		int baseMana = base.minBaseMana + GameRandom.nextInt(base.maxBaseMana - base.minBaseMana);
+		
+		return new Creature(base, nature, stats, baseHealth, baseMana);
 	}
 	
 	public static CreatureNature generateRandomCreatureNature() {

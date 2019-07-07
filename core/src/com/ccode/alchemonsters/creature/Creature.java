@@ -46,24 +46,32 @@ public class Creature {
 	 * @param nature
 	 * @param stats
 	 */
-	public Creature(CreatureBase base, CreatureNature nature, CreatureStats stats) {
+	public Creature(CreatureBase base, CreatureNature nature, CreatureStats stats, int baseHealth, int baseMana) {
 		this.base = base;
 		this.nature = nature;
 		this.stats = stats;
-		
-		//TODO: remove, this is test only (include actual health calculation)
-		currentHealth = 50;
-		maxHealth = 50;
-		currentMana = 50;
-		maxMana = 50;
+		this.baseHealth = baseHealth;
+		this.baseMana = baseMana;
 		
 		personalName = base.name;
 		moves = new String[4];
 		currentXP = 0;
-		nextLevelXP = 1000000; //TODO: 
+		nextLevelXP = 1000000; //TODO: experience gain and leveling up
 		currentLevel = 1;
 		
 		buffs = new StatBuffs();
+		
+		calcDerivedStats();
+	}
+	
+	public void calcDerivedStats() {
+		int healthDif = base.maxBaseHealth - base.minBaseHealth;
+		maxHealth = (int) (baseHealth + (currentLevel * (healthDif / 5f)) + (currentLevel * (stats.vitae / 20f)));
+		currentHealth = maxHealth;
+		
+		int manaDif = base.maxBaseMana - base.minBaseMana;
+		maxMana = (int) (baseMana + (currentLevel * (manaDif / 5f)) + (currentLevel * (stats.focus / 20f)));
+		currentMana = maxMana;
 	}
 	
 	/**
