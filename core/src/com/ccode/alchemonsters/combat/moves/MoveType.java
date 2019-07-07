@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters.combat;
+package com.ccode.alchemonsters.combat.moves;
 
 public enum MoveType {
 

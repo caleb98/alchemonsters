@@ -9,8 +9,10 @@
 	moveType: "MAGIC",
 	actions: [
 		{
-			class: "Damage"
+			class: "Damage",
+			target: "OPPONENT"
 		}
 	],
-	turnType: "INSTANT"
+	turnType: "INSTANT",
+	priority: 0
 }

@@ -2,19 +2,17 @@ package com.ccode.alchemonsters.combat;
 
 import java.util.ArrayList;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
+import com.ccode.alchemonsters.engine.event.Publisher;
 
-import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
-import com.ccode.alchemonsters.creature.Creature;
-import com.ccode.alchemonsters.util.GameRandom;
-
-public class BattleContext {
+public class BattleContext implements Publisher {
 	
-	public IBattleController teamAController;
+	public CombatState currentState;
+	
+	public BattleController teamAController;
 	public CreatureTeam teamA;
 	public ArrayList<BattleAction> teamAActions;
 	
-	public IBattleController teamBController;
+	public BattleController teamBController;
 	public CreatureTeam teamB;
 	public ArrayList<BattleAction> teamBActions;
 	

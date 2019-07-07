@@ -1,14 +1,30 @@
 package com.ccode.alchemonsters.combat;
 
-public class BattleAction {
+public class BattleAction implements Comparable<BattleAction> {
 
+	public enum BattleActionType {
+		SWITCH,
+		USE,
+		MOVE,
+	}
+	
 	public BattleActionType type;
 	public int id;
+
+	public BattleAction(BattleActionType type, int id) {
+		this.type = type;
+		this.id = id;
+	}
 	
-	public enum BattleActionType {
-		MOVE,
-		SWITCH,
-		USE
+	@Override
+	public int compareTo(BattleAction o) {
+		if((o.type != BattleActionType.MOVE && type != BattleActionType.MOVE) ||
+		    o.type == BattleActionType.MOVE && type == BattleActionType.MOVE) {
+			return 0;
+		}
+		else {
+			return type.compareTo(o.type);
+		}
 	}
 	
 }

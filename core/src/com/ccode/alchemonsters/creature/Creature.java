@@ -1,7 +1,6 @@
 package com.ccode.alchemonsters.creature;
 
 import com.ccode.alchemonsters.combat.Catalyst;
-import com.ccode.alchemonsters.combat.Move;
 import com.ccode.alchemonsters.combat.PassiveAbility;
 import com.ccode.alchemonsters.combat.StatBuffs;
 import com.ccode.alchemonsters.combat.StatusAilment;
@@ -11,7 +10,7 @@ public class Creature {
 	public String personalName;
 	public CreatureBase base;
 	public CreatureNature nature;
-	public CreatureStats stats;
+	private CreatureStats stats;
 	public int baseHealth;
 	public int baseMana;
 	
@@ -21,7 +20,7 @@ public class Creature {
 	public int currentMana;
 	public int maxMana;
 	
-	public StatBuffs buffs;
+	public StatBuffs buffs = new StatBuffs();
 	public StatusAilment currentAilment;
 	
 	//Moves/Abilities
@@ -67,12 +66,93 @@ public class Creature {
 		buffs = new StatBuffs();
 	}
 	
-	public void enterCombat() {
-		buffs = new StatBuffs();
+	/**
+	 * Resets current health and mana to their 
+	 * maximum values.
+	 */
+	public void rest() {
+		currentHealth = maxHealth;
+		currentMana = maxMana;
 	}
 	
-	public void exitCombat() {
-		
+	public boolean isDead() {
+		return currentHealth <= 0;
+	}
+	
+	public void startCombat() {
+		buffs.reset();
+	}
+	
+	public int getBaseVitae() {
+		return stats.vitae;
+	}
+	
+	public int getBaseFocus() {
+		return stats.focus;
+	}
+	
+	public int getBaseMagicAtk() {
+		return stats.magicPower;
+	}
+	
+	public int getBaseMagicDef() {
+		return stats.magicResistance;
+	}
+	
+	public int getBasePhysAtk() {
+		return stats.physPenetration;
+	}
+	
+	public int getBasePhysDef() {
+		return stats.physResistance;
+	}
+	
+	public int getBaseSpeed() {
+		return stats.speed;
+	}
+	
+	public int getCurrentVitae() {
+		return stats.vitae;
+	}
+	
+	public int getCurrentFocus() {
+		return stats.focus;
+	}
+	
+	public int getCurrentMagicAtk() {
+		return (int) (stats.magicPower * buffs.getMagicPowerMultiplier());
+	}
+	
+	public int getCurrentMagicDef() {
+		return (int) (stats.magicResistance * buffs.getMagicResMultiplier());
+	}
+	
+	public int getCurrentPhysAtk() {
+		return (int) (stats.physPenetration * buffs.getPhysPowerMultiplier());
+	}
+	
+	public int getCurrentPhysDef() {
+		return (int) (stats.physResistance * buffs.getPhysResMultiplier());
+	}
+	
+	public int getCurrentSpeed() {
+		return (int) (stats.speed * buffs.getSpeedMultiplier());
 	}
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

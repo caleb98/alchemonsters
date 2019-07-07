@@ -16,4 +16,21 @@ public class CreatureTeam {
 		return creatures[active];
 	}
 	
+	public void startCombat() {
+		for(Creature c : creatures) {
+			if(c != null) {
+				c.startCombat();
+			}
+		}
+	}
+	
+	public boolean isDefeated() {
+		for(Creature c : creatures) {
+			if(c != null && !c.isDead()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 }

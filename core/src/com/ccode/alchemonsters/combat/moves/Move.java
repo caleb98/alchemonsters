@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters.combat;
+package com.ccode.alchemonsters.combat.moves;
 
 import com.ccode.alchemonsters.creature.ElementType;
 
@@ -26,7 +26,7 @@ public class Move {
 	public int critStage;
 	public ElementType elementType;
 	public MoveType moveType;
-	public IMoveAction[] actions;
+	public MoveAction[] actions;
 
 	public int priority;
 	public TurnType turnType;
