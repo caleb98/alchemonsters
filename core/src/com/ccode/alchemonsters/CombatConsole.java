@@ -6,9 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Subscriber;
+import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
+import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
+import com.ccode.alchemonsters.engine.event.messages.MCombatStatBuffApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 
@@ -32,6 +35,9 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 		subscribe(MCombatStarted.ID);
 		subscribe(MCombatStateChanged.ID);
 		subscribe(MCombatTeamActiveChanged.ID);
+		subscribe(MCombatStatBuffApplied.ID);
+		subscribe(MCombatAilmentApplied.ID);
+		subscribe(MCombatAilmentRemoved.ID);
 	}
 	
 	@Override
@@ -47,12 +53,12 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 						damageText = String.format("%s dealt %s %s damage to %s%s", 
 								damage.source.personalName, 
 								damage.amount, 
-								damage.move.elementType, 
+								damage.elementType, 
 								damage.target.personalName, 
 								damage.isCrit ? " (CRIT!)" : ".");
 					}
 					else {
-						damageText = String.format("%s attacked with %s, but missed!", damage.source.personalName, damage.move.name);
+						damageText = String.format("%s attacked with %s, but missed!", damage.source.personalName, damage.cause);
 					}
 					println(damageText);
 			 }
@@ -91,6 +97,30 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 				 println(String.format("Switched from %s to %s.", 
 						 full.team.creatures[full.prevActive].personalName, 
 						 full.team.creatures[full.nextActive].personalName));
+			 }
+			 else if(m instanceof MCombatStatBuffApplied) {
+				 MCombatStatBuffApplied full = (MCombatStatBuffApplied) m;
+				 println(String.format("%s buffed %s's %s stat by %s.", 
+						 full.source.personalName,
+						 full.target.personalName,
+						 full.statBuffed,
+						 full.buffAmt));
+			 }
+			 else if(m instanceof MCombatAilmentApplied) {
+				 MCombatAilmentApplied full = (MCombatAilmentApplied) m;
+				 println(String.format("%s's %s applied %s to %s.", 
+						 full.source.personalName,
+						 full.cause,
+						 full.ailmentName,
+						 full.target.personalName));
+			 }
+			 else if(m instanceof MCombatAilmentRemoved) {
+				 MCombatAilmentRemoved full = (MCombatAilmentRemoved) m;
+				 println(String.format("%s's %s (caused by %s) was removed from %s.",
+						 full.source.personalName,
+						 full.ailmentName,
+						 full.cause,
+						 full.target.personalName));
 			 }
 		}
 	}

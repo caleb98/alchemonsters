@@ -3,7 +3,7 @@ package com.ccode.alchemonsters.creature;
 import com.ccode.alchemonsters.combat.Catalyst;
 import com.ccode.alchemonsters.combat.PassiveAbility;
 import com.ccode.alchemonsters.combat.StatBuffs;
-import com.ccode.alchemonsters.combat.StatusAilment;
+import com.ccode.alchemonsters.combat.ailments.StatusAilment;
 
 public class Creature {
 

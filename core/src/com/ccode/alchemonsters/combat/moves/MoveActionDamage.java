@@ -12,7 +12,7 @@ public class MoveActionDamage implements MoveAction {
 	public static final float STAB_MULTIPLIER = 1.5f;
 	
 	public MoveTarget target;
-	
+	public int power;
 	public float accuracy;
 	
 	@Override
@@ -46,24 +46,26 @@ public class MoveActionDamage implements MoveAction {
 			case OPPONENT:
 				int damage = getDamageAgainst(move, source, target, isCrit, isStab);
 				target.currentHealth -= damage;
-				publish(new MCombatDamageDealt(context, source, target, move, damage, isHit, isCrit));
+				publish(new MCombatDamageDealt(context, source, target, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
 				
 			case OPPONENT_TEAM:
+				//TODO: team damage
 				break;
 				
 			case SELF:
+				//TODO: self damage 
 				break;
 				
 			case SELF_TEAM:
+				//TODO: self team damage
 				break;
 			
 			}
 		}
 	}
 	
-	private static int getDamageAgainst(Move move, Creature source, Creature target, boolean isCrit, boolean isStab) {
-		int power = move.power;
+	private int getDamageAgainst(Move move, Creature source, Creature target, boolean isCrit, boolean isStab) {
 		float attackDefenseRatio = (move.moveType == MoveType.MAGIC) ?
 				source.getCurrentMagicAtk() / target.getCurrentMagicDef() :
 				source.getCurrentPhysAtk() / target.getCurrentPhysDef();

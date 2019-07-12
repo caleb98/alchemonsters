@@ -2,9 +2,9 @@ package com.ccode.alchemonsters.combat;
 
 import java.util.ArrayList;
 
-import com.ccode.alchemonsters.engine.event.Publisher;
+import com.ccode.alchemonsters.creature.Creature;
 
-public class BattleContext implements Publisher {
+public class BattleContext {
 	
 	public CombatState currentState;
 	
@@ -17,6 +17,19 @@ public class BattleContext implements Publisher {
 	public ArrayList<BattleAction> teamBActions;
 	
 	public Battleground battleground;
+	
+	public void update() {
+		for(Creature c : teamA.creatures) {
+			if(c != null && c.currentAilment != null	) {
+				c.currentAilment.update();
+			}
+		}
+		for(Creature c : teamB.creatures) {
+			if(c != null && c.currentAilment != null	) {
+				c.currentAilment.update();
+			}
+		}
+	}
 	
 }
 

@@ -21,7 +21,6 @@ public class Move {
 	public String name;
 	public String desc;
 	public float accuracy;
-	public int power;
 	public int manaCost;
 	public int critStage;
 	public ElementType elementType;

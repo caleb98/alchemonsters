@@ -1,83 +1,166 @@
 package com.ccode.alchemonsters.combat;
 
+import com.ccode.alchemonsters.creature.StatType;
+
 public class StatBuffs {
 
-	public byte magicPower = 0;
-	public byte magicPenetration = 0;
-	public byte magicResistance = 0;
-	public byte physPower = 0;
-	public byte physPenetration = 0;
-	public byte physResistance = 0;
-	public byte speed = 0;
+	private static final int MAX_BUFF_AMOUNT = 6;
+	private static final float REDUCTION_STRENGTH = 1.5f;
+	private static final float INCREASE_STRENGTH = 0.35f;
+	
+	private byte magicPower = 0;
+	private byte magicPenetration = 0;
+	private byte magicResistance = 0;
+	private byte physPower = 0;
+	private byte physPenetration = 0;
+	private byte physResistance = 0;
+	private byte speed = 0;
 	
 	public float getMagicPowerMultiplier() {
-		return 1 + (magicPower * 0.5f);
+		if(magicPower < 0) {
+			return (float) Math.pow(REDUCTION_STRENGTH, magicPower);
+		}
+		else {
+			return 1 + (magicPower * INCREASE_STRENGTH);
+		}
 	}
 	
 	public float getMagicPenMultiplier() {
-		return 1 + (magicPenetration * 0.5f);
+		if(magicPenetration < 0) {
+			return (float) Math.pow(REDUCTION_STRENGTH, magicPenetration);
+		}
+		else {
+			return 1 + (magicPenetration * INCREASE_STRENGTH);
+		}
 	}
 	
 	public float getMagicResMultiplier() {
-		return 1 + (magicResistance * 0.5f);
+		if(magicResistance < 0) {
+			return (float) Math.pow(REDUCTION_STRENGTH, magicResistance);
+		}
+		else {
+			return 1 + (magicResistance * INCREASE_STRENGTH);
+		}
 	}
 	
 	public float getPhysPowerMultiplier() {
-		return 1 + (physPower * 0.5f);
+		if(physPower < 0) {
+			return (float) Math.pow(REDUCTION_STRENGTH, physPower);
+		}
+		else {
+			return 1 + (physPower * INCREASE_STRENGTH);
+		}
 	}
 	
 	public float getPhysPenMultiplier() {
-		return 1 + (physPenetration * 0.5f);
+		if(physPenetration < 0) {
+			return (float) Math.pow(REDUCTION_STRENGTH, physPenetration);
+		}
+		else {
+			return 1 + (physPenetration * INCREASE_STRENGTH);
+		}
 	}
 	
 	public float getPhysResMultiplier() {
-		return 1 + (physResistance * 0.5f);
+		if(physResistance < 0) {
+			return (float) Math.pow(REDUCTION_STRENGTH, physResistance);
+		}
+		else {
+			return 1 + (physResistance * INCREASE_STRENGTH);
+		}
 	}
 	
 	public float getSpeedMultiplier() {
-		return 1 + (speed * 0.5f);
+		if(speed < 0) {
+			return (float) Math.pow(REDUCTION_STRENGTH, speed);
+		}
+		else {
+			return 1 + (speed * INCREASE_STRENGTH);
+		}
 	}
 	
 	public void addMagicPowerBuff(byte amt) {
 		magicPower += amt;
-		if(magicPower > 6) magicPower = 6;
-		if(magicPower < -6) magicPower = -6;
+		if(magicPower > MAX_BUFF_AMOUNT) magicPower = MAX_BUFF_AMOUNT;
+		if(magicPower < -MAX_BUFF_AMOUNT) magicPower = -MAX_BUFF_AMOUNT;
 	}
 	
 	public void addMagicPenBuff(byte amt) {
 		magicPenetration += amt;
-		if(magicPenetration > 6) magicPenetration = 6;
-		if(magicPenetration < -6) magicPenetration = -6;
+		if(magicPenetration > MAX_BUFF_AMOUNT) magicPenetration = MAX_BUFF_AMOUNT;
+		if(magicPenetration < -MAX_BUFF_AMOUNT) magicPenetration = -MAX_BUFF_AMOUNT;
 	}
 	
 	public void addMagicResBuff(byte amt) {
 		magicResistance += amt;
-		if(magicResistance > 6) magicResistance = 6;
-		if(magicResistance < -6) magicResistance = -6;
+		if(magicResistance > MAX_BUFF_AMOUNT) magicResistance = MAX_BUFF_AMOUNT;
+		if(magicResistance < -MAX_BUFF_AMOUNT) magicResistance = -MAX_BUFF_AMOUNT;
 	}
 	
 	public void addPhysPowerBuff(byte amt) {
 		physPower += amt;
-		if(physPower > 6) physPower = 6;
-		if(physPower < -6) physPower= -6;
+		if(physPower > MAX_BUFF_AMOUNT) physPower = MAX_BUFF_AMOUNT;
+		if(physPower < -MAX_BUFF_AMOUNT) physPower= -MAX_BUFF_AMOUNT;
 	}
 	
 	public void addPhysPenBuff(byte amt) {
 		physPenetration += amt;
-		if(physPenetration > 6) physPenetration = 6;
-		if(physPenetration < -6) physPenetration = -6;
+		if(physPenetration > MAX_BUFF_AMOUNT) physPenetration = MAX_BUFF_AMOUNT;
+		if(physPenetration < -MAX_BUFF_AMOUNT) physPenetration = -MAX_BUFF_AMOUNT;
 	}
 	
 	public void addPhysResBuff(byte amt) {
 		physResistance += amt;
-		if(physResistance > 6) physResistance = 6;
-		if(physResistance < -6) physResistance= -6;
+		if(physResistance > MAX_BUFF_AMOUNT) physResistance = MAX_BUFF_AMOUNT;
+		if(physResistance < -MAX_BUFF_AMOUNT) physResistance= -MAX_BUFF_AMOUNT;
 	}
 	
 	public void addSpeedBuff(byte amt) {
 		speed += amt;
-		if(speed > 6) speed = 6;
-		if(speed < -6) speed = -6;
+		if(speed > MAX_BUFF_AMOUNT) speed = MAX_BUFF_AMOUNT;
+		if(speed < -MAX_BUFF_AMOUNT) speed = -MAX_BUFF_AMOUNT;
+	}
+	
+	public void addBuff(byte amt, StatType stat) {
+		switch(stat) {
+		
+		case FOCUS:
+			//TODO: log error
+			break;
+			
+		case MAGIC_PENETRATION:
+			addMagicPenBuff(amt);
+			break;
+			
+		case MAGIC_POWER:
+			addMagicPowerBuff(amt);
+			break;
+			
+		case MAGIC_RESISTANCE:
+			addMagicResBuff(amt);
+			break;
+			
+		case PHYS_PENETRATION:
+			addPhysPenBuff(amt);
+			break;
+			
+		case PHYS_POWER:
+			addPhysPowerBuff(amt);
+			break;
+			
+		case PHYS_RESISTANCE:
+			addPhysResBuff(amt);
+			break;
+			
+		case SPEED:
+			addSpeedBuff(amt);
+			break;
+			
+		case VITAE:
+			//TODO: log error
+			break;
+		
+		}
 	}
 	
 	public void reset() {

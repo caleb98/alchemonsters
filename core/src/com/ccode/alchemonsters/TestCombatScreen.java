@@ -79,6 +79,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	
 	//Combat event and state variables
 	private BattleContext battleContext;
+	private boolean isCombat = false;
 	
 	private BattleController teamAControl;
 	private CreatureTeam teamA;
@@ -264,6 +265,11 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		teamA.startCombat();
 		teamB.startCombat();
 		
+		battleContext.teamA = teamA;
+		battleContext.teamB = teamB;
+		
+		isCombat = true;
+		
 		//Reset health and mana values
 		for(Creature c : teamA.creatures) {
 			if(c != null) c.rest();
@@ -359,6 +365,10 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			}
 		}
 		
+		if(isCombat) {
+			battleContext.update();
+		}
+		
 		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
@@ -435,10 +445,12 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		
 		if(teamA.isDefeated()) {
 			publish(new MCombatFinished(battleContext, teamB, teamA));
+			isCombat = false;
 			return;
 		}
 		else if(teamB.isDefeated()) {
 			publish(new MCombatFinished(battleContext, teamA, teamB));
+			isCombat = false;
 			return;
 		}
 		

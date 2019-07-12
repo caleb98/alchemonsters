@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import com.badlogic.gdx.utils.Json;
-
 public class EventManager {
 	
 	private static final LinkedList<Message> messageQueue = new LinkedList<>();
@@ -14,9 +12,7 @@ public class EventManager {
 	private static boolean isDeInitRequested = false;
 	
 	public static void init() {
-		Thread eventManagerThread = new Thread(()->{
-			Json json = new Json();
-			
+		Thread eventManagerThread = new Thread(()->{			
 			synchronized(messageQueue) {
 				while(!isDeInitRequested) {
 					while(messageQueue.size() == 0) {
@@ -26,7 +22,7 @@ public class EventManager {
 					}
 					Message currentMessage;
 					while((currentMessage = messageQueue.poll()) != null) {
-						System.out.println("[EventManager] Message received: " + json.toJson(currentMessage));
+						System.out.println("[EventManager] Message received: " + currentMessage.id);
 						Set<Subscriber> subs = subscribers.get(currentMessage.id);
 						if(subs != null) {
 							for(Subscriber s : subs) {

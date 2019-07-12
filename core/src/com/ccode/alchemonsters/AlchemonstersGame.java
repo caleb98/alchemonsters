@@ -2,7 +2,7 @@ package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.ccode.alchemonsters.combat.StatusAilmentDictionary;
+import com.ccode.alchemonsters.combat.ailments.StatusAilmentDictionary;
 import com.ccode.alchemonsters.combat.moves.MoveDictionary;
 import com.ccode.alchemonsters.creature.CreatureDictionary;
 import com.ccode.alchemonsters.engine.event.EventManager;
