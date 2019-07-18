@@ -10,7 +10,17 @@
 		{
 			class: "Damage",
 			target: "OPPONENT",
-			power: 10
+			power: 5
+		},
+		{
+			class: "Damage",
+			target: "OPPONENT",
+			power: 5
+		},
+		{
+			class: "Damage",
+			target: "OPPONENT",
+			power: 5
 		}
 	],
 	turnType: "INSTANT",

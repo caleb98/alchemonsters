@@ -44,7 +44,7 @@ public class MoveActionDamage implements MoveAction {
 			switch(this.target) {
 			
 			case OPPONENT:
-				int damage = getDamageAgainst(move, source, target, isCrit, isStab);
+				int damage = getDamageAgainst(move, source, target, power, isCrit, isStab);
 				target.currentHealth -= damage;
 				publish(new MCombatDamageDealt(context, source, target, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
@@ -65,15 +65,18 @@ public class MoveActionDamage implements MoveAction {
 		}
 	}
 	
-	private int getDamageAgainst(Move move, Creature source, Creature target, boolean isCrit, boolean isStab) {
-		float attackDefenseRatio = (move.moveType == MoveType.MAGIC) ?
-				source.getCurrentMagicAtk() / target.getCurrentMagicDef() :
-				source.getCurrentPhysAtk() / target.getCurrentPhysDef();
-				
-		float min = ((float) (power * source.getCurrentMagicAtk()) / 32f + 1) * attackDefenseRatio * 0.8f;
-		float max = ((float) (power * source.getCurrentMagicAtk()) / 32f + 1) * attackDefenseRatio * 1.2f;
-		float actual = min + GameRandom.nextFloat() * (max - min);
+	private int getDamageAgainst(Move move, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
+		float sourceAttack = move.moveType == MoveType.MAGIC ? source.getBuffedMagicAtk() : source.getBuffedPhysAtk();
+		float targetDefense = move.moveType == MoveType.MAGIC ? target.getBuffedMagicDef() : target.getBuffedPhysDef();	
 		
+		float rawDamage = ((200 + (sourceAttack)) * 2 * power) / 200f;
+		
+		float defenseReduction = rawDamage * (targetDefense / (targetDefense + 0.5f * rawDamage)) + (targetDefense * power) / 1500f;
+		float penResRatio = source.getBuffedPen() / (float) target.getBuffedRes();
+		
+		float actual = Math.max((rawDamage - defenseReduction) * penResRatio, 1);
+		
+		//TODO: apply these buffs before defenses?
 		//TODO: variable crit multiplier values
 		if(isCrit) {
 			actual *= 1.5f;
@@ -84,9 +87,7 @@ public class MoveActionDamage implements MoveAction {
 			actual *= STAB_MULTIPLIER;
 		}
 		
-		int floored = (int) Math.floor(actual);
-		
-		return floored;
+		return (int) actual;
 	}
 	
 }

@@ -2,27 +2,46 @@ package com.ccode.alchemonsters.creature;
 
 public class CreatureStats {
 
-	public byte vitae;
-	public byte focus;
-	public byte magicPower;
-	public byte magicPenetration;
-	public byte magicResistance;
-	public byte physPower;
-	public byte physPenetration;
-	public byte physResistance;
-	public byte speed;
+	/**
+	 * Determines maximum HP
+	 */
+	public int vitae; 
+	/**
+	 * Determines maximum MP
+	 */
+	public int focus;
+	/**
+	 * Determines damage for magic attacks
+	 */
+	public int magicAtk;
+	/**
+	 * Determines mitigation for magic attacks
+	 */
+	public int magicDef;
+	/**
+	 * Determines damage for physical attacks
+	 */
+	public int physAtk;
+	/**
+	 * Determines mitigation for physical attacks
+	 */
+	public int physDef;
 	
-	public CreatureStats(byte vitae, byte focus, 
-			byte magicPower, byte magicPenetration, byte magicResistance, 
-			byte physPower, byte physPenetration,  byte physResistance, byte speed) {
+	public int penetration;
+	public int resistance;
+	public int speed;
+	
+	public CreatureStats(int vitae, int focus, 
+					     int magicAtk, int magicDef,
+					     int physAtk, int physDef, 
+					     int penetration, int resistance, 
+					     int speed) {
 		this.vitae = vitae;
 		this.focus = focus;
-		this.magicPower = magicPower;
-		this.magicPenetration = magicPenetration;
-		this.magicResistance = magicResistance;
-		this.physPower = physPower;
-		this.physPenetration = physPenetration;
-		this.physResistance = physResistance;
+		this.magicAtk = magicAtk;
+		this.magicDef = magicDef;
+		this.physAtk = physAtk;
+		this.physDef = physDef;
 		this.speed = speed;
 	}
 	

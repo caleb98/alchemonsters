@@ -34,12 +34,12 @@ public class CreatureEditWindow extends Window {
 	
 	private TextField vitaeEdit;
 	private TextField focusEdit;
-	private TextField magicPowerEdit;
-	private TextField magicPenEdit;
-	private TextField magicResistEdit;
-	private TextField physPowerEdit;
-	private TextField physPenEdit;
-	private TextField physResistEdit;
+	private TextField magicAtkEdit;
+	private TextField magicDefEdit;
+	private TextField physAtkEdit;
+	private TextField physDefEdit;
+	private TextField penetrationEdit;
+	private TextField resistanceEdit;
 	private TextField speedEdit;
 	
 	private SelectBox<StatType> positiveNature;
@@ -104,36 +104,41 @@ public class CreatureEditWindow extends Window {
 		add(baseManaLabel, baseManaSlider, baseManaDisplay);
 		row();
 		
+		add(new Label("", UI.DEFAULT_SKIN));
+		row();
+		add(new Label("Attunement Values (=IVs)", UI.DEFAULT_SKIN));
+		row();
+		
 		Label vitaeLabel = new Label("Vitae: ", UI.DEFAULT_SKIN);
 		vitaeEdit = new TextField("16", UI.DEFAULT_SKIN);
 		Label focusLabel = new Label("Focus: ", UI.DEFAULT_SKIN);
 		focusEdit = new TextField("16", UI.DEFAULT_SKIN);
-		Label magicATKLabel = new Label("Magic Power: ", UI.DEFAULT_SKIN);
-		magicPowerEdit = new TextField("16", UI.DEFAULT_SKIN);
-		Label magicPenLabel = new Label("Magic Pen: ", UI.DEFAULT_SKIN);
-		magicPenEdit = new TextField("16", UI.DEFAULT_SKIN);
-		Label magicDEFLabel = new Label("Magic Resist: ", UI.DEFAULT_SKIN);
-		magicResistEdit = new TextField("16", UI.DEFAULT_SKIN);
-		Label physATKLabel = new Label("Phys Power: ", UI.DEFAULT_SKIN);
-		physPowerEdit = new TextField("16", UI.DEFAULT_SKIN);
-		Label physPenLabel = new Label("Phys Pen: ", UI.DEFAULT_SKIN);
-		physPenEdit = new TextField("16", UI.DEFAULT_SKIN);
-		Label physDEFLabel = new Label("Phys Resist: ", UI.DEFAULT_SKIN);
-		physResistEdit = new TextField("16", UI.DEFAULT_SKIN);
+		Label magicAtkLabel = new Label("Magic Atk: ", UI.DEFAULT_SKIN);
+		magicAtkEdit = new TextField("16", UI.DEFAULT_SKIN);
+		Label magicDefLabel = new Label("Magic Def: ", UI.DEFAULT_SKIN);
+		magicDefEdit = new TextField("16", UI.DEFAULT_SKIN);
+		Label physAtkLabel = new Label("Phys Atk: ", UI.DEFAULT_SKIN);
+		physAtkEdit = new TextField("16", UI.DEFAULT_SKIN);
+		Label physDefLabel = new Label("Phys Def: ", UI.DEFAULT_SKIN);
+		physDefEdit = new TextField("16", UI.DEFAULT_SKIN);
+		Label penetrationLabel = new Label("Penetration: ", UI.DEFAULT_SKIN);
+		penetrationEdit = new TextField("16", UI.DEFAULT_SKIN);
+		Label resistanceLabel = new Label("Resistance: ", UI.DEFAULT_SKIN);
+		resistanceEdit = new TextField("16", UI.DEFAULT_SKIN);
 		Label speedLabel = new Label("Speed: ", UI.DEFAULT_SKIN);
 		speedEdit = new TextField("16", UI.DEFAULT_SKIN);
 		
 		add(vitaeLabel, vitaeEdit);
 		add(focusLabel, focusEdit);
 		row();
-		add(magicATKLabel, magicPowerEdit);
-		add(physATKLabel, physPowerEdit);
+		add(magicAtkLabel, magicAtkEdit);
+		add(physDefLabel, physDefEdit);
 		row();
-		add(magicPenLabel, magicPenEdit);
-		add(physPenLabel, physPenEdit);
+		add(magicDefLabel, magicDefEdit);
+		add(penetrationLabel, penetrationEdit);
 		row();
-		add(magicDEFLabel, magicResistEdit);
-		add(physDEFLabel, physResistEdit);
+		add(physAtkLabel, physAtkEdit);
+		add(resistanceLabel, resistanceEdit);
 		row();
 		add(speedLabel, speedEdit);
 		row();
@@ -152,9 +157,15 @@ public class CreatureEditWindow extends Window {
 		negativeNature = new SelectBox<>(UI.DEFAULT_SKIN);
 		negativeNature.setItems(StatType.values());
 
+		add(new Label("", UI.DEFAULT_SKIN));
+		row();
+		add(new Label("Nature Selection", UI.DEFAULT_SKIN));
+		row();
 		add(positiveNatureLabel, positiveNature);
 		row();
 		add(negativeNatureLabel, negativeNature);
+		row();
+		add(new Label("", UI.DEFAULT_SKIN));
 		row();
 		
 		Table moveButtons = new Table(UI.DEFAULT_SKIN);
@@ -204,12 +215,12 @@ public class CreatureEditWindow extends Window {
 					CreatureStats stats = new CreatureStats(
 							Byte.parseByte(vitaeEdit.getText()), 
 							Byte.parseByte(focusEdit.getText()), 
-							Byte.parseByte(magicPowerEdit.getText()), 
-							Byte.parseByte(magicPenEdit.getText()),
-							Byte.parseByte(magicResistEdit.getText()), 
-							Byte.parseByte(physPowerEdit.getText()),
-							Byte.parseByte(physPenEdit.getText()),
-							Byte.parseByte(physResistEdit.getText()), 
+							Byte.parseByte(magicAtkEdit.getText()), 
+							Byte.parseByte(magicDefEdit.getText()),
+							Byte.parseByte(physAtkEdit.getText()), 
+							Byte.parseByte(physDefEdit.getText()),
+							Byte.parseByte(penetrationEdit.getText()),
+							Byte.parseByte(resistanceEdit.getText()), 
 							Byte.parseByte(speedEdit.getText())
 					);
 					CreatureNature nature = new CreatureNature(positiveNature.getSelected(), negativeNature.getSelected());
@@ -302,13 +313,15 @@ public class CreatureEditWindow extends Window {
 			positiveNature.setSelected(c.nature.increased);
 			negativeNature.setSelected(c.nature.decreased);
 			
-			vitaeEdit.setText(String.valueOf(c.getBaseVitae()));
-			focusEdit.setText(String.valueOf(c.getBaseFocus()));
-			magicPowerEdit.setText(String.valueOf(c.getBaseMagicAtk()));
-			magicResistEdit.setText(String.valueOf(c.getBaseMagicDef()));
-			physPowerEdit.setText(String.valueOf(c.getBasePhysAtk()));
-			physResistEdit.setText(String.valueOf(c.getBasePhysDef()));
-			speedEdit.setText(String.valueOf(c.getBaseSpeed()));
+			vitaeEdit.setText(String.valueOf(c.getAttunementValue(StatType.VITAE)));
+			focusEdit.setText(String.valueOf(c.getAttunementValue(StatType.FOCUS)));
+			magicAtkEdit.setText(String.valueOf(c.getAttunementValue(StatType.MAGIC_ATK)));
+			magicDefEdit.setText(String.valueOf(c.getAttunementValue(StatType.MAGIC_DEF)));
+			physAtkEdit.setText(String.valueOf(c.getAttunementValue(StatType.PHYS_ATK)));
+			physDefEdit.setText(String.valueOf(c.getAttunementValue(StatType.PHYS_DEF)));
+			penetrationEdit.setText(String.valueOf(c.getAttunementValue(StatType.PENETRATION)));
+			resistanceEdit.setText(String.valueOf(c.getAttunementValue(StatType.RESISTANCE)));
+			speedEdit.setText(String.valueOf(c.getAttunementValue(StatType.SPEED)));
 	
 			movesActiveList.setItems(c.moves);
 		}
@@ -337,10 +350,10 @@ public class CreatureEditWindow extends Window {
 		
 		vitaeEdit.setText("16");
 		focusEdit.setText("16");
-		magicPowerEdit.setText("16");
-		magicResistEdit.setText("16");
-		physPowerEdit.setText("16");
-		physResistEdit.setText("16");
+		magicAtkEdit.setText("16");
+		physAtkEdit.setText("16");
+		physDefEdit.setText("16");
+		resistanceEdit.setText("16");
 		speedEdit.setText("16");
 		
 		movesActiveList.setItems();

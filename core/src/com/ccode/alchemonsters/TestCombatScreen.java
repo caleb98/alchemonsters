@@ -338,7 +338,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 					break;
 					
 				case END_PHASE:
-					//TODO: end phase stuff?
+					//TODO: if creature has died allow selection of new mon
 					setCombatState(CombatState.MAIN_PHASE_1);
 					break;
 					
@@ -414,8 +414,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			int teamBOrder = teamBMove.priority;
 			
 			if(teamAOrder == teamBOrder) {
-				teamAOrder = teamA.active().getCurrentSpeed();
-				teamBOrder = teamB.active().getCurrentSpeed();
+				teamAOrder = teamA.active().getBuffedSpeed();
+				teamBOrder = teamB.active().getBuffedSpeed();
 			}
 			
 			if(teamAOrder == teamBOrder) {

@@ -7,10 +7,13 @@ import com.ccode.alchemonsters.combat.ailments.StatusAilment;
 
 public class Creature {
 
+	private static final int LEVEL_ONE_STAT_VALUE = 5;
+	
 	public String personalName;
 	public CreatureBase base;
 	public CreatureNature nature;
-	private CreatureStats stats;
+	private CreatureStats attunementValues;
+	private CreatureStats experienceValues;
 	public int baseHealth;
 	public int baseMana;
 	
@@ -44,14 +47,16 @@ public class Creature {
 	 * and stats.
 	 * @param base
 	 * @param nature
-	 * @param stats
+	 * @param attunementValues
 	 */
-	public Creature(CreatureBase base, CreatureNature nature, CreatureStats stats, int baseHealth, int baseMana) {
+	public Creature(CreatureBase base, CreatureNature nature, CreatureStats attunementValues, int baseHealth, int baseMana) {
 		this.base = base;
 		this.nature = nature;
-		this.stats = stats;
+		this.attunementValues = attunementValues;
 		this.baseHealth = baseHealth;
 		this.baseMana = baseMana;
+		
+		experienceValues = new CreatureStats(0, 0, 0, 0, 0, 0, 0, 0, 0);
 		
 		personalName = base.name;
 		moves = new String[4];
@@ -66,11 +71,17 @@ public class Creature {
 	
 	public void calcDerivedStats() {
 		int healthDif = base.maxBaseHealth - base.minBaseHealth;
-		maxHealth = (int) (baseHealth + (currentLevel * (healthDif / 5f)) + (currentLevel * (stats.vitae / 20f)));
+		maxHealth = (int) (baseHealth + 
+				           (currentLevel * (healthDif / 5f)) + 
+				           (currentLevel * (attunementValues.vitae / 20f)) +
+				           (currentLevel * (experienceValues.vitae / 20f)));
 		currentHealth = maxHealth;
 		
 		int manaDif = base.maxBaseMana - base.minBaseMana;
-		maxMana = (int) (baseMana + (currentLevel * (manaDif / 5f)) + (currentLevel * (stats.focus / 20f)));
+		maxMana = (int) (baseMana + 
+				         (currentLevel * (manaDif / 5f)) + 
+				         (currentLevel * (attunementValues.focus / 20f)) +
+				         (currentLevel * (experienceValues.vitae / 20f)));
 		currentMana = maxMana;
 	}
 	
@@ -91,60 +102,97 @@ public class Creature {
 		buffs.reset();
 	}
 	
-	public int getBaseVitae() {
-		return stats.vitae;
+	public int getBuffedMagicAtk() {
+		return (int) ((LEVEL_ONE_STAT_VALUE + 
+				      (base.baseMagicAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+				      (currentLevel / 100f) * attunementValues.magicAtk +
+				      (currentLevel / 100f) * experienceValues.magicAtk)
+					  * buffs.getMagicAtkMultiplier());
 	}
 	
-	public int getBaseFocus() {
-		return stats.focus;
+	public int getBuffedMagicDef() {
+		return (int) ((LEVEL_ONE_STAT_VALUE + 
+				      (base.baseMagicDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+				      (currentLevel / 100f) * attunementValues.magicDef +
+				      (currentLevel / 100f) * experienceValues.magicDef)
+					  * buffs.getMagicDefMultiplier());
 	}
 	
-	public int getBaseMagicAtk() {
-		return stats.magicPower;
+	public int getBuffedPhysAtk() {
+		return (int) ((LEVEL_ONE_STAT_VALUE + 
+				      (base.basePhysAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+				      (currentLevel / 100f) * attunementValues.physAtk +
+				      (currentLevel / 100f) * experienceValues.physAtk)
+					  * buffs.getPhysAtkMultiplier());
 	}
 	
-	public int getBaseMagicDef() {
-		return stats.magicResistance;
+	public int getBuffedPhysDef() {
+		return (int) ((LEVEL_ONE_STAT_VALUE + 
+				      (base.basePhysDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+				      (currentLevel / 100f) * attunementValues.physDef +
+				      (currentLevel / 100f) * experienceValues.physDef)
+					  * buffs.getPhysDefMultiplier());
 	}
 	
-	public int getBasePhysAtk() {
-		return stats.physPenetration;
+
+	public int getBuffedPen() {
+		return (int) ((LEVEL_ONE_STAT_VALUE + 
+			      (base.basePenetration - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+			      (currentLevel / 100f) * attunementValues.penetration +
+			      (currentLevel / 100f) * experienceValues.penetration)
+				  * buffs.getPenMultiplier());
 	}
 	
-	public int getBasePhysDef() {
-		return stats.physResistance;
+	public int getBuffedRes() {
+		return (int) ((LEVEL_ONE_STAT_VALUE + 
+				      (base.baseResistance - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+				      (currentLevel / 100f) * attunementValues.resistance +
+				      (currentLevel / 100f) * experienceValues.resistance)
+					  * buffs.getResMultiplier());
 	}
 	
-	public int getBaseSpeed() {
-		return stats.speed;
+	public int getBuffedSpeed() {
+		return (int) ((LEVEL_ONE_STAT_VALUE + 
+			      (base.baseSpeed - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+			      (currentLevel / 100f) * attunementValues.speed +
+			      (currentLevel / 100f) * experienceValues.speed)
+				  * buffs.getSpeedMultiplier());
 	}
 	
-	public int getCurrentVitae() {
-		return stats.vitae;
-	}
-	
-	public int getCurrentFocus() {
-		return stats.focus;
-	}
-	
-	public int getCurrentMagicAtk() {
-		return (int) (stats.magicPower * buffs.getMagicPowerMultiplier());
-	}
-	
-	public int getCurrentMagicDef() {
-		return (int) (stats.magicResistance * buffs.getMagicResMultiplier());
-	}
-	
-	public int getCurrentPhysAtk() {
-		return (int) (stats.physPenetration * buffs.getPhysPowerMultiplier());
-	}
-	
-	public int getCurrentPhysDef() {
-		return (int) (stats.physResistance * buffs.getPhysResMultiplier());
-	}
-	
-	public int getCurrentSpeed() {
-		return (int) (stats.speed * buffs.getSpeedMultiplier());
+	public int getAttunementValue(StatType stat) {
+		switch(stat) {
+		
+		case FOCUS:
+			return attunementValues.focus;
+			
+		case MAGIC_ATK:
+			return attunementValues.magicAtk;
+			
+		case MAGIC_DEF:
+			return attunementValues.magicDef;
+			
+		case PENETRATION:
+			return attunementValues.penetration;
+			
+		case PHYS_ATK:
+			return attunementValues.physAtk;
+					
+		case PHYS_DEF:
+			return attunementValues.physDef;
+			
+		case RESISTANCE:
+			return attunementValues.resistance;
+			
+		case SPEED:
+			return attunementValues.speed;
+			
+		case VITAE:
+			return attunementValues.vitae;
+			
+		default:
+			return -1;	
+		
+		}
 	}
 	
 }
