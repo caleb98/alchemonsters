@@ -572,8 +572,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			if(t.creatures[id] == null) {
 				setText("<empty>");
 			}
-			else if(!t.creatures[id].base.name.equals(getText())) {
-				setText(t.creatures[id].base.name);
+			else if(!t.creatures[id].personalName.equals(getText())) {
+				setText(t.creatures[id].personalName);
 			}
 		}
 		

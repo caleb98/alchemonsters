@@ -27,6 +27,8 @@ import com.ccode.alchemonsters.creature.StatType;
 public class CreatureEditWindow extends Window {
 	
 	private SelectBox<String> creatureSelectBox;
+	private Slider levelSlider;
+	private Label levelDisplay;
 	private Slider baseHealthSlider;
 	private Label baseHealthDisplay;
 	private Slider baseManaSlider;
@@ -76,6 +78,19 @@ public class CreatureEditWindow extends Window {
 		});
 		
 		add(creatureSelectText, creatureSelectBox);
+		row();
+		
+		Label levelLabel = new Label("Level", UI.DEFAULT_SKIN);
+		levelSlider = new Slider(1, 100, 1, false, UI.DEFAULT_SKIN);
+		levelDisplay = new Label("", UI.DEFAULT_SKIN) {
+			@Override
+			public void act(float delta) {
+				super.act(delta);
+				setText((int) levelSlider.getValue());
+			}
+		};
+		
+		add(levelLabel, levelSlider, levelDisplay);
 		row();
 		
 		Label baseHealthLabel = new Label("Base Health", UI.DEFAULT_SKIN);
@@ -232,7 +247,9 @@ public class CreatureEditWindow extends Window {
 						(int) baseManaSlider.getValue()
 					);
 					
+					c.currentLevel = (int) levelSlider.getValue();
 					c.moves = movesActiveList.getItems().toArray(String.class);
+					c.personalName = c.base.name + " (LVL " + c.currentLevel + ")";
 					
 					editedCreature = c;
 					setVisible(false);
@@ -304,6 +321,7 @@ public class CreatureEditWindow extends Window {
 			
 			creatureSelectBox.setSelected(b.id);
 			
+			levelSlider.setValue(c.currentLevel);
 			baseHealthSlider.setRange(b.minBaseHealth, b.maxBaseHealth);
 			baseHealthSlider.setValue(c.baseHealth);
 			
@@ -347,6 +365,8 @@ public class CreatureEditWindow extends Window {
 	
 	private void resetCreatureStatsDisplay() {
 		creatureSelectBox.setSelectedIndex(0);
+		
+		levelSlider.setValue(1);
 		
 		vitaeEdit.setText("16");
 		focusEdit.setText("16");

@@ -69,7 +69,7 @@ public class MoveActionDamage implements MoveAction {
 		float sourceAttack = move.moveType == MoveType.MAGIC ? source.getBuffedMagicAtk() : source.getBuffedPhysAtk();
 		float targetDefense = move.moveType == MoveType.MAGIC ? target.getBuffedMagicDef() : target.getBuffedPhysDef();	
 		
-		float rawDamage = ((200 + (sourceAttack)) * 2 * power) / 200f;
+		float rawDamage = ((200 + (sourceAttack - 200)) * 2.9f * power) / 200f;
 		
 		float defenseReduction = rawDamage * (targetDefense / (targetDefense + 0.5f * rawDamage)) + (targetDefense * power) / 1500f;
 		float penResRatio = source.getBuffedPen() / (float) target.getBuffedRes();

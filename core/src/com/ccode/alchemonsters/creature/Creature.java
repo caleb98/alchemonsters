@@ -72,16 +72,18 @@ public class Creature {
 	public void calcDerivedStats() {
 		int healthDif = base.maxBaseHealth - base.minBaseHealth;
 		maxHealth = (int) (baseHealth + 
-				           (currentLevel * (healthDif / 5f)) + 
-				           (currentLevel * (attunementValues.vitae / 20f)) +
-				           (currentLevel * (experienceValues.vitae / 20f)));
+				           (currentLevel * (healthDif / 10f)) + 
+				           (currentLevel * (base.baseVitae / 60f)) +
+				           (currentLevel * (attunementValues.vitae / 15f)) +
+				           (currentLevel * (experienceValues.vitae / 60f)));
 		currentHealth = maxHealth;
 		
 		int manaDif = base.maxBaseMana - base.minBaseMana;
 		maxMana = (int) (baseMana + 
 				         (currentLevel * (manaDif / 5f)) + 
-				         (currentLevel * (attunementValues.focus / 20f)) +
-				         (currentLevel * (experienceValues.vitae / 20f)));
+				         (currentLevel * (base.baseFocus / 60f)) +
+				         (currentLevel * (attunementValues.focus / 15f)) +
+				         (currentLevel * (experienceValues.vitae / 60f)));
 		currentMana = maxMana;
 	}
 	

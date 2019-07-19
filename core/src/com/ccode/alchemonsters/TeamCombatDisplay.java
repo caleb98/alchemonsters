@@ -229,6 +229,7 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 		
 		//Setup inactives
 		if(team.creatures[inactives[0]] != null) {
+			inactive1Name.setText(team.creatures[inactives[0]].personalName);
 			inactive1HP.setRange(0, team.creatures[inactives[0]].maxHealth);
 			inactive1HP.setValue(team.creatures[inactives[0]].currentHealth);
 			inactive1MP.setRange(0, team.creatures[inactives[0]].maxMana);
