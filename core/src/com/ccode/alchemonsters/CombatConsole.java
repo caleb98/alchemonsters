@@ -89,6 +89,10 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 					
 				case MAIN_PHASE_2:
 					break;
+					
+				case ACTIVE_DEATH_SWAP:
+					println("Entering Death Swap Phase...");
+					break;
 				 
 				 }
 			 }

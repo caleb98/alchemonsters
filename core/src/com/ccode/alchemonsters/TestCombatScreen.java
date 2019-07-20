@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -88,7 +89,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	private CreatureTeam teamB;
 	
 	private boolean isWaitingOnActionSelect = false;
-	
+	private boolean isWaitingOnDeathSwitchSelect = false;
 	
 	public TestCombatScreen(AlchemonstersGame game) {
 		this.game = game;
@@ -290,7 +291,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	}
 	
 	private void doBattleAction(BattleController control, CreatureTeam team, CreatureTeam other) {
-		if(team.active().isDead()) {
+		if(team.active().isDead() && control.getSelectedAction().type != BattleActionType.SWITCH) {
 			return;
 		}
 		
@@ -316,8 +317,6 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			break;
 		
 		}
-		
-		control.refresh();
 	}
 	
 	@Override
@@ -338,17 +337,41 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 					break;
 					
 				case END_PHASE:
-					//TODO: if creature has died allow selection of new mon
-					setCombatState(CombatState.MAIN_PHASE_1);
+					if(!areActivesDead()) {
+						//TODO: speed double hit check
+						setCombatState(CombatState.MAIN_PHASE_1);
+					}
+					else {
+						setCombatState(CombatState.ACTIVE_DEATH_SWAP);
+					}
 					break;
 					
 				case MAIN_PHASE_1:
 					isWaitingOnActionSelect = true;
-					setControllerActions();
+					setDefaultControllerActions(teamAControl, teamA);
+					setDefaultControllerActions(teamBControl, teamB);
+					teamAControl.refresh();
+					teamBControl.refresh();
 					break;
 					
 				case MAIN_PHASE_2:
 					//TODO: main phase if available
+					break;
+					
+				case ACTIVE_DEATH_SWAP:
+					isWaitingOnDeathSwitchSelect = true;
+					
+					if(teamA.active().isDead()) {
+						setDefaultControllerActions(teamAControl, teamA);
+						teamAControl.refresh();
+						teamAControl.filterActions((a)->{return a.type != BattleActionType.SWITCH;});
+					}
+					
+					if(teamB.active().isDead()) {
+						setDefaultControllerActions(teamBControl, teamB);
+						teamBControl.refresh();
+						teamBControl.filterActions((a)->{return a.type != BattleActionType.SWITCH;});
+					}
 					break;
 					
 				default:
@@ -364,6 +387,18 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 				setCombatState(CombatState.BATTLE_PHASE_1);
 			}
 		}
+		else if(isWaitingOnDeathSwitchSelect) {
+			if(teamAControl.isActionSelected() && teamBControl.isActionSelected()) {
+				isWaitingOnDeathSwitchSelect = false;
+				if(teamA.active().isDead()) {
+					doBattleAction(teamAControl, teamA, teamB);
+				}
+				if(teamB.active().isDead()) {
+					doBattleAction(teamBControl, teamB, teamA);
+				}
+				setCombatState(CombatState.MAIN_PHASE_1);
+			}
+		}
 		
 		if(isCombat) {
 			battleContext.update();
@@ -377,28 +412,30 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		
 	}
 	
-	private void setControllerActions() {
-		ArrayList<BattleAction> teamAActions = new ArrayList<>();
-		for(int i = 0; i < teamA.creatures.length; ++i) {
-			if(i != teamA.active && teamA.creatures[i] != null) {
-				teamAActions.add(new BattleAction(BattleActionType.SWITCH, i));
-			}
-		}
-		for(int i = 0; i < teamA.active().moves.length; ++i) {
-			teamAActions.add(new BattleAction(BattleActionType.MOVE, i));
-		}
-		teamADisplay.setAvailableActions(teamAActions);
+	private boolean areActivesDead() {
+		boolean activesDead = false;
 		
-		ArrayList<BattleAction> teamBActions = new ArrayList<>();
-		for(int i = 0; i < teamB.creatures.length; ++i) {
-			if(i != teamB.active && teamB.creatures[i] != null) {
-				teamBActions.add(new BattleAction(BattleActionType.SWITCH, i));
+		if(teamA.active().isDead()) {
+			activesDead = true;
+		}
+		if(teamB.active().isDead()) {
+			activesDead = true;
+		}
+		
+		return activesDead;
+	}
+	
+	private void setDefaultControllerActions(BattleController control, CreatureTeam team) {
+		ArrayList<BattleAction> actions = new ArrayList<>();
+		for(int i = 0; i < team.creatures.length; ++i) {
+			if(i != team.active && team.creatures[i] != null && !team.creatures[i].isDead()) {
+				actions.add(new BattleAction(BattleActionType.SWITCH, i));
 			}
 		}
-		for(int i = 0; i < teamB.active().moves.length; ++i) {
-			teamBActions.add(new BattleAction(BattleActionType.MOVE, i));
+		for(int i = 0; i < team.active().moves.length; ++i) {
+			actions.add(new BattleAction(BattleActionType.MOVE, i));
 		}
-		teamBDisplay.setAvailableActions(teamBActions);
+		control.setAvailableActions(actions);
 		
 	}
 	

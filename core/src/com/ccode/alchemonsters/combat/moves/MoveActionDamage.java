@@ -74,10 +74,10 @@ public class MoveActionDamage implements MoveAction {
 		float defenseReduction = rawDamage * (targetDefense / (targetDefense + 0.5f * rawDamage)) + (targetDefense * power) / 1500f;
 		float penResRatio = source.getBuffedPen() / (float) target.getBuffedRes();
 		
-		float actual = Math.max((rawDamage - defenseReduction) * penResRatio, 1);
+		float actual = Math.max((rawDamage - defenseReduction) * penResRatio * (11 - source.currentLevel / 10f), 1);
 		
 		//TODO: apply these buffs before defenses?
-		//TODO: variable crit multiplier values
+		//TODO: variable crit multiplier values3
 		if(isCrit) {
 			actual *= 1.5f;
 		}

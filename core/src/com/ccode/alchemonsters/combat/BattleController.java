@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters.combat;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public interface BattleController {
 	
@@ -8,6 +9,7 @@ public interface BattleController {
 	public ArrayList<BattleAction> getAvailableActions();
 	public boolean isActionSelected();
 	public BattleAction getSelectedAction();
+	public void filterActions(Predicate<BattleAction> filter);
 	
 	/**
 	 * This method will be called on a battle controller whenever a 

@@ -2,6 +2,7 @@ package com.ccode.alchemonsters;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.function.Predicate;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -49,7 +50,6 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 	private LinkedList<Message> messageQueue = new LinkedList<>();
 	
 	private CreatureTeam team;
-	private int active;
 	private int[] inactives = new int[3];
 	
 	private boolean isCombatActive = false;
@@ -302,6 +302,16 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 	@Override
 	public void setAvailableActions(ArrayList<BattleAction> actions) {
 		this.actions = actions;
+		updateActionStrings();
+	}
+	
+	@Override
+	public void filterActions(Predicate<BattleAction> filter) {
+		actions.removeIf(filter);
+		updateActionStrings();
+	}
+	
+	private void updateActionStrings() {
 		Array<String> stringVer = new Array<>();
 		for(BattleAction a : actions) {
 			switch(a.type) {
