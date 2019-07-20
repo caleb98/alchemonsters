@@ -1,7 +1,7 @@
 package com.ccode.alchemonsters;
 
 import java.util.ArrayList;
-import java.util.function.Predicate;
+import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -33,6 +33,8 @@ import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
+import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
+import com.ccode.alchemonsters.engine.event.messages.MCombatChargeStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
@@ -87,6 +89,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	
 	private BattleController teamBControl;
 	private CreatureTeam teamB;
+	
+	private ArrayList<DelayedMoveInfo> delayedMoves = new ArrayList<>();
 	
 	private boolean isWaitingOnActionSelect = false;
 	private boolean isWaitingOnDeathSwitchSelect = false;
@@ -301,8 +305,34 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		case MOVE:
 			String moveName = team.active().moves[action.id];
 			Move move = MoveDictionary.getMove(moveName);
-			for(MoveAction a : move.actions) {
-				a.activate(move, battleContext, team.active(), team, other.active(), other);
+			switch(move.turnType) {
+			
+			case CHARGE:
+				if(!control.isCharging()) {
+					control.setCharging(action.id);
+					publish(new MCombatChargeStarted(battleContext, team.active(), other.active(), move));
+				}
+				else {
+					control.stopCharging();
+					for(MoveAction a : move.actions) {
+						a.activate(move, battleContext, team.active(), team, other.active(), other);
+					}
+					publish(new MCombatChargeFinished(battleContext, team.active(), other.active(), move));
+				}
+				break;
+				
+			case DELAYED:
+				delayedMoves.add(new DelayedMoveInfo(team, team.active(), move, other, move.delayAmount));
+				break;
+				
+			case RECHARGE:
+				control.setRecharging(true);
+			case INSTANT:
+				for(MoveAction a : move.actions) {
+					a.activate(move, battleContext, team.active(), team, other.active(), other);
+				}
+				break;
+			
 			}
 			break;
 			
@@ -314,6 +344,10 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			
 		case USE:
 			//TODO: implement inventory and item use
+			break;
+			
+		case WAIT:
+			control.setRecharging(false);
 			break;
 		
 		}
@@ -425,8 +459,25 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		return activesDead;
 	}
 	
-	private void setDefaultControllerActions(BattleController control, CreatureTeam team) {
+	private void setDefaultControllerActions(BattleController control, CreatureTeam team) {		
 		ArrayList<BattleAction> actions = new ArrayList<>();
+		
+		//Check for special charging case - we'll need different actions
+		if(control.isCharging()) {
+			actions.add(new BattleAction(BattleActionType.MOVE, control.getCharging()));
+			control.setAvailableActions(actions);
+			return;
+		}
+		
+		if(control.isRecharging()) {
+			actions.add(new BattleAction(BattleActionType.WAIT, 0));
+			control.setAvailableActions(actions);
+			return;
+		}
+		
+		//Check for recharge
+		if(control.isCharging())
+		
 		for(int i = 0; i < team.creatures.length; ++i) {
 			if(i != team.active && team.creatures[i] != null && !team.creatures[i].isDead()) {
 				actions.add(new BattleAction(BattleActionType.SWITCH, i));
@@ -435,8 +486,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		for(int i = 0; i < team.active().moves.length; ++i) {
 			actions.add(new BattleAction(BattleActionType.MOVE, i));
 		}
+		actions.add(new BattleAction(BattleActionType.WAIT, 0));
 		control.setAvailableActions(actions);
-		
 	}
 	
 	private void doBattlePhase() {
@@ -478,6 +529,22 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		else {
 			doBattleAction(teamBControl, teamB, teamA);
 			doBattleAction(teamAControl, teamA, teamB);
+		}
+		
+		//Do delayed moves
+		Iterator<DelayedMoveInfo> delays = delayedMoves.iterator();
+		while(delays.hasNext()) {
+			DelayedMoveInfo inf = delays.next();
+			if(inf.delayTurns == 0) {
+				Move move = inf.move;
+				for(MoveAction a : move.actions) {
+					a.activate(move, battleContext, inf.sourceCreature, inf.sourceTeam, inf.targetTeam.active(), inf.targetTeam);
+				}
+				delays.remove();
+			}
+			else {
+				inf.delayTurns--;
+			}
 		}
 		
 		if(teamA.isDefeated()) {
@@ -576,6 +643,24 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	public boolean scrolled(int amount) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	private class DelayedMoveInfo {
+		
+		CreatureTeam sourceTeam;
+		Creature sourceCreature;
+		Move move;
+		CreatureTeam targetTeam;
+		int delayTurns;
+		
+		public DelayedMoveInfo(CreatureTeam team, Creature creature, Move move, CreatureTeam target, int turns) {
+			sourceTeam = team;
+			sourceCreature = creature;
+			this.move = move;
+			targetTeam = target;
+			delayTurns = turns;
+		}
+		
 	}
 	
 	private class EditButton extends TextButton {

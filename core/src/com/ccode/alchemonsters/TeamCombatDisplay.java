@@ -52,6 +52,9 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 	private CreatureTeam team;
 	private int[] inactives = new int[3];
 	
+	private int chargingMove = -1;
+	private boolean isRecharging = false;
+	
 	private boolean isCombatActive = false;
 	
 	public TeamCombatDisplay(String teamName, CreatureTeam team) {
@@ -311,12 +314,46 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 		updateActionStrings();
 	}
 	
+	@Override
+	public int getCharging() {
+		return chargingMove;
+	}
+	
+	@Override
+	public boolean isCharging() {
+		return chargingMove != -1;
+	}
+	
+	@Override
+	public void setCharging(int move) {
+		chargingMove = move;
+	}
+	
+	@Override
+	public void stopCharging() {
+		chargingMove = -1;
+	}
+	
+	@Override
+	public void setRecharging(boolean isRecharging) {
+		this.isRecharging = isRecharging;
+	}
+	
+	@Override
+	public boolean isRecharging() {
+		return isRecharging;
+	}
+	
 	private void updateActionStrings() {
-		Array<String> stringVer = new Array<>();
+		Array<String> stringVer = new Array<>();		
 		for(BattleAction a : actions) {
 			switch(a.type) {
 			
 			case MOVE:
+				if(isCharging()) {
+					stringVer.add("Continue charging " + team.active().moves[a.id]);
+					break;
+				}
 				stringVer.add("Use move " + team.active().moves[a.id]);
 				break;
 				
@@ -327,6 +364,14 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 			case USE:
 				//TODO: use inventory item
 				stringVer.add("Use item [not implemented]");
+				break;
+				
+			case WAIT:
+				if(isRecharging) {
+					stringVer.add("Wait (recharge)");
+					break;
+				}
+				stringVer.add("Wait (do nothing)");
 				break;
 			
 			}

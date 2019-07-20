@@ -6,6 +6,7 @@ public class BattleAction implements Comparable<BattleAction> {
 		SWITCH,
 		USE,
 		MOVE,
+		WAIT,
 	}
 	
 	public BattleActionType type;

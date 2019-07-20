@@ -29,6 +29,7 @@ public class Move {
 
 	public int priority;
 	public TurnType turnType;
+	public int delayAmount = 1;
 	
 	public static enum TurnType {
 		INSTANT,
