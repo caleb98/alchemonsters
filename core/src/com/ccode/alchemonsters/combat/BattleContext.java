@@ -1,20 +1,18 @@
 package com.ccode.alchemonsters.combat;
 
-import java.util.ArrayList;
-
 import com.ccode.alchemonsters.creature.Creature;
+import com.ccode.alchemonsters.util.VariableList;
 
 public class BattleContext {
 	
 	public CombatState currentState;
+	public VariableList variables = new VariableList();
 	
 	public BattleController teamAController;
 	public CreatureTeam teamA;
-	public ArrayList<BattleAction> teamAActions;
 	
 	public BattleController teamBController;
 	public CreatureTeam teamB;
-	public ArrayList<BattleAction> teamBActions;
 	
 	public Battleground battleground;
 	

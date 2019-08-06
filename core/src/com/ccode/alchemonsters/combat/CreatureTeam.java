@@ -1,11 +1,13 @@
 package com.ccode.alchemonsters.combat;
 
 import com.ccode.alchemonsters.creature.Creature;
+import com.ccode.alchemonsters.util.VariableList;
 
 public class CreatureTeam {
 
 	public int active;
 	public Creature[] creatures;
+	public VariableList variables = new VariableList();
 	
 	public CreatureTeam() {
 		creatures = new Creature[4];
@@ -17,6 +19,7 @@ public class CreatureTeam {
 	}
 	
 	public void startCombat() {
+		variables.clear();
 		for(Creature c : creatures) {
 			if(c != null) {
 				c.startCombat();

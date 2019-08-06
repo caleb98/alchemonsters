@@ -4,6 +4,7 @@ import com.ccode.alchemonsters.combat.Catalyst;
 import com.ccode.alchemonsters.combat.PassiveAbility;
 import com.ccode.alchemonsters.combat.StatBuffs;
 import com.ccode.alchemonsters.combat.ailments.StatusAilment;
+import com.ccode.alchemonsters.util.VariableList;
 
 public class Creature {
 
@@ -22,6 +23,7 @@ public class Creature {
 	public int maxHealth;
 	public int currentMana;
 	public int maxMana;
+	public VariableList variables = new VariableList();
 	
 	public StatBuffs buffs = new StatBuffs();
 	public StatusAilment currentAilment;
@@ -64,8 +66,6 @@ public class Creature {
 		nextLevelXP = 1000000; //TODO: experience gain and leveling up
 		currentLevel = 1;
 		
-		buffs = new StatBuffs();
-		
 		calcDerivedStats();
 	}
 	
@@ -102,6 +102,7 @@ public class Creature {
 	
 	public void startCombat() {
 		buffs.reset();
+		variables.clear();
 	}
 	
 	public int getBuffedMagicAtk() {
