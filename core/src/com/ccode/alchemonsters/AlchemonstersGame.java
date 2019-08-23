@@ -1,10 +1,16 @@
 package com.ccode.alchemonsters;
 
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+import org.luaj.vm2.lib.jse.JsePlatform;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.ccode.alchemonsters.combat.ailments.StatusAilmentDictionary;
 import com.ccode.alchemonsters.combat.moves.MoveDictionary;
 import com.ccode.alchemonsters.creature.CreatureDictionary;
+import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.event.EventManager;
 
 public class AlchemonstersGame extends Game {
@@ -26,8 +32,14 @@ public class AlchemonstersGame extends Game {
 	@Override
 	public void create () {
 		
+		//TEST	
+
+		
 		//Init event system
 		EventManager.init();
+		
+		//Init script manager
+		ScriptManager.init();
 		
 		//Load dictionaries
 		CreatureDictionary.initAndLoad();

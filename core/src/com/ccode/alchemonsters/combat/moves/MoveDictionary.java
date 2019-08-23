@@ -23,6 +23,7 @@ public class MoveDictionary {
 		json.addClassTag("Damage", MoveActionDamage.class);
 		json.addClassTag("StatModifier", MoveActionStatModifier.class);
 		json.addClassTag("AilmentApplicator", MoveActionAilmentApplicator.class);
+		json.addClassTag("Script", MoveActionRunScript.class);
 		
 		FileHandle loadDir = Gdx.files.internal(MOVE_DIRECTORY);
 		for(FileHandle moveFile : loadDir.list("move")) {
