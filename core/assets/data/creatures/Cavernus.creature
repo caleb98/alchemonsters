@@ -6,6 +6,15 @@
 	maxBaseHealth: 39,
 	minBaseMana: 19,
 	maxBaseMana: 22,
+	baseVitae: 200,
+	baseFocus: 200,
+	baseMagicAtk: 200,
+	baseMagicDef: 200,
+	basePhysAtk: 200,
+	basePhysDef: 200,
+	basePenetration: 200,
+	baseResistance: 200,
+	baseSpeed: 200,
 	types: [ GROUND, VOID ],
 	componentCost: { GROUND: 1, VOID: 1 }
 }

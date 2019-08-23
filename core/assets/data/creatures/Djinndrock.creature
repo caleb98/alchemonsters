@@ -6,6 +6,15 @@
 	maxBaseHealth: 40,
 	minBaseMana: 18,
 	maxBaseMana: 21,
+	baseVitae: 200,
+	baseFocus: 200,
+	baseMagicAtk: 200,
+	baseMagicDef: 200,
+	basePhysAtk: 200,
+	basePhysDef: 200,
+	basePenetration: 200,
+	baseResistance: 200,
+	baseSpeed: 200,
 	types: [ GROUND, FEY ],
 	componentCost: { GROUND: 1, FEY: 1 }
 }

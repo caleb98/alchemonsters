@@ -6,6 +6,15 @@
 	maxBaseHealth: 21,
 	minBaseMana: 16,
 	maxBaseMana: 20,
+	baseVitae: 200,
+	baseFocus: 200,
+	baseMagicAtk: 200,
+	baseMagicDef: 200,
+	basePhysAtk: 200,
+	basePhysDef: 200,
+	basePenetration: 200,
+	baseResistance: 200,
+	baseSpeed: 200,
 	types: [ WATER ],
 	componentCost: { WATER: 1 }
 }
