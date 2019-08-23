@@ -1,13 +1,13 @@
 package com.ccode.alchemonsters.combat;
 
 import com.ccode.alchemonsters.creature.Creature;
-import com.ccode.alchemonsters.util.VariableList;
+import com.ccode.alchemonsters.util.DynamicVariables;
 
 public class CreatureTeam {
 
 	public int active;
 	public Creature[] creatures;
-	public VariableList variables = new VariableList();
+	public DynamicVariables variables = new DynamicVariables();
 	
 	public CreatureTeam() {
 		creatures = new Creature[4];

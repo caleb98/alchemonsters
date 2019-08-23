@@ -2,7 +2,7 @@ package com.ccode.alchemonsters.util;
 
 import java.util.HashMap;
 
-public class VariableList {
+public class DynamicVariables {
 
 	private HashMap<String, Object> variables = new HashMap<>();
 	

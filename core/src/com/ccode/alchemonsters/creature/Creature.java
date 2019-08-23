@@ -4,7 +4,7 @@ import com.ccode.alchemonsters.combat.Catalyst;
 import com.ccode.alchemonsters.combat.PassiveAbility;
 import com.ccode.alchemonsters.combat.StatBuffs;
 import com.ccode.alchemonsters.combat.ailments.StatusAilment;
-import com.ccode.alchemonsters.util.VariableList;
+import com.ccode.alchemonsters.util.DynamicVariables;
 
 public class Creature {
 
@@ -23,7 +23,7 @@ public class Creature {
 	public int maxHealth;
 	public int currentMana;
 	public int maxMana;
-	public VariableList variables = new VariableList();
+	public DynamicVariables variables = new DynamicVariables();
 	
 	public StatBuffs buffs = new StatBuffs();
 	public StatusAilment currentAilment;

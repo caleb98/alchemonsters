@@ -1,12 +1,12 @@
 package com.ccode.alchemonsters.combat;
 
 import com.ccode.alchemonsters.creature.Creature;
-import com.ccode.alchemonsters.util.VariableList;
+import com.ccode.alchemonsters.util.DynamicVariables;
 
 public class BattleContext {
 	
 	public CombatState currentState;
-	public VariableList variables = new VariableList();
+	public DynamicVariables variables = new DynamicVariables();
 	
 	public BattleController teamAController;
 	public CreatureTeam teamA;

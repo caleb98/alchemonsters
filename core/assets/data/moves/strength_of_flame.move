@@ -10,7 +10,7 @@
 		{
 			class: "StatModifier",
 			target: "SELF",
-			stat: "MAGIC_POWER",
+			stat: "MAGIC_ATK",
 			amt: 6
 		}
 	],

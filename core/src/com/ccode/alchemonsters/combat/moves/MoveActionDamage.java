@@ -1,5 +1,7 @@
 package com.ccode.alchemonsters.combat.moves;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.creature.Creature;
@@ -91,3 +93,26 @@ public class MoveActionDamage implements MoveAction {
 	}
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
