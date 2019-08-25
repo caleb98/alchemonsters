@@ -317,6 +317,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 					for(MoveAction a : move.actions) {
 						a.activate(move, battleContext, team.active(), team, other.active(), other);
 					}
+					team.active().variables.setVariable("_PREVIOUS_MOVE", move);
 					publish(new MCombatChargeFinished(battleContext, team.active(), other.active(), move));
 				}
 				break;
@@ -331,6 +332,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 				for(MoveAction a : move.actions) {
 					a.activate(move, battleContext, team.active(), team, other.active(), other);
 				}
+				team.active().variables.setVariable("_PREVIOUS_MOVE", move);
 				break;
 			
 			}
@@ -540,6 +542,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 				for(MoveAction a : move.actions) {
 					a.activate(move, battleContext, inf.sourceCreature, inf.sourceTeam, inf.targetTeam.active(), inf.targetTeam);
 				}
+				inf.sourceCreature.variables.setVariable("_PREVIOUS_MOVE", move);
 				delays.remove();
 			}
 			else {
@@ -596,6 +599,10 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			Json json = new Json();
 			json.setOutputType(OutputType.javascript);
 			System.out.println(json.prettyPrint(currentTeam.creatures[currentId]));
+		}
+		else if(keycode == Keys.F5) {
+			MoveDictionary.initAndLoad();
+			creatureEdit.reloadMovesList();
 		}
 		else {
 			return false;

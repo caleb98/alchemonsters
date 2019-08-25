@@ -1,6 +1,6 @@
 {
-	name: "Fireball",
-	desc: "Casts a fireball at the enemy.",
+	name: "Ember Spray",
+	desc: "<TODO>",
 	accuracy: 1,
 	manaCost: 5,
 	critStage: 1,
@@ -10,7 +10,7 @@
 		{
 			class: "Damage",
 			target: "OPPONENT",
-			power: 200
+			power: 30
 		}
 	],
 	turnType: "INSTANT",

@@ -363,6 +363,10 @@ public class CreatureEditWindow extends Window {
 		return isEditComplete;
 	}
 	
+	public void reloadMovesList() {
+		movesAvailableList.setItems(MoveDictionary.getLoadedMoveNames().toArray(new String[]{}));
+	}
+	
 	private void resetCreatureStatsDisplay() {
 		creatureSelectBox.setSelectedIndex(0);
 		

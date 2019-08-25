@@ -16,6 +16,8 @@ public class MoveDictionary {
 	private static boolean isInitialized = false;
 	
 	public static void initAndLoad() {
+		isInitialized = false;
+		
 		MOVE_DICTIONARY = new HashMap<String, Move>();
 		Json json = new Json();
 		
