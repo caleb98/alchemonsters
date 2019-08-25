@@ -10,7 +10,7 @@
 		{
 			class: "Damage",
 			target: "OPPONENT",
-			power: 30
+			power: 60
 		}
 	],
 	turnType: "INSTANT",

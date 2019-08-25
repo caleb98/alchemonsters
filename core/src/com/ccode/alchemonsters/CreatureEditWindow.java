@@ -251,6 +251,8 @@ public class CreatureEditWindow extends Window {
 					c.moves = movesActiveList.getItems().toArray(String.class);
 					c.personalName = c.base.name + " (LVL " + c.currentLevel + ")";
 					
+					c.calcDerivedStats();
+					
 					editedCreature = c;
 					setVisible(false);
 					isEditComplete = true;
