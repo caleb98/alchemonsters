@@ -25,7 +25,11 @@ public class MoveDictionary {
 		json.addClassTag("Damage", MoveActionDamage.class);
 		json.addClassTag("StatModifier", MoveActionStatModifier.class);
 		json.addClassTag("AilmentApplicator", MoveActionAilmentApplicator.class);
-		json.addClassTag("Script", MoveActionRunScript.class);
+		json.addClassTag("Script", MoveActionScript.class);
+		json.addClassTag("Chance", MoveActionChance.class);
+		json.addClassTag("Repeat", MoveActionRepeat.class);
+		json.addClassTag("ChooseRandom", MoveActionChooseRandom.class);
+		json.addClassTag("Combine", MoveActionCombine.class);
 		
 		FileHandle loadDir = Gdx.files.internal(MOVE_DIRECTORY);
 		for(FileHandle moveFile : loadDir.list("move")) {

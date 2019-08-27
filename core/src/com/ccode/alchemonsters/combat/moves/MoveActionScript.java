@@ -15,7 +15,7 @@ import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.ScriptManager;
 
-public class MoveActionRunScript implements MoveAction, Serializable {
+public class MoveActionScript implements MoveAction, Serializable {
 
 	public LuaValue scriptFunction;
 

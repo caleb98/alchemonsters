@@ -4,13 +4,18 @@ import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.creature.Creature;
 
-public class MoveActionAilmentRemoval implements MoveAction {
+public class MoveActionCombine implements MoveAction {
 
-	private MoveTarget target;
+	/**
+	 * The actions to be run.
+	 */
+	public MoveAction[] actions;
 	
 	@Override
 	public void activate(Move move, BattleContext context, Creature source, CreatureTeam sourceTeam, Creature target, CreatureTeam targetTeam) {
-		//TODO: ailment removal!
+		for(MoveAction a : actions) {
+			a.activate(move, context, source, sourceTeam, target, targetTeam);
+		}
 	}
-
+	
 }

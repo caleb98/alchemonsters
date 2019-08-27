@@ -11,9 +11,14 @@ public class MoveActionDamage implements MoveAction {
 	
 	public static final float STAB_MULTIPLIER = 1.5f;
 	
+	/**
+	 * The target of the damage.
+	 */
 	public MoveTarget target;
+	/**
+	 * The strength of the damage. (Not equal to actual damage amount!)
+	 */
 	public int power;
-	public float accuracy;
 	
 	@Override
 	public void activate(Move move, BattleContext context, Creature source, CreatureTeam sourceTeam, Creature target, CreatureTeam targetTeam) {
@@ -25,11 +30,13 @@ public class MoveActionDamage implements MoveAction {
 		//STAB
 		boolean isStab = checkStab(move, context, source, target);
 		
+		int damage;
+		
 		if(isHit) {
 			switch(this.target) {
 			
 			case OPPONENT:
-				int damage = getDamageAgainst(move, context, source, target, power, isCrit, isStab);
+				damage = getDamageAgainst(move, context, source, target, power, isCrit, isStab);
 				target.currentHealth -= damage;
 				publish(new MCombatDamageDealt(context, source, target, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
@@ -39,7 +46,9 @@ public class MoveActionDamage implements MoveAction {
 				break;
 				
 			case SELF:
-				//TODO: self damage 
+				damage = getDamageAgainst(move, context, source, source, power, isCrit, isStab);
+				source.currentHealth -= damage;
+				publish(new MCombatDamageDealt(context, source, source, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
 				
 			case SELF_TEAM:

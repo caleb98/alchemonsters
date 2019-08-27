@@ -8,9 +8,18 @@ import com.ccode.alchemonsters.util.GameRandom;
 
 public class MoveActionAilmentApplicator implements MoveAction {
 	
+	/**
+	 * The target of this move action.
+	 */
 	public MoveTarget target;
+	/**
+	 * The name of the ailment to apply.
+	 */
 	private String ailmentName;
-	public float chance;
+	/**
+	 * The chance that the ailment is applied. Defaults to 1.
+	 */
+	public float chance = 1f;
 	
 	public MoveActionAilmentApplicator() {
 		// TODO Auto-generated constructor stub
