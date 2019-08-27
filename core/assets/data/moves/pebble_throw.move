@@ -2,7 +2,7 @@
 	name: "Pebble Throw",
 	desc: "<TODO>",
 	accuracy: 1,
-	manaCost: 5,
+	manaCost: 1,
 	critStage: 1,
 	elementType: "GROUND",
 	moveType: "PHYSICAL",

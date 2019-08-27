@@ -2,7 +2,7 @@
 	name: "Ember Spray",
 	desc: "<TODO>",
 	accuracy: 1,
-	manaCost: 5,
+	manaCost: 1,
 	critStage: 1,
 	elementType: "FIRE",
 	moveType: "MAGIC",

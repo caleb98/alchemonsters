@@ -305,6 +305,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		case MOVE:
 			String moveName = team.active().moves[action.id];
 			Move move = MoveDictionary.getMove(moveName);
+			team.active().currentMana -= move.manaCost;
 			switch(move.turnType) {
 			
 			case CHARGE:
@@ -477,16 +478,16 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			return;
 		}
 		
-		//Check for recharge
-		if(control.isCharging())
-		
 		for(int i = 0; i < team.creatures.length; ++i) {
 			if(i != team.active && team.creatures[i] != null && !team.creatures[i].isDead()) {
 				actions.add(new BattleAction(BattleActionType.SWITCH, i));
 			}
 		}
 		for(int i = 0; i < team.active().moves.length; ++i) {
-			actions.add(new BattleAction(BattleActionType.MOVE, i));
+			Move move = MoveDictionary.getMove(team.active().moves[i]);
+			if(team.active().currentMana >= move.manaCost) {
+				actions.add(new BattleAction(BattleActionType.MOVE, i));
+			}
 		}
 		actions.add(new BattleAction(BattleActionType.WAIT, 0));
 		control.setAvailableActions(actions);
