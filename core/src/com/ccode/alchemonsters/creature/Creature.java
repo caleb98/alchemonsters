@@ -23,6 +23,7 @@ public class Creature {
 	public int maxHealth;
 	public int currentMana;
 	public int maxMana;
+	public float critChance = 0.05f;
 	public DynamicVariables variables = new DynamicVariables();
 	
 	public StatBuffs buffs = new StatBuffs();
@@ -40,9 +41,7 @@ public class Creature {
 	public int nextLevelXP;
 	public int currentLevel;
 	
-	public Creature() {
-		
-	}
+	public Creature() {}
 	
 	/**
 	 * Creates a new level one creature from the given base with the given nature

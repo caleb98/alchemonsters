@@ -22,7 +22,7 @@ public class CreatureBase implements Serializable {
 	public int baseMagicDef;
 	public int basePhysAtk;
 	public int basePhysDef;
-	public int basePenetration; //hehe
+	public int basePenetration;
 	public int baseResistance;
 	public int baseSpeed;
 	public ElementType[] types;
@@ -32,35 +32,32 @@ public class CreatureBase implements Serializable {
 		componentCost = new ArrayList<Pair<ElementType, Integer>>();
 	}
 	
-	public CreatureBase(String id, String name, int minBaseHealth, int maxBaseHealth, int minBaseMana, int maxBaseMana, ElementType[] types, Pair<ElementType, Integer>... componentCost) {
-		this.id = id;
-		this.name = name;
-		this.desc = "";
-		this.minBaseHealth = minBaseHealth;
-		this.maxBaseHealth = maxBaseHealth;
-		this.minBaseMana = minBaseMana;
-		this.maxBaseMana = maxBaseMana;
-		this.types = types;
-		
-		this.componentCost = new ArrayList<Pair<ElementType, Integer>>();
-		for(Pair<ElementType, Integer> p : componentCost) {
-			this.componentCost.add(p);
-		}
-	}
-	
 	/*
 	 * SERIALIZATION METHODS
 	 */
 	
 	@Override
 	public void write(Json json) {
+		
 		json.writeValue("id", id);
 		json.writeValue("name", name);
 		json.writeValue("desc", desc);
+		
 		json.writeValue("minBaseHealth", minBaseHealth);
 		json.writeValue("maxBaseHealth", maxBaseHealth);
 		json.writeValue("minBaseMana", minBaseMana);
 		json.writeValue("maxBaseMana", maxBaseMana);
+		
+		json.writeValue("baseVitae", baseVitae);
+		json.writeValue("baseFocus", baseFocus);
+		json.writeValue("baseMagicAtk", baseMagicAtk);
+		json.writeValue("baseMagicDef", baseMagicDef);
+		json.writeValue("basePhysAtk", basePhysAtk);
+		json.writeValue("basePhysDef", basePhysDef);
+		json.writeValue("basePenetration", basePenetration);
+		json.writeValue("baseResistance", baseResistance);
+		json.writeValue("baseSpeed", baseSpeed);
+		
 		json.writeValue("types", types);
 		json.writeObjectStart("componentCost");
 		for(Pair<ElementType, Integer> c : componentCost) {
@@ -71,13 +68,25 @@ public class CreatureBase implements Serializable {
 	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
+		
 		id = jsonData.getString("id");
 		name = jsonData.getString("name");
 		desc = jsonData.getString("desc");
+		
 		minBaseHealth = jsonData.getInt("minBaseHealth");
 		maxBaseHealth = jsonData.getInt("maxBaseHealth");
 		minBaseMana = jsonData.getInt("minBaseMana");
 		maxBaseMana = jsonData.getInt("maxBaseMana");
+		
+		baseVitae = jsonData.getInt("baseVitae");
+		baseFocus = jsonData.getInt("baseFocus");
+		baseMagicAtk = jsonData.getInt("baseMagicAtk");
+		baseMagicDef = jsonData.getInt("baseMagicDef");
+		basePhysAtk = jsonData.getInt("basePhysAtk");
+		basePhysDef = jsonData.getInt("basePhysDef");
+		basePenetration = jsonData.getInt("basePenetration");
+		baseResistance = jsonData.getInt("baseResistance");
+		baseSpeed = jsonData.getInt("baseSpeed");
 		
 		String[] typeStrings = jsonData.get("types").asStringArray();
 		types = new ElementType[typeStrings.length];

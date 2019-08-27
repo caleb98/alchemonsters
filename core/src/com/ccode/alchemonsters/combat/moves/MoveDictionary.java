@@ -42,6 +42,7 @@ public class MoveDictionary {
 				System.out.printf("Move \'%s\' loaded.\n", move.name);
 			} catch (SerializationException se) {
 				System.err.printf("[Error] Unable to load move file %s! Caused by %s\n", moveFile.name(), se.getCause());
+				se.printStackTrace(System.err);
 			}
 			
 		}

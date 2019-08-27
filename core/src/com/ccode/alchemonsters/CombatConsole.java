@@ -10,6 +10,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
+import com.ccode.alchemonsters.engine.event.messages.MCombatHealingReceived;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStatBuffApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
@@ -38,6 +39,7 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 		subscribe(MCombatStatBuffApplied.ID);
 		subscribe(MCombatAilmentApplied.ID);
 		subscribe(MCombatAilmentRemoved.ID);
+		subscribe(MCombatHealingReceived.ID);
 	}
 	
 	@Override
@@ -125,6 +127,14 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 						 full.ailmentName,
 						 full.cause,
 						 full.target.personalName));
+			 }
+			 else if(m instanceof MCombatHealingReceived) {
+				 MCombatHealingReceived full = (MCombatHealingReceived) m;
+				 println(String.format("%s's %s healed %s for %s.", 
+						 full.source.personalName,
+						 full.cause,
+						 full.target.personalName,
+						 full.amount));
 			 }
 		}
 	}

@@ -7,6 +7,8 @@ import java.util.stream.LongStream;
 
 public class GameRandom {
 
+	
+	
 	private GameRandom() {}
 	
 	private static final Random RAND = new Random();

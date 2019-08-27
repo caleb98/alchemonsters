@@ -17,34 +17,19 @@ public class MoveActionDamage implements MoveAction {
 	
 	@Override
 	public void activate(Move move, BattleContext context, Creature source, CreatureTeam sourceTeam, Creature target, CreatureTeam targetTeam) {
+		
 		//Check accuracy/hit chance
-		boolean isHit = GameRandom.nextFloat() < move.accuracy;
-		
+		boolean isHit = rollHit(move, context, source, target);
 		//Check for crit
-		boolean isCrit = false;
-		for(int i = 0; i < move.critStage; ++i) {
-			if(GameRandom.nextFloat() < 0.05f) {
-				isCrit = true;
-				break;
-			}
-		}
-		
+		boolean isCrit = rollCrit(move, context, source, target);
 		//STAB
-		boolean isStab = false;
-		for(ElementType e : source.base.types) {
-			if(e == move.elementType) {
-				isStab = true;
-				break;
-			}
-		}
-		
-		
+		boolean isStab = checkStab(move, context, source, target);
 		
 		if(isHit) {
 			switch(this.target) {
 			
 			case OPPONENT:
-				int damage = getDamageAgainst(move, source, target, power, isCrit, isStab);
+				int damage = getDamageAgainst(move, context, source, target, power, isCrit, isStab);
 				target.currentHealth -= damage;
 				publish(new MCombatDamageDealt(context, source, target, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
@@ -65,7 +50,29 @@ public class MoveActionDamage implements MoveAction {
 		}
 	}
 	
-	private int getDamageAgainst(Move move, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
+	public boolean rollHit(Move move, BattleContext context, Creature source, Creature target) {
+		return GameRandom.nextFloat() < move.accuracy;
+	}
+	
+	public boolean rollCrit(Move move, BattleContext context, Creature source, Creature target) {
+		for(int i = 0; i < move.critStage; ++i) {
+			if(GameRandom.nextFloat() < source.critChance) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkStab(Move move, BattleContext context, Creature source, Creature target) {
+		for(ElementType e : source.base.types) {
+			if(e == move.elementType) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public  int getDamageAgainst(Move move, BattleContext context, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
 		float sourceAttack = move.moveType == MoveType.MAGIC ? source.getBuffedMagicAtk() : source.getBuffedPhysAtk();
 		float targetDefense = move.moveType == MoveType.MAGIC ? target.getBuffedMagicDef() : target.getBuffedPhysDef();	
 		
@@ -86,6 +93,9 @@ public class MoveActionDamage implements MoveAction {
 		if(isStab) {
 			actual *= STAB_MULTIPLIER;
 		}
+		
+		float random = 0.8f + GameRandom.nextFloat() * 0.4f;
+		actual *= random;
 		
 		return (int) actual;
 	}
