@@ -26,6 +26,9 @@ import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleController;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.GroundType;
+import com.ccode.alchemonsters.combat.TerrainType;
+import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveDictionary;
@@ -255,7 +258,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		Gdx.input.setInputProcessor(multi);
 		
 		//Combat setup
-		battleContext = new BattleContext();
+		battleContext = new BattleContext(teamAControl, teamA, teamBControl, teamB);
 		
 		subscribe(MCombatStateChanged.ID);
 	}	
@@ -282,6 +285,11 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		for(Creature c : teamB.creatures) {
 			if(c != null) c.rest();
 		}
+		
+		//Reset to default battleground values
+		battleContext.battleground.ground = GroundType.NORMAL;
+		battleContext.battleground.terrain = TerrainType.NORMAL;
+		battleContext.battleground.weather = WeatherType.NORMAL;
 		
 		combatTextDisplay.clear();
 		publish(new MCombatStarted(battleContext, teamA, teamB));

@@ -30,6 +30,9 @@ public class MoveDictionary {
 		json.addClassTag("Repeat", MoveActionRepeat.class);
 		json.addClassTag("ChooseRandom", MoveActionChooseRandom.class);
 		json.addClassTag("Combine", MoveActionCombine.class);
+		json.addClassTag("SetWeather", MoveActionSetWeather.class);
+		json.addClassTag("SetTerrain", MoveActionSetTerrain.class);
+		json.addClassTag("SetGround", MoveActionSetGround.class);
 		
 		FileHandle loadDir = Gdx.files.internal(MOVE_DIRECTORY);
 		for(FileHandle moveFile : loadDir.list("move")) {

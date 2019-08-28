@@ -16,6 +16,18 @@ public class BattleContext {
 	
 	public Battleground battleground;
 	
+	public BattleContext(BattleController teamAControl, CreatureTeam teamA, 
+						 BattleController teamBControl, CreatureTeam teamB) {
+		
+		teamAController = teamAControl;
+		this.teamA = teamA;
+		teamBController = teamBControl;
+		this.teamB = teamB;
+		
+		battleground = new Battleground();
+		
+	}
+	
 	public void update() {
 		for(Creature c : teamA.creatures) {
 			if(c != null && c.currentAilment != null	) {

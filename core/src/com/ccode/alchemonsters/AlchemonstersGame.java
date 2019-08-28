@@ -1,10 +1,5 @@
 package com.ccode.alchemonsters;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-import org.luaj.vm2.lib.jse.JsePlatform;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.ccode.alchemonsters.combat.ailments.StatusAilmentDictionary;
@@ -52,7 +47,7 @@ public class AlchemonstersGame extends Game {
 		
 		//Set initial screen
 		//setScreen(mainMenu);
-		setScreen(new TestCombatScreen(this));
+		setScreen(new TestWorldScreen());
 		
 		
 	}
