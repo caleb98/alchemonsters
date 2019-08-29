@@ -12,13 +12,17 @@ public class ScriptManager {
 	
 	private static MoveActionDamage LUA_DAMAGE_INSTANCE;
 	
+	
 	public static void init() {
 		GLOBAL_CONTEXT = JsePlatform.standardGlobals();
 		GLOBAL_CONTEXT.load(
-				"_MCombatDamageDealt = 'com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt'\n"
-			  + "_MCombatHealingReceived = 'com.ccode.alchemonsters.engine.event.messages.MCombatHealingReceived'\n"
-			  + "_MCombatAilmentApplied = 'com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied'\n"
-			  + "_MCombatStatBuffApplied = 'com.ccode.alchemonsters.engine.event.messages.MCombatStatBuffApplied'\n"
+				"MCombatDamageDealt = 'com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt'\n"
+			  + "MCombatHealingReceived = 'com.ccode.alchemonsters.engine.event.messages.MCombatHealingReceived'\n"
+			  + "MCombatAilmentApplied = 'com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied'\n"
+			  + "MCombatStatBuffApplied = 'com.ccode.alchemonsters.engine.event.messages.MCombatStatBuffApplied'\n"
+			  + "WeatherType = luajava.bindClass('com.ccode.alchemonsters.combat.WeatherType')\n"
+			  + "GroundType = luajava.bindClass('com.ccode.alchemonsters.combat.GroundType')\n"
+			  + "TerrainType = luajava.bindClass('com.ccode.alchemonsters.combat.TerrainType')\n"
 		).call();
 		
 		//Expose a Damage action instance to allow scripts to calc damage and publish combat events
