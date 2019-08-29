@@ -4,6 +4,7 @@ import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.GroundType;
 import com.ccode.alchemonsters.creature.Creature;
+import com.ccode.alchemonsters.engine.event.messages.MCombatGroundChanged;
 
 public class MoveActionSetGround implements MoveAction {
 
@@ -15,7 +16,9 @@ public class MoveActionSetGround implements MoveAction {
 	@Override
 	public void activate(Move move, BattleContext context, Creature source, CreatureTeam sourceTeam, Creature target,
 			CreatureTeam targetTeam) {
+		GroundType old = context.battleground.ground;
 		context.battleground.ground = ground;
+		publish(new MCombatGroundChanged(context, source, move.name, old, ground));
 	}
 	
 }

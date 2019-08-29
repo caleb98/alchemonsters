@@ -8,17 +8,8 @@
 	moveType: "MAGIC",
 	actions: [
 		{
-			class: "Combine",
-			actions: [
-				{
-					class: "Script",
-					script: "print('action 1')"
-				},
-				{
-					class: "Script",
-					script: "print('action 2')"
-				}
-			]
+			class: "SetWeather",
+			weather: "RAIN"
 		}
 	],
 	turnType: "INSTANT",

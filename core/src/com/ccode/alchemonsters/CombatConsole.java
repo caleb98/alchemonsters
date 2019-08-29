@@ -10,11 +10,14 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
+import com.ccode.alchemonsters.engine.event.messages.MCombatGroundChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatHealingReceived;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStatBuffApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
+import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
+import com.ccode.alchemonsters.engine.event.messages.MCombatWeatherChanged;
 
 public class CombatConsole extends ScrollPane implements Subscriber {
 
@@ -40,6 +43,9 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 		subscribe(MCombatAilmentApplied.ID);
 		subscribe(MCombatAilmentRemoved.ID);
 		subscribe(MCombatHealingReceived.ID);
+		subscribe(MCombatTerrainChanged.ID);
+		subscribe(MCombatWeatherChanged.ID);
+		subscribe(MCombatGroundChanged.ID);
 	}
 	
 	@Override
@@ -135,6 +141,30 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 						 full.cause,
 						 full.target.personalName,
 						 full.amount));
+			 }
+			 else if(m instanceof MCombatTerrainChanged) {
+				 MCombatTerrainChanged full = (MCombatTerrainChanged) m;
+				 println(String.format("%s's %s changed the terrain from %s to %s.", 
+						 full.source.personalName,
+						 full.cause,
+						 full.oldTerrain,
+						 full.newTerrain));
+			 }
+			 else if(m instanceof MCombatGroundChanged) {
+				 MCombatGroundChanged full = (MCombatGroundChanged) m;
+				 println(String.format("%s's %s changed the ground from %s to %s.", 
+						 full.source.personalName,
+						 full.cause,
+						 full.oldGround,
+						 full.newGround));
+			 }
+			 else if(m instanceof MCombatWeatherChanged) {
+				 MCombatWeatherChanged full = (MCombatWeatherChanged) m;
+				 println(String.format("%s's %s changed the weather from %s to %s.", 
+						 full.source.personalName,
+						 full.cause,
+						 full.oldWeather,
+						 full.newWeather));
 			 }
 		}
 	}

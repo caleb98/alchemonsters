@@ -47,7 +47,7 @@ public class AlchemonstersGame extends Game {
 		
 		//Set initial screen
 		//setScreen(mainMenu);
-		setScreen(new TestWorldScreen());
+		setScreen(new TestCombatScreen(this));
 		
 		
 	}
