@@ -5,7 +5,7 @@ isHit = Damage:rollHit(move, context, source, target)
 isCrit = Damage:rollCrit(move, context, source, target)
 isStab = Damage:checkStab(move, context, source, target)
 
-if context.battleground.weather == WeatherType.RAIN then
+if context.battleground.weather == WeatherType.DELUGE then
 	POWER = 70
 end
 

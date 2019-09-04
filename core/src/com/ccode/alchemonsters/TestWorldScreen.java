@@ -15,10 +15,7 @@ public class TestWorldScreen implements Screen {
 	private TiledMap map;
 	private TiledMapRenderer renderer;
 	private OrthographicCamera camera;
-	private OrthoCamController cControl;
-	
-	private Texture tile;
-	
+	private OrthoCamController cControl;	
 
 	@Override
 	public void show() {

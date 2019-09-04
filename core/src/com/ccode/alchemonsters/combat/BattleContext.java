@@ -24,6 +24,13 @@ public class BattleContext {
 		teamBController = teamBControl;
 		this.teamB = teamB;
 		
+		for(Creature c : teamA.creatures) {
+			c.currentContext = this;
+		}
+		for(Creature c : teamB.creatures) {
+			c.currentContext = this;
+		}
+		
 		battleground = new Battleground();
 		
 	}
@@ -38,6 +45,15 @@ public class BattleContext {
 			if(c != null && c.currentAilment != null	) {
 				c.currentAilment.update();
 			}
+		}
+	}
+	
+	public void endCombat() {
+		for(Creature c : teamA.creatures) {
+			c.currentContext = null;
+		}
+		for(Creature c : teamB.creatures) {
+			c.currentContext = null;
 		}
 	}
 	

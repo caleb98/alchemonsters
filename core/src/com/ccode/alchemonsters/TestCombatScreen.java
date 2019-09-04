@@ -257,9 +257,6 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
 		
-		//Combat setup
-		battleContext = new BattleContext(teamAControl, teamA, teamBControl, teamB);
-		
 		subscribe(MCombatStateChanged.ID);
 	}	
 	
@@ -270,6 +267,9 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	}
 
 	private void startCombat() {
+		//Combat setup
+		battleContext = new BattleContext(teamAControl, teamA, teamBControl, teamB);
+		
 		teamA.startCombat();
 		teamB.startCombat();
 		
@@ -336,7 +336,11 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 				break;
 				
 			case RECHARGE:
-				control.setRecharging(true);
+				//Deluge makes it so that recharge abilities dont require a recharge time,
+				//so only apply the recharge if the current weather is NOT deluge
+				if(battleContext.battleground.weather != WeatherType.DELUGE) {
+					control.setRecharging(true);	
+				}
 			case INSTANT:
 				for(MoveAction a : move.actions) {
 					a.activate(move, battleContext, team.active(), team, other.active(), other);
@@ -513,8 +517,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			int teamBOrder = teamBMove.priority;
 			
 			if(teamAOrder == teamBOrder) {
-				teamAOrder = teamA.active().getBuffedSpeed();
-				teamBOrder = teamB.active().getBuffedSpeed();
+				teamAOrder = teamA.active().calcTotalSpeed();
+				teamBOrder = teamB.active().calcTotalSpeed();
 			}
 			
 			if(teamAOrder == teamBOrder) {
@@ -561,11 +565,13 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		
 		if(teamA.isDefeated()) {
 			publish(new MCombatFinished(battleContext, teamB, teamA));
+			battleContext.endCombat();
 			isCombat = false;
 			return;
 		}
 		else if(teamB.isDefeated()) {
 			publish(new MCombatFinished(battleContext, teamA, teamB));
+			battleContext.endCombat();
 			isCombat = false;
 			return;
 		}

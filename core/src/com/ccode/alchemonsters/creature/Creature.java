@@ -1,8 +1,10 @@
 package com.ccode.alchemonsters.creature;
 
+import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.Catalyst;
 import com.ccode.alchemonsters.combat.PassiveAbility;
 import com.ccode.alchemonsters.combat.StatBuffs;
+import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.ailments.StatusAilment;
 import com.ccode.alchemonsters.util.DynamicVariables;
 
@@ -25,6 +27,7 @@ public class Creature {
 	public int maxMana;
 	public float critChance = 0.05f;
 	public DynamicVariables variables = new DynamicVariables();
+	public BattleContext currentContext;
 	
 	public StatBuffs buffs = new StatBuffs();
 	public StatusAilment currentAilment;
@@ -104,61 +107,75 @@ public class Creature {
 		variables.clear();
 	}
 	
-	public int getBuffedMagicAtk() {
-		return (int) ((LEVEL_ONE_STAT_VALUE + 
-				      (base.baseMagicAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
-				      (currentLevel / 100f) * attunementValues.magicAtk +
-				      (currentLevel / 100f) * experienceValues.magicAtk)
-					  * buffs.getMagicAtkMultiplier());
+	public int calcTotalMagicAtk() {
+		int total =  (int) ((LEVEL_ONE_STAT_VALUE + 
+				      		(base.baseMagicAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+				      		(currentLevel / 100f) * attunementValues.magicAtk +
+				      		(currentLevel / 100f) * experienceValues.magicAtk)
+					  		* buffs.getMagicAtkMultiplier());
+		
+		return total;
 	}
 	
-	public int getBuffedMagicDef() {
-		return (int) ((LEVEL_ONE_STAT_VALUE + 
-				      (base.baseMagicDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
-				      (currentLevel / 100f) * attunementValues.magicDef +
-				      (currentLevel / 100f) * experienceValues.magicDef)
-					  * buffs.getMagicDefMultiplier());
+	public int calcTotalMagicDef() {
+		int total =  (int) ((LEVEL_ONE_STAT_VALUE + 
+							(base.baseMagicDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+							(currentLevel / 100f) * attunementValues.magicDef +
+							(currentLevel / 100f) * experienceValues.magicDef)
+					  		* buffs.getMagicDefMultiplier());
+		
+		return total;
 	}
 	
-	public int getBuffedPhysAtk() {
-		return (int) ((LEVEL_ONE_STAT_VALUE + 
-				      (base.basePhysAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
-				      (currentLevel / 100f) * attunementValues.physAtk +
-				      (currentLevel / 100f) * experienceValues.physAtk)
-					  * buffs.getPhysAtkMultiplier());
+	public int calcTotalPhysAtk() {
+		int total =  (int) ((LEVEL_ONE_STAT_VALUE + 
+							(base.basePhysAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+							(currentLevel / 100f) * attunementValues.physAtk +
+							(currentLevel / 100f) * experienceValues.physAtk)
+					  		* buffs.getPhysAtkMultiplier());
+		
+		return total;
 	}
 	
-	public int getBuffedPhysDef() {
-		return (int) ((LEVEL_ONE_STAT_VALUE + 
-				      (base.basePhysDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
-				      (currentLevel / 100f) * attunementValues.physDef +
-				      (currentLevel / 100f) * experienceValues.physDef)
-					  * buffs.getPhysDefMultiplier());
+	public int calcTotalPhysDef() {
+		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
+						   (base.basePhysDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+						   (currentLevel / 100f) * attunementValues.physDef +
+						   (currentLevel / 100f) * experienceValues.physDef)
+					  		* buffs.getPhysDefMultiplier());
+		
+		return total;
 	}
 	
 
-	public int getBuffedPen() {
-		return (int) ((LEVEL_ONE_STAT_VALUE + 
-			      (base.basePenetration - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
-			      (currentLevel / 100f) * attunementValues.penetration +
-			      (currentLevel / 100f) * experienceValues.penetration)
-				  * buffs.getPenMultiplier());
+	public int calcTotalPen() {
+		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
+			      		   (base.basePenetration - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+			      		   (currentLevel / 100f) * attunementValues.penetration +
+			      		   (currentLevel / 100f) * experienceValues.penetration)
+				  			* buffs.getPenMultiplier());
+		
+		return total;
 	}
 	
-	public int getBuffedRes() {
-		return (int) ((LEVEL_ONE_STAT_VALUE + 
-				      (base.baseResistance - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
-				      (currentLevel / 100f) * attunementValues.resistance +
-				      (currentLevel / 100f) * experienceValues.resistance)
-					  * buffs.getResMultiplier());
+	public int calcTotalRes() {
+		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
+				      	   (base.baseResistance - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+				      	   (currentLevel / 100f) * attunementValues.resistance +
+				      	   (currentLevel / 100f) * experienceValues.resistance)
+					  		* buffs.getResMultiplier());
+		
+		return total;
 	}
 	
-	public int getBuffedSpeed() {
-		return (int) ((LEVEL_ONE_STAT_VALUE + 
-			      (base.baseSpeed - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
-			      (currentLevel / 100f) * attunementValues.speed +
-			      (currentLevel / 100f) * experienceValues.speed)
-				  * buffs.getSpeedMultiplier());
+	public int calcTotalSpeed() {
+		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
+			      		   (base.baseSpeed - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
+			      		   (currentLevel / 100f) * attunementValues.speed +
+			      		   (currentLevel / 100f) * experienceValues.speed)
+				  			* buffs.getSpeedMultiplier());
+		
+		return total;
 	}
 	
 	public int getAttunementValue(StatType stat) {

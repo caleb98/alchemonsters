@@ -9,7 +9,7 @@
 	actions: [
 		{
 			class: "SetWeather",
-			weather: "RAIN"
+			weather: "DELUGE"
 		}
 	],
 	turnType: "INSTANT",

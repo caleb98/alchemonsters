@@ -1,6 +1,10 @@
 package com.ccode.alchemonsters.combat.moves;
 
+import com.ccode.alchemonsters.combat.BattleContext;
+import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
+import com.ccode.alchemonsters.util.GameRandom;
 
 public class Move {
 	
@@ -30,6 +34,15 @@ public class Move {
 	public int priority;
 	public TurnType turnType;
 	public int delayAmount = 1;
+	
+	public boolean rollHit(BattleContext context, Creature source, Creature target) {
+		float accuracy = this.accuracy;
+		//TODO: globalize variables related to deluge accuracy increase 
+		if(context.battleground.weather == WeatherType.DELUGE && elementType == ElementType.LIGHTNING) {
+			accuracy += 0.2f;
+		}
+		return GameRandom.nextFloat() < accuracy;
+	}
 	
 	public static enum TurnType {
 		INSTANT,

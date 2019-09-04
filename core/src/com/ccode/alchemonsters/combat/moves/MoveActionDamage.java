@@ -2,6 +2,7 @@ package com.ccode.alchemonsters.combat.moves;
 
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
@@ -24,7 +25,7 @@ public class MoveActionDamage implements MoveAction {
 	public void activate(Move move, BattleContext context, Creature source, CreatureTeam sourceTeam, Creature target, CreatureTeam targetTeam) {
 		
 		//Check accuracy/hit chance
-		boolean isHit = rollHit(move, context, source, target);
+		boolean isHit = move.rollHit(context, source, target);
 		//Check for crit
 		boolean isCrit = rollCrit(move, context, source, target);
 		//STAB
@@ -59,10 +60,6 @@ public class MoveActionDamage implements MoveAction {
 		}
 	}
 	
-	public boolean rollHit(Move move, BattleContext context, Creature source, Creature target) {
-		return GameRandom.nextFloat() < move.accuracy;
-	}
-	
 	public boolean rollCrit(Move move, BattleContext context, Creature source, Creature target) {
 		for(int i = 0; i < move.critStage; ++i) {
 			if(GameRandom.nextFloat() < source.critChance) {
@@ -82,13 +79,13 @@ public class MoveActionDamage implements MoveAction {
 	}
 	
 	public  int getDamageAgainst(Move move, BattleContext context, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
-		float sourceAttack = move.moveType == MoveType.MAGIC ? source.getBuffedMagicAtk() : source.getBuffedPhysAtk();
-		float targetDefense = move.moveType == MoveType.MAGIC ? target.getBuffedMagicDef() : target.getBuffedPhysDef();	
+		float sourceAttack = move.moveType == MoveType.MAGIC ? source.calcTotalMagicAtk() : source.calcTotalPhysAtk();
+		float targetDefense = move.moveType == MoveType.MAGIC ? target.calcTotalMagicDef() : target.calcTotalPhysDef();	
 		
 		float rawDamage = ((200 + (sourceAttack - 200)) * 2.9f * power) / 200f;
 		
 		float defenseReduction = rawDamage * (targetDefense / (targetDefense + 0.5f * rawDamage)) + (targetDefense * power) / 1500f;
-		float penResRatio = source.getBuffedPen() / (float) target.getBuffedRes();
+		float penResRatio = source.calcTotalPen() / (float) target.calcTotalRes();
 		
 		float actual = Math.max((rawDamage - defenseReduction) * penResRatio * (11 - source.currentLevel / 10f), 1);
 		
@@ -101,6 +98,16 @@ public class MoveActionDamage implements MoveAction {
 		//TODO: variable stab multiplier values?
 		if(isStab) {
 			actual *= STAB_MULTIPLIER;
+		}
+		
+		//TODO: globalize deluge water damage bonus and fire damage decrease
+		if(context.battleground.weather == WeatherType.DELUGE) {
+			if(move.elementType == ElementType.WATER) {
+				actual *= 1.20f;
+			}
+			else if(move.elementType == ElementType.FIRE) {
+				actual *= 0.8f;
+			}
 		}
 		
 		float random = 0.8f + GameRandom.nextFloat() * 0.4f;
