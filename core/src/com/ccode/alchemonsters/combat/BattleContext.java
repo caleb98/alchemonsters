@@ -25,10 +25,12 @@ public class BattleContext {
 		this.teamB = teamB;
 		
 		for(Creature c : teamA.creatures) {
-			c.currentContext = this;
+			if(c != null)
+				c.currentContext = this;
 		}
 		for(Creature c : teamB.creatures) {
-			c.currentContext = this;
+			if(c != null)
+				c.currentContext = this;
 		}
 		
 		battleground = new Battleground();
@@ -50,10 +52,12 @@ public class BattleContext {
 	
 	public void endCombat() {
 		for(Creature c : teamA.creatures) {
-			c.currentContext = null;
+			if(c != null)
+				c.currentContext = null;
 		}
 		for(Creature c : teamB.creatures) {
-			c.currentContext = null;
+			if(c != null)
+				c.currentContext = null;
 		}
 	}
 	

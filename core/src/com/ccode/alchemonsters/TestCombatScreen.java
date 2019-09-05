@@ -98,6 +98,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	
 	private boolean isWaitingOnActionSelect = false;
 	private boolean isWaitingOnDeathSwitchSelect = false;
+	private boolean isTeamADoubleAttack = false;
+	private boolean isTeamBDoubleAttack = false;
 	
 	public TestCombatScreen(AlchemonstersGame game) {
 		this.game = game;
@@ -392,7 +394,12 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 					break;
 					
 				case BATTLE_PHASE_2:
-					//TODO: second battle phase
+					if(isTeamADoubleAttack) {
+						doBattleAction(teamAControl, teamA, teamB);
+					}
+					else if(isTeamBDoubleAttack) {
+						doBattleAction(teamBControl, teamB, teamA);
+					}
 					break;
 					
 				case END_PHASE:
@@ -518,7 +525,10 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		if(isWaitingOnActionSelect) {
 			if(teamAControl.isActionSelected() && teamBControl.isActionSelected()) {
 				isWaitingOnActionSelect = false;
-				setCombatState(CombatState.BATTLE_PHASE_1);
+				if(battleContext.currentState == CombatState.MAIN_PHASE_1)
+					setCombatState(CombatState.BATTLE_PHASE_1);
+				else if(battleContext.currentState == CombatState.MAIN_PHASE_2)
+					setCombatState(CombatState.BATTLE_PHASE_2);
 			}
 		}
 		else if(isWaitingOnDeathSwitchSelect) {
@@ -661,7 +671,32 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			return;
 		}
 		
-		setCombatState(CombatState.END_PHASE);
+		//check for speed double attack
+		if(teamAAction.type == BattleActionType.MOVE &&
+		   teamA.active().calcTotalSpeed() >= 2 * teamB.active().calcTotalSpeed()) {
+			
+			isWaitingOnActionSelect = true;
+			//TODO: filter actions that cant be used for second attack?
+			setDefaultControllerActions(teamAControl, teamA);
+			teamAControl.refresh();
+			isTeamADoubleAttack = true;
+			setCombatState(CombatState.MAIN_PHASE_2);
+			
+		}
+		else if(teamBAction.type == BattleActionType.MOVE &&
+				teamB.active().calcTotalSpeed() >= 2 * teamA.active().calcTotalSpeed()) {
+			
+			isWaitingOnActionSelect = true;
+			//TODO: filter actions that cant be used for second attack?
+			setDefaultControllerActions(teamBControl, teamB);
+			teamBControl.refresh();
+			isTeamBDoubleAttack = true;
+			setCombatState(CombatState.MAIN_PHASE_2);
+			
+		}
+		else {
+			setCombatState(CombatState.END_PHASE);	
+		}
 	}
 
 	@Override

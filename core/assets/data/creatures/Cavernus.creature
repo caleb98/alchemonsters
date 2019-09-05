@@ -14,7 +14,7 @@
 	basePhysDef: 200,
 	basePenetration: 200,
 	baseResistance: 200,
-	baseSpeed: 200,
+	baseSpeed: 0,
 	types: [ GROUND, VOID ],
 	componentCost: { GROUND: 1, VOID: 1 }
 }

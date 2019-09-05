@@ -1,6 +1,6 @@
 POWER = 40
 
-isHit = Damage:rollHit(move, context, source, target)
+isHit = move:rollHit(context, source, target)
 isCrit = Damage:rollCrit(move, context, source, target)
 isStab = Damage:checkStab(move, context, source, target)
 
