@@ -114,6 +114,16 @@ public class Creature {
 				      		(currentLevel / 100f) * experienceValues.magicAtk)
 					  		* buffs.getMagicAtkMultiplier());
 		
+		//TODO: globalize magic atk buff for fire in pyronimbus
+		if(currentContext != null && currentContext.battleground.weather == WeatherType.PYRONIMBUS) {
+			for(ElementType t : base.types) {
+				if(t == ElementType.FIRE) {
+					total *= 1.2f;
+					break;
+				}
+			}
+		}
+		
 		return total;
 	}
 	
@@ -124,6 +134,15 @@ public class Creature {
 							(currentLevel / 100f) * experienceValues.magicDef)
 					  		* buffs.getMagicDefMultiplier());
 		
+		if(currentContext != null && currentContext.battleground.weather == WeatherType.SANDSTORM) {
+			for(ElementType t : base.types) {
+				if(t == ElementType.GROUND) {
+					total *= 1.2f;
+					break;
+				}
+			}
+		}
+		
 		return total;
 	}
 	
@@ -133,6 +152,16 @@ public class Creature {
 							(currentLevel / 100f) * attunementValues.physAtk +
 							(currentLevel / 100f) * experienceValues.physAtk)
 					  		* buffs.getPhysAtkMultiplier());
+		
+		//TODO: globalize phys atk buff for fire in pyronimbus
+		if(currentContext != null && currentContext.battleground.weather == WeatherType.PYRONIMBUS) {
+			for(ElementType t : base.types) {
+				if(t == ElementType.FIRE) {
+					total *= 1.2f;
+					break;
+				}
+			}
+		}
 		
 		return total;
 	}
@@ -165,6 +194,16 @@ public class Creature {
 				      	   (currentLevel / 100f) * experienceValues.resistance)
 					  		* buffs.getResMultiplier());
 		
+		//TODO: globalize implementation of locust swarm undead resistance value.
+		if(currentContext != null && currentContext.battleground.weather == WeatherType.LOCUST_SWARM) {
+			for(ElementType t : base.types) {
+				if(t == ElementType.UNDEAD) {
+					total *= 1.2f;
+					break;
+				}
+			}
+		}
+		
 		return total;
 	}
 	
@@ -174,6 +213,15 @@ public class Creature {
 			      		   (currentLevel / 100f) * attunementValues.speed +
 			      		   (currentLevel / 100f) * experienceValues.speed)
 				  			* buffs.getSpeedMultiplier());
+		
+		if(currentContext != null && currentContext.battleground.weather == WeatherType.JETSTREAM) {
+			for(ElementType t : base.types) {
+				if(t == ElementType.AIR) {
+					total *= 1.2f;
+					break;
+				}
+			}
+		}
 		
 		return total;
 	}

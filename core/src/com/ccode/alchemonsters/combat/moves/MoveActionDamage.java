@@ -109,6 +109,33 @@ public class MoveActionDamage implements MoveAction {
 				actual *= 0.8f;
 			}
 		}
+		//TODO: globalize darkness void damage increase amount and fire/air decrease
+		else if(context.battleground.weather == WeatherType.DARKNESS) {
+			if(move.elementType == ElementType.VOID) {
+				actual *= 1.15f;
+			}
+			else if(move.elementType ==ElementType.AIR || move.elementType == ElementType.FIRE) {
+				actual *= 0.9f;
+			}
+		}
+		//TODO: globalize dreamscape fey damage increase 
+		else if(context.battleground.weather == WeatherType.DREAMSCAPE) {
+			if(move.elementType == ElementType.FEY) {
+				actual *= 1.3f;
+			}
+		}
+		//TODO: globalize sandstorm air attack damage increase amount
+		else if(context.battleground.weather == WeatherType.SANDSTORM) {
+			if(move.elementType == ElementType.AIR) {
+				actual *= 1.2f;
+			}
+		}
+		//TODO: globalize tempest lightning damage increase
+		else if(context.battleground.weather == WeatherType.TEMPEST) {
+			if(move.elementType == ElementType.LIGHTNING) {
+				actual *= 1.2f;
+			}
+		}
 		
 		float random = 0.8f + GameRandom.nextFloat() * 0.4f;
 		actual *= random;

@@ -33,6 +33,7 @@ import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveDictionary;
 import com.ccode.alchemonsters.creature.Creature;
+import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
@@ -317,7 +318,16 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			switch(move.turnType) {
 			
 			case CHARGE:
-				if(!control.isCharging()) {
+				//First check for dreamscape
+				if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
+					publish(new MCombatChargeStarted(battleContext, team.active(), other.active(), move));
+					for(MoveAction a : move.actions) {
+						a.activate(move, battleContext, team.active(), team, other.active(), other);
+					}
+					team.active().variables.setVariable("_PREVIOUS_MOVE", move);
+					publish(new MCombatChargeFinished(battleContext, team.active(), other.active(), move));
+				}
+				else if(!control.isCharging()) {
 					control.setCharging(action.id);
 					publish(new MCombatChargeStarted(battleContext, team.active(), other.active(), move));
 				}
@@ -396,6 +406,81 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 					break;
 					
 				case MAIN_PHASE_1:
+					//Apply damage from sandstorm
+					if(battleContext.battleground.weather == WeatherType.SANDSTORM) {
+						
+						for(ElementType t : teamA.active().base.types) {
+							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+								teamA.active().currentHealth -= teamA.active().maxHealth / 16f;
+								break;
+							}
+						}
+						
+						for(ElementType t : teamB.active().base.types) {
+							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+								teamB.active().currentHealth -= teamB.active().maxHealth / 16f;
+								break;
+							}
+						}
+						
+						//Check for sandstorm death
+						if(areActivesDead()) {
+							if(teamA.isDefeated()) {
+								publish(new MCombatFinished(battleContext, teamB, teamA));
+								battleContext.endCombat();
+								isCombat = false;
+								break;
+							}
+							else if(teamB.isDefeated()) {
+								publish(new MCombatFinished(battleContext, teamA, teamB));
+								battleContext.endCombat();
+								isCombat = false;
+								break;
+							}
+							else {
+								setCombatState(CombatState.ACTIVE_DEATH_SWAP);
+								break;
+							}
+						}
+						
+					}
+					
+					//Apply healing from dreamscape if applicable
+					if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
+						
+						teamA.active().currentHealth += teamA.active().maxHealth / 16f;
+						if(teamA.active().currentHealth > teamA.active().maxHealth) 
+							teamA.active().currentHealth = teamA.active().maxHealth;
+						
+						teamB.active().currentHealth += teamB.active().maxHealth / 16f;
+						if(teamB.active().currentHealth > teamB.active().maxHealth) 
+							teamB.active().currentHealth = teamB.active().maxHealth;
+						
+					}
+					
+					//Apply healing from tempest if applicable
+					if(battleContext.battleground.weather == WeatherType.TEMPEST) {
+						
+						for(ElementType t : teamA.active().base.types) {
+							if(t == ElementType.UNDEAD) {
+								teamA.active().currentHealth += teamA.active().maxHealth / 16f;
+								if(teamA.active().currentHealth > teamA.active().maxHealth) 
+									teamA.active().currentHealth = teamA.active().maxHealth;
+								break;
+							}
+						}
+						
+						for(ElementType t : teamB.active().base.types) {
+							if(t == ElementType.UNDEAD) {
+								teamB.active().currentHealth += teamB.active().maxHealth / 16f;
+								if(teamB.active().currentHealth > teamB.active().maxHealth) 
+									teamB.active().currentHealth = teamB.active().maxHealth;
+								break;
+							}
+						}
+						
+					}
+					
 					isWaitingOnActionSelect = true;
 					setDefaultControllerActions(teamAControl, teamA);
 					setDefaultControllerActions(teamBControl, teamB);

@@ -41,6 +41,16 @@ public class Move {
 		if(context.battleground.weather == WeatherType.DELUGE && elementType == ElementType.LIGHTNING) {
 			accuracy += 0.2f;
 		}
+		//TODO: globalize variables related to pyronimbus accuracy decrease
+		else if(context.battleground.weather == WeatherType.PYRONIMBUS && elementType == ElementType.WATER) {
+			accuracy -= 0.2f;
+		}
+		//TODO: globalize variables related to tempest accuracy increase
+		else if(context.battleground.weather == WeatherType.TEMPEST) {
+			if(elementType == ElementType.WATER || elementType == ElementType.AIR) {
+				accuracy += 0.2f;
+			}
+		}
 		return GameRandom.nextFloat() < accuracy;
 	}
 	
