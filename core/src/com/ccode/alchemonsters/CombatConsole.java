@@ -85,6 +85,7 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 					break;
 					
 				case BATTLE_PHASE_2:
+					println("Entering Battle Phase 2...");
 					break;
 					
 				case END_PHASE:
@@ -96,6 +97,17 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 					break;
 					
 				case MAIN_PHASE_2:
+					if(full.context.teamA.active().calcTotalSpeed() >= 2 * full.context.teamB.active().calcTotalSpeed()) {
+						println(String.format("%s is much faster than %s! They can attack twice...", 
+								full.context.teamA.active().personalName,
+								full.context.teamB.active().personalName));
+					}
+					else {
+						println(String.format("%s is much faster than %s! They can attack twice...", 
+								full.context.teamB.active().personalName,
+								full.context.teamA.active().personalName));
+					}
+					println("Entering Main Phase 2...");
 					break;
 					
 				case ACTIVE_DEATH_SWAP:

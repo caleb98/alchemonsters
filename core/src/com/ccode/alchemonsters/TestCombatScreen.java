@@ -400,6 +400,21 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 					else if(isTeamBDoubleAttack) {
 						doBattleAction(teamBControl, teamB, teamA);
 					}
+					if(teamA.isDefeated()) {
+						publish(new MCombatFinished(battleContext, teamB, teamA));
+						battleContext.endCombat();
+						isCombat = false;
+						return;
+					}
+					else if(teamB.isDefeated()) {
+						publish(new MCombatFinished(battleContext, teamA, teamB));
+						battleContext.endCombat();
+						isCombat = false;
+						return;
+					}
+					else {
+						setCombatState(CombatState.END_PHASE);	
+					}
 					break;
 					
 				case END_PHASE:
