@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="32" nextobjectid="27">
+<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="33" nextobjectid="28">
  <properties>
   <property name="isRoot" type="bool" value="true"/>
  </properties>
@@ -29,6 +29,14 @@
 13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13
 </data>
  </layer>
+ <objectgroup id="32" name="spawn">
+  <object id="27" x="336.333" y="403">
+   <properties>
+    <property name="id" value="main"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
  <layer id="30" name="blob_wall1" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

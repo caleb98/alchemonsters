@@ -2,9 +2,8 @@ package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2D;
 import com.ccode.alchemonsters.combat.ailments.StatusAilmentDictionary;
 import com.ccode.alchemonsters.combat.moves.MoveDictionary;
 import com.ccode.alchemonsters.creature.CreatureDictionary;
@@ -50,6 +49,9 @@ public class AlchemonstersGame extends Game {
 		CreatureDictionary.initAndLoad();
 		MoveDictionary.initAndLoad();
 		StatusAilmentDictionary.init();
+		
+		//Setup Box2d
+		Box2D.init();
 		
 		//Rendering setup
 		batch = new SpriteBatch();
