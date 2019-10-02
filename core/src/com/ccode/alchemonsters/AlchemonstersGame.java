@@ -2,7 +2,9 @@ package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 import com.ccode.alchemonsters.combat.ailments.StatusAilmentDictionary;
 import com.ccode.alchemonsters.combat.moves.MoveDictionary;
 import com.ccode.alchemonsters.creature.CreatureDictionary;
@@ -34,6 +36,7 @@ public class AlchemonstersGame extends Game {
 		
 		//TEST
 		
+		
 		//Init the Process Manager
 		processManager = new ProcessManager();
 		
@@ -54,7 +57,7 @@ public class AlchemonstersGame extends Game {
 		
 		//Set initial screen
 		//setScreen(mainMenu);
-		setScreen(new TestCombatScreen(this));
+		setScreen(new TestWorldScreen());
 		
 		
 	}
