@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters.combat.moves;
+package com.ccode.alchemonsters.engine.database;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -7,8 +7,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.SerializationException;
+import com.ccode.alchemonsters.combat.moves.Move;
+import com.ccode.alchemonsters.combat.moves.MoveActionAilmentApplicator;
+import com.ccode.alchemonsters.combat.moves.MoveActionChance;
+import com.ccode.alchemonsters.combat.moves.MoveActionChooseRandom;
+import com.ccode.alchemonsters.combat.moves.MoveActionCombine;
+import com.ccode.alchemonsters.combat.moves.MoveActionDamage;
+import com.ccode.alchemonsters.combat.moves.MoveActionRepeat;
+import com.ccode.alchemonsters.combat.moves.MoveActionScript;
+import com.ccode.alchemonsters.combat.moves.MoveActionSetGround;
+import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
+import com.ccode.alchemonsters.combat.moves.MoveActionSetWeather;
+import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
 
-public class MoveDictionary {
+public class MoveDatabase {
 
 	private static final String MOVE_DIRECTORY = "moves";
 	

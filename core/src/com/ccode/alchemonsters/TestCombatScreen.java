@@ -31,9 +31,9 @@ import com.ccode.alchemonsters.combat.TerrainType;
 import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
-import com.ccode.alchemonsters.combat.moves.MoveDictionary;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
+import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
@@ -315,7 +315,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		
 		case MOVE:
 			String moveName = team.active().moves[action.id];
-			Move move = MoveDictionary.getMove(moveName);
+			Move move = MoveDatabase.getMove(moveName);
 			team.active().currentMana -= move.manaCost;
 			switch(move.turnType) {
 			
@@ -606,7 +606,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			}
 		}
 		for(int i = 0; i < team.active().moves.length; ++i) {
-			Move move = MoveDictionary.getMove(team.active().moves[i]);
+			Move move = MoveDatabase.getMove(team.active().moves[i]);
 			if(team.active().currentMana >= move.manaCost) {
 				actions.add(new BattleAction(BattleActionType.MOVE, i));
 			}
@@ -620,8 +620,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		BattleAction teamBAction = teamBControl.getSelectedAction();
 		
 		if(teamAAction.type == BattleActionType.MOVE && teamBAction.type == BattleActionType.MOVE) {
-			Move teamAMove = MoveDictionary.getMove(teamA.active().moves[teamAAction.id]);
-			Move teamBMove = MoveDictionary.getMove(teamB.active().moves[teamBAction.id]);
+			Move teamAMove = MoveDatabase.getMove(teamA.active().moves[teamAAction.id]);
+			Move teamBMove = MoveDatabase.getMove(teamB.active().moves[teamBAction.id]);
 			
 			int teamAOrder = teamAMove.priority;
 			int teamBOrder = teamBMove.priority;
@@ -751,7 +751,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			System.out.println(json.prettyPrint(currentTeam.creatures[currentId]));
 		}
 		else if(keycode == Keys.F5) {
-			MoveDictionary.initAndLoad();
+			MoveDatabase.initAndLoad();
 			creatureEdit.reloadMovesList();
 		}
 		else {

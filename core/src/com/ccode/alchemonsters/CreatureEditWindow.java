@@ -16,13 +16,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.ccode.alchemonsters.combat.moves.MoveDictionary;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.CreatureBase;
-import com.ccode.alchemonsters.creature.CreatureDictionary;
 import com.ccode.alchemonsters.creature.CreatureNature;
 import com.ccode.alchemonsters.creature.CreatureStats;
 import com.ccode.alchemonsters.creature.StatType;
+import com.ccode.alchemonsters.engine.database.CreatureDatabase;
+import com.ccode.alchemonsters.engine.database.MoveDatabase;
 
 public class CreatureEditWindow extends Window {
 	
@@ -64,14 +64,14 @@ public class CreatureEditWindow extends Window {
 		Label creatureSelectText = new Label("Creature:", UI.DEFAULT_SKIN);
 		creatureSelectBox = new SelectBox<>(UI.DEFAULT_SKIN);
 		Array<String> items = new Array<>();
-		for(String id : CreatureDictionary.getAvailableCreatureIDs()) {
+		for(String id : CreatureDatabase.getAvailableCreatureIDs()) {
 			items.add(id);
 		}
 		creatureSelectBox.setItems(items);
 		creatureSelectBox.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				CreatureBase b = CreatureDictionary.getBase(creatureSelectBox.getSelected());
+				CreatureBase b = CreatureDatabase.getBase(creatureSelectBox.getSelected());
 				baseHealthSlider.setRange(b.minBaseHealth, b.maxBaseHealth);
 				baseManaSlider.setRange(b.minBaseMana, b.maxBaseMana);
 			}
@@ -226,7 +226,7 @@ public class CreatureEditWindow extends Window {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				try {
-					CreatureBase base = CreatureDictionary.getBase(creatureSelectBox.getSelected());
+					CreatureBase base = CreatureDatabase.getBase(creatureSelectBox.getSelected());
 					CreatureStats stats = new CreatureStats(
 							Byte.parseByte(vitaeEdit.getText()), 
 							Byte.parseByte(focusEdit.getText()), 
@@ -274,7 +274,7 @@ public class CreatureEditWindow extends Window {
 		
 		Label loadedMoves = new Label("Loaded Moves", UI.DEFAULT_SKIN);
 		movesAvailableList = new List<>(UI.DEFAULT_SKIN);
-		movesAvailableList.setItems(MoveDictionary.getLoadedMoveNames().toArray(new String[]{}));
+		movesAvailableList.setItems(MoveDatabase.getLoadedMoveNames().toArray(new String[]{}));
 		ScrollPane movesSelect = new ScrollPane(movesAvailableList, UI.DEFAULT_SKIN);
 		movesSelect.setScrollbarsVisible(true);
 		movesSelect.setFadeScrollBars(false);
@@ -366,7 +366,7 @@ public class CreatureEditWindow extends Window {
 	}
 	
 	public void reloadMovesList() {
-		movesAvailableList.setItems(MoveDictionary.getLoadedMoveNames().toArray(new String[]{}));
+		movesAvailableList.setItems(MoveDatabase.getLoadedMoveNames().toArray(new String[]{}));
 	}
 	
 	private void resetCreatureStatsDisplay() {

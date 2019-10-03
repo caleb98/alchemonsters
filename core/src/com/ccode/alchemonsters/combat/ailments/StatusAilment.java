@@ -2,6 +2,7 @@ package com.ccode.alchemonsters.combat.ailments;
 
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.creature.Creature;
+import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
 import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
 
@@ -19,7 +20,7 @@ public class StatusAilment extends ListSubscriber {
 		this.target = target;		
 		this.cause = cause;
 		
-		effect = StatusAilmentDictionary.getAilment(ailmentName);
+		effect = StatusAilmentDatabase.getAilment(ailmentName);
 	}
 	
 	public void update() {

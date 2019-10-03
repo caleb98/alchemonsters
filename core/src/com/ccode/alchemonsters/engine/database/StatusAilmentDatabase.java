@@ -1,8 +1,9 @@
-package com.ccode.alchemonsters.combat.ailments;
+package com.ccode.alchemonsters.engine.database;
 
 import java.util.HashMap;
 
 import com.ccode.alchemonsters.combat.BattleContext;
+import com.ccode.alchemonsters.combat.ailments.StatusAilmentEffect;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.event.Message;
@@ -11,7 +12,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
 
-public class StatusAilmentDictionary {
+public class StatusAilmentDatabase {
 
 	private static HashMap<String, StatusAilmentEffect> STATUS_AILMENTS;
 	private static boolean isInitialized = false;

@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleController;
 import com.ccode.alchemonsters.combat.CreatureTeam;
-import com.ccode.alchemonsters.combat.moves.MoveDictionary;
+import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Subscriber;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
@@ -356,7 +356,7 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 					stringVer.add("Continue charging " + moveName);
 					break;
 				}
-				stringVer.add("Use move " + team.active().moves[a.id] + " [" + MoveDictionary.getMove(moveName).manaCost + " mana]");
+				stringVer.add("Use move " + team.active().moves[a.id] + " [" + MoveDatabase.getMove(moveName).manaCost + " mana]");
 				break;
 				
 			case SWITCH:

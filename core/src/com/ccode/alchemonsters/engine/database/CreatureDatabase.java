@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters.creature;
+package com.ccode.alchemonsters.engine.database;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -7,8 +7,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.SerializationException;
+import com.ccode.alchemonsters.creature.CreatureBase;
 
-public class CreatureDictionary {
+public class CreatureDatabase {
 
 	private static final String CREATURE_DIRECTORY = "creatures";
 	

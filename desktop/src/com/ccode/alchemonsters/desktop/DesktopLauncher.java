@@ -27,7 +27,7 @@ public class DesktopLauncher {
 		config.addIcon("icon/icon16.png", Files.FileType.Internal);
 		
 		config.vSyncEnabled = false;
-		config.foregroundFPS = 0;
+		config.foregroundFPS = 250;
 		
 		new LwjglApplication(new AlchemonstersGame(), config);
 	}

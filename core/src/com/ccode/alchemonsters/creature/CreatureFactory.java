@@ -2,6 +2,7 @@ package com.ccode.alchemonsters.creature;
 
 import java.util.Random;
 
+import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.util.GameRandom;
 
 public class CreatureFactory {
@@ -13,7 +14,7 @@ public class CreatureFactory {
 	private static double STAT_GEN_SD = 6;
 	
 	public static Creature generateRandomLevelOne(String baseID) {
-		CreatureBase base = CreatureDictionary.getBase(baseID);
+		CreatureBase base = CreatureDatabase.getBase(baseID);
 		CreatureNature nature = generateRandomCreatureNature();
 		CreatureStats stats = generateRandomCreatureStats();
 		
