@@ -2,6 +2,8 @@ package com.ccode.alchemonsters;
 
 import java.util.Stack;
 
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input.Keys;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -22,6 +25,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader.Parameters;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -31,11 +35,27 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.ccode.alchemonsters.entity.BodyComponent;
+import com.ccode.alchemonsters.entity.CollisionComponent;
+import com.ccode.alchemonsters.entity.CollisionSystem;
+import com.ccode.alchemonsters.entity.Mappers;
+import com.ccode.alchemonsters.entity.PhysicsSystem;
+import com.ccode.alchemonsters.entity.TransformComponent;
+import com.ccode.alchemonsters.entity.TypeComponent;
+import com.ccode.alchemonsters.entity.TypeComponent.Type;
+import com.ccode.alchemonsters.entity.WarpComponent;
 
-public class TestWorldScreen implements Screen, InputProcessor {
+public class TestWorldScreen implements Screen, InputProcessor, ContactListener {
 	
 	private TmxMapLoader mapLoader = new TmxMapLoader();
 	
@@ -52,7 +72,7 @@ public class TestWorldScreen implements Screen, InputProcessor {
 	private Box2DDebugRenderer collisionDebug = new Box2DDebugRenderer();
 	
 	//Camera control
-	private ExtendViewport viewport;
+	private Viewport viewport;
 	private OrthographicCamera camera;
 	private Vector3 current = new Vector3();
 	private Vector3 last = new Vector3(-1, -1, -1);
@@ -78,11 +98,14 @@ public class TestWorldScreen implements Screen, InputProcessor {
 	@Override
 	public void show() {
 		
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false);
 		camera.update();
 		
-		viewport = new ExtendViewport(1024, 576, camera);
+		viewport = new FitViewport(640, 640 * (h / w), camera);
 		
 		Gdx.input.setInputProcessor(this);
 	
@@ -90,7 +113,7 @@ public class TestWorldScreen implements Screen, InputProcessor {
 		player = new Texture(Gdx.files.internal("data/sprites/player.png"));
 		font.setColor(Color.YELLOW);
 		
-		loadRootMap("test1");
+		switchToMap("city");
 		
 	}
 
@@ -116,7 +139,7 @@ public class TestWorldScreen implements Screen, InputProcessor {
 		
 		pBody.setLinearVelocity(vx, vy);
 		
-		activeInstance.boxWorld.step(delta, 6, 2);
+		activeInstance.entityEngine.update(delta);
 		
 		if(followCamera) {
 			camera.position.set(pBody.getPosition(), 0);
@@ -126,7 +149,7 @@ public class TestWorldScreen implements Screen, InputProcessor {
 		double fps = 1.0 / Gdx.graphics.getDeltaTime();
 		
 		//Draw
-		Gdx.gl.glClearColor(0f, 0.0f, 0.0f, 0f);
+		Gdx.gl.glClearColor(0f, 0.2f, 0.5f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		camera.update();
@@ -221,16 +244,6 @@ public class TestWorldScreen implements Screen, InputProcessor {
 			
 		case Keys.F2:
 			followCamera = !followCamera;
-			break;
-			
-		case Keys.F3:
-			loadStackMap("test1");
-			break;
-			
-		case Keys.F4:
-			if(instanceStack.size() > 0) {
-				exitStackMap();
-			}
 			break;
 		
 		}
@@ -335,25 +348,42 @@ public class TestWorldScreen implements Screen, InputProcessor {
 	/**
 	 * World loading functions
 	 */
-	private void loadStackMap(String mapName) {
-		loadStackMap(mapName, "main");
+	public void switchToMap(String mapName) {
+		switchToMap(mapName, "main");
 	}
 	
-	private void loadStackMap(String mapName, String spawnId) {
-		instanceStack.push(activeInstance);
-		setActiveInstance(loadMapInstance(mapName));
-	}
-	
-	private void exitStackMap() {
-		setActiveInstance(instanceStack.pop());
-	}
-	
-	private void loadRootMap(String mapName) {
-		//Load the instance
-		setActiveInstance(loadMapInstance(mapName));
+	public void switchToMap(String mapName, String spawnId) {
+		//Check if the new instance is just moving back up the chain
+		if(instanceStack.size() > 0 && instanceStack.peek().mapName.equals(mapName)) {
+			setActiveInstance(instanceStack.pop());
+			return;
+		}
 		
-		//Clean the instance stack
-		instanceStack.clear();
+		//Otherwise, load the new instance
+		MapInstance newInstance = loadMapInstance(mapName, spawnId);
+		Object isRootObj = newInstance.map.getProperties().get("isRoot");
+		if(isRootObj != null && isRootObj instanceof Boolean) {
+			boolean isRoot = (boolean) isRootObj;
+			if(isRoot) {
+				
+				//New map is a root map
+				setActiveInstance(newInstance);
+				instanceStack.clear();
+				
+			}
+			else {
+			
+				//New map is not a root map
+				if(activeInstance != null) {
+					instanceStack.push(activeInstance);
+				}
+				setActiveInstance(newInstance);
+				
+			}
+		}
+		else {
+			//TODO: isRoot variable does not exist in the map or not not of boolean type
+		}
 	}
 	
 	private void setActiveInstance(MapInstance instance) {
@@ -370,21 +400,27 @@ public class TestWorldScreen implements Screen, InputProcessor {
 		pBody = activeInstance.playerBody;
 	}
 	
-	private MapInstance loadMapInstance(String mapName) {
-		return loadMapInstance(mapName, "main");
-	}
-	
 	private MapInstance loadMapInstance(String mapName, String spawnId) {
 		//Load the map
 		TiledMap map = mapLoader.load(String.format("data/maps/%s.tmx", mapName));
 		OrthogonalTiledMapRenderer renderer = new OrthogonalTiledMapRenderer(map);
 		
-		//Create collisions
+		//Create box2d world
 		World boxWorld = new World(new Vector2(0, 0), true);
+		boxWorld.setContactListener(this);
 		
+		//Create the entity engine
+		Engine entityEngine = new Engine();
+		entityEngine.addSystem(new PhysicsSystem(boxWorld));
+		entityEngine.addSystem(new CollisionSystem(this));
+		
+		//Add the collision boxes to the world/entity system
 		if(map.getLayers().get("collision") != null) {
 			for(MapObject o : map.getLayers().get("collision").getObjects()) {
+				//TODO: handle other shape collision boxes
 				if(o instanceof RectangleMapObject) {
+					
+					Entity collisionEntity = new Entity();
 					
 					RectangleMapObject col = (RectangleMapObject) o;
 					Rectangle colRect = col.getRectangle();
@@ -398,11 +434,60 @@ public class TestWorldScreen implements Screen, InputProcessor {
 					colBody.createFixture(colBox, 0.0f);
 					colBox.dispose();
 					
+					collisionEntity.add(new BodyComponent(colBody));
+					collisionEntity.add(new TransformComponent());
+					collisionEntity.add(new TypeComponent(Type.COLLISION_BOX));
+					entityEngine.addEntity(collisionEntity);
+					
+					colBody.setUserData(collisionEntity);
+					
 				}
 			}
 		}
 		
-		//Add player at spawn
+		//Add warp area boxes to the world/entity system
+		if(map.getLayers().get("warps") != null) {
+			for(MapObject o : map.getLayers().get("warps").getObjects()) {
+				//TODO: handle other shape collision boxes
+				if(o instanceof RectangleMapObject) {
+					
+					MapProperties props = o.getProperties();
+					if(!props.containsKey("connectedMap")) {
+						System.err.printf("[Error] Unable to load warp area in %s (no connectedMap property.)\n", mapName);
+					}
+					
+					String connectedMap = (String) props.get("connectedMap");
+					String connectedSpawn = props.containsKey("connectedSpawn") ? (String) props.get("connectedSpawn") : "main";
+					
+					Entity warpEntity = new Entity();
+					
+					RectangleMapObject warp = (RectangleMapObject) o;
+					Rectangle warpRect = warp.getRectangle();
+					
+					BodyDef warpBodyDef = new BodyDef();
+					warpBodyDef.position.set(warpRect.x + warpRect.width / 2, warpRect.y + warpRect.width / 2);
+					
+					Body warpBody = boxWorld.createBody(warpBodyDef);
+					PolygonShape warpBox = new PolygonShape();
+					warpBox.setAsBox(warpRect.width / 2, warpRect.height / 2);
+					FixtureDef warpFixDef = new FixtureDef();
+					warpFixDef.isSensor = true;
+					warpFixDef.shape = warpBox;
+					warpBody.createFixture(warpFixDef);
+					
+					warpEntity.add(new BodyComponent(warpBody));
+					warpEntity.add(new TransformComponent());
+					warpEntity.add(new TypeComponent(Type.WARP_AREA));
+					warpEntity.add(new WarpComponent(connectedMap, connectedSpawn));
+					entityEngine.addEntity(warpEntity);
+					
+					warpBody.setUserData(warpEntity);
+					
+				}
+			}
+		}
+		
+		//Add player at spawn (to box2d world/entity engine)		
 		Vector2 playerSpawn = new Vector2();
 		boolean spawnFound = false;
 		if(map.getLayers().get("spawn") != null) {
@@ -420,6 +505,8 @@ public class TestWorldScreen implements Screen, InputProcessor {
 			System.err.printf("[Warning] No spawn point found for map %s.\n", mapName);
 		}
 		
+		Entity playerEntity = new Entity();
+		
 		BodyDef pBodyDef = new BodyDef();
 		pBodyDef.type = BodyType.DynamicBody;
 		pBodyDef.position.set(playerSpawn);
@@ -431,22 +518,64 @@ public class TestWorldScreen implements Screen, InputProcessor {
 		pBody.createFixture(pShape, 0.0f);
 		pShape.dispose();
 		
+		playerEntity.add(new BodyComponent(pBody));
+		playerEntity.add(new TransformComponent());
+		playerEntity.add(new CollisionComponent());
+		playerEntity.add(new TypeComponent(Type.UNIT));
+		entityEngine.addEntity(playerEntity);
+		
+		pBody.setUserData(playerEntity);
+		
 		//Combine into map instance
-		return new MapInstance(map, renderer, boxWorld, pBody);
+		return new MapInstance(mapName, map, renderer, boxWorld, pBody, entityEngine);
 	}
+	
+	/**
+	 * Contact listener methods for CollisionComponents
+	 */
+	@Override
+	public void beginContact(Contact contact) {
+		Fixture a = contact.getFixtureA();
+		Fixture b = contact.getFixtureB();	
+		
+		if(a.getBody().getUserData() instanceof Entity && b.getBody().getUserData() instanceof Entity) {
+			Entity ea = (Entity) a.getBody().getUserData();
+			Entity eb = (Entity) b.getBody().getUserData();
+			
+			//Look for collision components
+			CollisionComponent colA = Mappers.collisionComponent.get(ea);
+			CollisionComponent colB = Mappers.collisionComponent.get(eb);
+			
+			//If the components were present, update the collided entity.
+			if(colA != null) {
+				colA.collisions.add(eb);
+			}
+			if(colB != null) {
+				colB.collisions.add(ea);
+			}
+		}
+	}
+
+	@Override public void endContact(Contact contact) {}
+	@Override public void preSolve(Contact contact, Manifold oldManifold) {}
+	@Override public void postSolve(Contact contact, ContactImpulse impulse) {}
 	
 	private class MapInstance {
 		
+		String mapName;
 		TiledMap map;
 		TiledMapRenderer renderer;
 		World boxWorld;
 		Body playerBody;
+		Engine entityEngine;
 		
-		MapInstance(TiledMap map, TiledMapRenderer renderer, World boxWorld, Body playerBody) {
+		MapInstance(String mapName, TiledMap map, TiledMapRenderer renderer, World boxWorld, Body playerBody, Engine entityEngine) {
+			this.mapName = mapName;
 			this.map = map;
 			this.renderer = renderer;
 			this.boxWorld = boxWorld;
 			this.playerBody = playerBody;
+			this.entityEngine = entityEngine;
 		}
 		
 	}

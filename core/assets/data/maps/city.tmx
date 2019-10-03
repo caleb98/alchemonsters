@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="32" nextobjectid="27">
+<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="34" nextobjectid="42">
  <properties>
   <property name="isRoot" type="bool" value="true"/>
  </properties>
@@ -32,13 +32,6 @@
  <layer id="30" name="blob_wall1" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,63,63,63,63,63,63,63,63,63,0,0,63,63,63,63,63,63,63,0,
-0,63,0,0,0,0,0,0,0,63,0,0,63,0,0,0,0,0,63,0,
-0,63,0,0,0,0,0,0,0,63,0,0,63,0,0,0,0,0,63,0,
-0,63,0,0,0,0,0,0,0,63,0,0,63,0,0,0,0,0,63,0,
-0,63,0,0,0,0,0,0,0,63,0,0,63,0,0,0,0,0,63,0,
-0,63,0,0,0,0,0,0,0,63,0,0,63,0,0,0,0,0,63,0,
-0,63,63,63,0,0,0,63,63,63,0,0,63,63,0,0,63,63,63,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -47,27 +40,46 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,63,0,63,0,63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,63,63,63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,63,0,63,0,63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,63,63,63,63,63,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,63,63,63,63,63,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,63,63,63,63,63,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,63,63,0,63,63,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="32" name="spawn">
+  <object id="29" template="spawn.tx" name="MainSpawn" x="128" y="544">
+   <properties>
+    <property name="id" value="main"/>
+   </properties>
+  </object>
+  <object id="37" template="spawn.tx" name="RoomDoor" x="304" y="448.667">
+   <properties>
+    <property name="id" value="roomDoor"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="33" name="warps">
+  <object id="34" template="connection.tx" x="288" y="384" width="32" height="32">
+   <properties>
+    <property name="connectedMap" value="room"/>
+    <property name="connectedSpawn" value="main"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup id="31" name="collision">
-  <object id="9" x="32" y="32" width="288" height="32"/>
-  <object id="10" x="32" y="64" width="32" height="192"/>
-  <object id="11" x="64" y="224" width="64" height="32"/>
-  <object id="12" x="224" y="224" width="96" height="32"/>
-  <object id="13" x="288" y="64" width="32" height="160"/>
-  <object id="14" x="384" y="32" width="32" height="224"/>
-  <object id="15" x="416" y="224" width="32" height="32"/>
-  <object id="16" x="416" y="32" width="192" height="32"/>
-  <object id="17" x="576" y="64" width="32" height="192"/>
-  <object id="18" x="512" y="224" width="64" height="32"/>
-  <object id="19" x="32" y="512" width="32" height="96"/>
-  <object id="20" x="64" y="544" width="32" height="32"/>
-  <object id="21" x="96" y="512" width="32" height="96"/>
-  <object id="22" x="160" y="512" width="32" height="32"/>
-  <object id="23" x="160" y="576" width="32" height="32"/>
+  <object id="31" x="224" y="288" width="160" height="96"/>
+  <object id="32" x="224" y="384" width="64" height="32"/>
+  <object id="33" x="320" y="384" width="64" height="32"/>
+  <object id="38" x="-32" y="-32" width="32" height="704"/>
+  <object id="39" x="0" y="640" width="672" height="32"/>
+  <object id="40" x="640" y="-32" width="32" height="672"/>
+  <object id="41" x="0" y="-32" width="640" height="32"/>
  </objectgroup>
 </map>
