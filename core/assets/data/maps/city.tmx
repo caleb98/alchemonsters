@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="34" nextobjectid="42">
+<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="34" nextobjectid="43">
  <properties>
   <property name="isRoot" type="bool" value="true"/>
  </properties>

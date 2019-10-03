@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -25,8 +24,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader.Parameters;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -95,6 +93,11 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	private Vector2 mouse = new Vector2();
 	private Vector3 mouseWorld = new Vector3();
 	
+	//fps display
+	float fps = 0;
+	float fpsTime = 0.25f;
+	float fpsTimer = fpsTime;
+	
 	@Override
 	public void show() {
 		
@@ -146,7 +149,10 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 			correctCamera();
 		}
 		
-		double fps = 1.0 / Gdx.graphics.getDeltaTime();
+		if((fpsTimer -= delta) < 0) {
+			fps = (float) (1.0 / Gdx.graphics.getDeltaTime());
+			fpsTimer += fpsTime;
+		}
 		
 		//Draw
 		Gdx.gl.glClearColor(0f, 0.2f, 0.5f, 1f);
@@ -403,7 +409,7 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	private MapInstance loadMapInstance(String mapName, String spawnId) {
 		//Load the map
 		TiledMap map = mapLoader.load(String.format("data/maps/%s.tmx", mapName));
-		OrthogonalTiledMapRenderer renderer = new OrthogonalTiledMapRenderer(map);
+		OrthoCachedTiledMapRenderer renderer = new OrthoCachedTiledMapRenderer(map);
 		
 		//Create box2d world
 		World boxWorld = new World(new Vector2(0, 0), true);
