@@ -2,7 +2,9 @@ package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.ccode.alchemonsters.combat.ailments.StatusAilmentDictionary;
 import com.ccode.alchemonsters.combat.moves.MoveDictionary;
@@ -13,8 +15,6 @@ import com.ccode.alchemonsters.engine.event.EventManager;
 
 public class AlchemonstersGame extends Game {
 	
-	//Game screens
-	public final MainMenuScreen mainMenu;
 	private boolean isExitRequested = false;
 	
 	//Game Process Manager
@@ -23,18 +23,19 @@ public class AlchemonstersGame extends Game {
 	//Rendering
 	public SpriteBatch batch;
 	
-	public AlchemonstersGame() {
-		
-		//Initialize Game Screens
-		mainMenu = new MainMenuScreen(this);
-		
-	}
+	//Asset Management
+	public final AssetManager assetManager = new AssetManager();
 	
 	@Override
 	public void create () {
 		
 		//TEST
 		
+		//Initialize and load the asset manager
+		assetManager.load("sprites_packed/packed.atlas", TextureAtlas.class);
+		while(!assetManager.update()) {
+			
+		}
 		
 		//Init the Process Manager
 		processManager = new ProcessManager();
@@ -59,7 +60,7 @@ public class AlchemonstersGame extends Game {
 		
 		//Set initial screen
 		//setScreen(mainMenu);
-		setScreen(new TestWorldScreen());
+		setScreen(new TestWorldScreen(this));
 		
 		
 	}

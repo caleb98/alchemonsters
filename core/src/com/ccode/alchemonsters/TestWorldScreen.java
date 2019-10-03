@@ -12,9 +12,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
@@ -55,6 +55,8 @@ import com.ccode.alchemonsters.entity.WarpComponent;
 
 public class TestWorldScreen implements Screen, InputProcessor, ContactListener {
 	
+	private AlchemonstersGame game;
+	
 	private TmxMapLoader mapLoader = new TmxMapLoader();
 	
 	private Stack<MapInstance> instanceStack = new Stack<>();
@@ -81,10 +83,9 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	
 	//Rendering
 	private ShapeRenderer shapes = new ShapeRenderer();
-	private SpriteBatch batch;
 	private BitmapFont font = new BitmapFont();
 	private Vector3 textPos = new Vector3();
-	private Texture player;
+	private Sprite player;
 	
 	//Player movement
 	private float pv = 128;
@@ -97,6 +98,10 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	float fps = 0;
 	float fpsTime = 0.25f;
 	float fpsTimer = fpsTime;
+	
+	public TestWorldScreen(AlchemonstersGame game) {
+		this.game = game;
+	}
 	
 	@Override
 	public void show() {
@@ -112,8 +117,7 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 		
 		Gdx.input.setInputProcessor(this);
 	
-		batch = new SpriteBatch();
-		player = new Texture(Gdx.files.internal("data/sprites/player.png"));
+		player = game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).createSprite("player");
 		font.setColor(Color.YELLOW);
 		
 		switchToMap("city");
@@ -162,14 +166,15 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 		activeInstance.renderer.setView(camera);
 		activeInstance.renderer.render();
 		
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();		
-		batch.draw(player, pBody.getPosition().x, pBody.getPosition().y);
+		game.batch.setProjectionMatrix(camera.combined);
+		game.batch.begin();		
+		
+		game.batch.draw(player, pBody.getPosition().x, pBody.getPosition().y);
 		
 		camera.unproject(textPos.set(5f, 5f, 0f));		
-		font.draw(batch, String.format("%.1f", fps), textPos.x, textPos.y);
+		font.draw(game.batch, String.format("%.1f", fps), textPos.x, textPos.y);
 		
-		batch.end();
+		game.batch.end();
 		
 		if(renderDebug) {
 			Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -408,8 +413,8 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	
 	private MapInstance loadMapInstance(String mapName, String spawnId) {
 		//Load the map
-		TiledMap map = mapLoader.load(String.format("data/maps/%s.tmx", mapName));
-		OrthoCachedTiledMapRenderer renderer = new OrthoCachedTiledMapRenderer(map);
+		TiledMap map = mapLoader.load(String.format("maps/%s.tmx", mapName));
+		OrthoCachedTiledMapRenderer renderer = new OrthoCachedTiledMapSpriteRenderer(map);
 		
 		//Create box2d world
 		World boxWorld = new World(new Vector2(0, 0), true);
@@ -471,7 +476,7 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 					Rectangle warpRect = warp.getRectangle();
 					
 					BodyDef warpBodyDef = new BodyDef();
-					warpBodyDef.position.set(warpRect.x + warpRect.width / 2, warpRect.y + warpRect.width / 2);
+					warpBodyDef.position.set(warpRect.x + warpRect.width / 2, warpRect.y + warpRect.height / 2);
 					
 					Body warpBody = boxWorld.createBody(warpBodyDef);
 					PolygonShape warpBox = new PolygonShape();

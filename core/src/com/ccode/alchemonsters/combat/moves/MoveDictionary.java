@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.SerializationException;
 
 public class MoveDictionary {
 
-	private static final String MOVE_DIRECTORY = "data/moves";
+	private static final String MOVE_DIRECTORY = "moves";
 	
 	private static HashMap<String, Move> MOVE_DICTIONARY;
 	private static boolean isInitialized = false;

@@ -45,7 +45,7 @@ public class MoveActionScript implements MoveAction, Serializable {
 	public void read(Json json, JsonValue jsonData) {
 		String fullScript = "";
 		if(jsonData.has("scriptFile")) {
-			String localFilePath = "data/moves/" + jsonData.getString("scriptFile");
+			String localFilePath = "moves/" + jsonData.getString("scriptFile");
 			FileHandle scriptFile = Gdx.files.internal(localFilePath);
 			try {
 				fullScript = String.format("function activate(move, context, source, sourceTeam, target, targetTeam)\n%s\nend", scriptFile.readString());

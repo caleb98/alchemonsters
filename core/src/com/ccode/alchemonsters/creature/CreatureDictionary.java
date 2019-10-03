@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.SerializationException;
 
 public class CreatureDictionary {
 
-	private static final String CREATURE_DIRECTORY = "data/creatures";
+	private static final String CREATURE_DIRECTORY = "creatures";
 	
 	private static HashMap<String, CreatureBase> CREATURE_DICTIONARY;
 	private static boolean isInitialized = false;

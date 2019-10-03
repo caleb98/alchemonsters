@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="34" nextobjectid="43">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="36" nextobjectid="47">
  <properties>
   <property name="isRoot" type="bool" value="true"/>
  </properties>
- <tileset firstgid="1" source="grass_texture.tsx"/>
- <tileset firstgid="51" source="wall_texture.tsx"/>
+ <tileset firstgid="1" source="tilesets/grass_texture.tsx"/>
+ <tileset firstgid="51" source="tilesets/wall_texture.tsx"/>
  <layer id="28" name="blob_grass1" width="20" height="20">
   <data encoding="csv">
 13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,
@@ -59,7 +59,7 @@
     <property name="id" value="main"/>
    </properties>
   </object>
-  <object id="37" template="spawn.tx" name="RoomDoor" x="304" y="448.667">
+  <object id="37" template="spawn.tx" name="RoomDoor" x="303" y="429.667">
    <properties>
     <property name="id" value="roomDoor"/>
    </properties>
@@ -75,11 +75,12 @@
  </objectgroup>
  <objectgroup id="31" name="collision">
   <object id="31" x="224" y="288" width="160" height="96"/>
-  <object id="32" x="224" y="384" width="64" height="32"/>
   <object id="33" x="320" y="384" width="64" height="32"/>
   <object id="38" x="-32" y="-32" width="32" height="704"/>
   <object id="39" x="0" y="640" width="672" height="32"/>
   <object id="40" x="640" y="-32" width="32" height="672"/>
   <object id="41" x="0" y="-32" width="640" height="32"/>
+  <object id="45" x="224" y="384" width="64" height="32"/>
+  <object id="46" x="-352" y="192"/>
  </objectgroup>
 </map>
