@@ -1,0 +1,13 @@
+Index
+
+1. General Structure
+2. Collision Layer
+3. Warps Layer
+4. Spawn Layer
+5. Blob Layers
+
+-------------------------------------
+
+1. General Structure
+
+Alchemonsters maps in Tiled generally distinguish different parts of information using layers of a specific name. 
