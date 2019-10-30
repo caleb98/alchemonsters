@@ -18,7 +18,7 @@ public class AlchemonstersGame extends Game {
 	private boolean isExitRequested = false;
 	
 	//Game Process Manager
-	ProcessManager processManager;
+	public ProcessManager processManager;
 	
 	//Rendering
 	public SpriteBatch batch;
@@ -58,7 +58,7 @@ public class AlchemonstersGame extends Game {
 		
 		//Set initial screen
 		//setScreen(mainMenu);
-		setScreen(new TestWorldScreen(this));
+		setScreen(new MainMenuScreen(this));
 		
 		
 	}
