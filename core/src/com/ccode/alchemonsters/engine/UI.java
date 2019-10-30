@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters;
+package com.ccode.alchemonsters.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;

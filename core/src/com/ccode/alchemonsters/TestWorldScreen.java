@@ -7,12 +7,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -24,7 +21,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -41,8 +38,14 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.ccode.alchemonsters.engine.GameScreen;
+import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.entity.BodyComponent;
 import com.ccode.alchemonsters.entity.CollisionComponent;
 import com.ccode.alchemonsters.entity.CollisionSystem;
@@ -53,9 +56,7 @@ import com.ccode.alchemonsters.entity.TypeComponent;
 import com.ccode.alchemonsters.entity.TypeComponent.Type;
 import com.ccode.alchemonsters.entity.WarpComponent;
 
-public class TestWorldScreen implements Screen, InputProcessor, ContactListener {
-	
-	private AlchemonstersGame game;
+public class TestWorldScreen extends GameScreen implements InputProcessor, ContactListener {
 	
 	private TmxMapLoader mapLoader = new TmxMapLoader();
 	
@@ -72,8 +73,6 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	private Box2DDebugRenderer collisionDebug = new Box2DDebugRenderer();
 	
 	//Camera control
-	private Viewport viewport;
-	private OrthographicCamera camera;
 	private Vector3 current = new Vector3();
 	private Vector3 last = new Vector3(-1, -1, -1);
 	private Vector3 delta = new Vector3();
@@ -83,8 +82,6 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	
 	//Rendering
 	private ShapeRenderer shapes = new ShapeRenderer();
-	private BitmapFont font = new BitmapFont();
-	private Vector3 textPos = new Vector3();
 	private Sprite player;
 	
 	//Player movement
@@ -94,38 +91,55 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	private Vector2 mouse = new Vector2();
 	private Vector3 mouseWorld = new Vector3();
 	
+	//UI
+	private Stage ui;
+	private Table table;
+	
+	private Label fpsLabel;
+	private TextButton menuButton;
+	
 	//fps display
 	float fps = 0;
-	float fpsTime = 0.25f;
+	float fpsTime = 0.1f;
 	float fpsTimer = fpsTime;
 	
 	public TestWorldScreen(AlchemonstersGame game) {
-		this.game = game;
+		super(game);
 	}
 	
 	@Override
 	public void show() {
-		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-		
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false);
-		camera.update();
-		
-		viewport = new FitViewport(640, 640 * (h / w), camera);
-		
-		Gdx.input.setInputProcessor(this);
 	
+		ui = new Stage(game.uiView, game.batch);
+		table = new Table();
+		table.setFillParent(true);
+		ui.addActor(table);
+		
+		fpsLabel = new Label("", UI.DEFAULT_SKIN);
+		menuButton = new TextButton("Main Menu", UI.DEFAULT_SKIN);
+		menuButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new MainMenuScreen(game));
+			}
+		});
+		
+		table.add(fpsLabel).expandY().top();
+		table.row();
+		table.add(menuButton).expandY().bottom();
+		table.left();
+		
+		InputMultiplexer input = new InputMultiplexer(ui, this);
+		Gdx.input.setInputProcessor(input);
+		
 		player = game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).createSprite("player");
-		font.setColor(Color.YELLOW);
 		
 		switchToMap("city");
 		
 	}
-
+	
 	@Override
-	public void render(float delta) {
+	public void renderGraphics(float delta) {
 		
 		float vy = 0;
 		float vx = 0;
@@ -149,7 +163,7 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 		activeInstance.entityEngine.update(delta);
 		
 		if(followCamera) {
-			camera.position.set(pBody.getPosition(), 0);
+			game.camera.position.set(pBody.getPosition(), 0);
 			correctCamera();
 		}
 		
@@ -158,28 +172,21 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 			fpsTimer += fpsTime;
 		}
 		
-		//Draw
-		Gdx.gl.glClearColor(0f, 0.2f, 0.5f, 1f);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		camera.update();
-		activeInstance.renderer.setView(camera);
+		game.camera.update();
+		activeInstance.renderer.setView(game.camera);
 		activeInstance.renderer.render();
 		
-		game.batch.setProjectionMatrix(camera.combined);
+		game.batch.setProjectionMatrix(game.camera.combined);
 		game.batch.begin();		
 		
 		game.batch.draw(player, pBody.getPosition().x, pBody.getPosition().y);
-		
-		camera.unproject(textPos.set(5f, 5f, 0f));		
-		font.draw(game.batch, String.format("%.1f", fps), textPos.x, textPos.y);
 		
 		game.batch.end();
 		
 		if(renderDebug) {
 			Gdx.gl.glEnable(GL20.GL_BLEND);
 			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-			shapes.setProjectionMatrix(camera.combined);
+			shapes.setProjectionMatrix(game.camera.combined);
 			for(MapLayer l : activeInstance.map.getLayers()) {
 				for(MapObject o : l.getObjects()) {
 					if(o instanceof RectangleMapObject) {
@@ -197,34 +204,34 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 			}
 			Gdx.gl.glDisable(GL20.GL_BLEND);
 			
-			collisionDebug.render(activeInstance.boxWorld, camera.combined);
+			collisionDebug.render(activeInstance.boxWorld, game.camera.combined);
 		}
 		
 	}
-
+	
 	@Override
-	public void resize(int width, int height) {
-		viewport.update(width, height);
-	}
-
-	@Override
-	public void pause() {
+	public void renderUI(float delta) {
 		
-	}
-
-	@Override
-	public void resume() {
+		//Recalc fps
+		if((fpsTimer -= delta) < 0) {
+			fps = (float) (1.0 / Gdx.graphics.getDeltaTime());
+			fpsLabel.setText(Math.round(fps));
+			fpsTimer += fpsTime;
+		}
 		
+		ui.act(delta);
+		ui.draw();
 	}
 
 	@Override
 	public void hide() {
-		
+		Gdx.input.setInputProcessor(null);
+		dispose();
 	}
 
 	@Override
 	public void dispose() {
-		
+		ui.dispose();
 	}
 
 	/**
@@ -281,11 +288,11 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		if(!followCamera) {
-			camera.unproject(current.set(screenX, screenY, 0));
+			game.camera.unproject(current.set(screenX, screenY, 0));
 			if(!(last.x == -1 && last.y == -1 && last.z == -1)) {
-				camera.unproject(delta.set(last.x, last.y, 0));
+				game.camera.unproject(delta.set(last.x, last.y, 0));
 				delta.sub(current);
-				camera.position.add(delta.x, delta.y, 0);
+				game.camera.position.add(delta.x, delta.y, 0);
 			}
 			last.set(screenX, screenY, 0);
 			
@@ -297,7 +304,7 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
 		mouse.set(screenX, screenY);
-		camera.unproject(mouseWorld.set(screenX, screenY, 0));
+		game.camera.unproject(mouseWorld.set(screenX, screenY, 0));
 		return false;
 	}
 
@@ -313,10 +320,10 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 		//Correct camera position so that it is locked within the map bounds.
 		//If the map is smaller than the camera size, correct it so that none of the
 		//map is ever off the camera.
-		Rectangle cameraBounds = new Rectangle(camera.position.x - camera.viewportWidth / 2, 
-											   camera.position.y - camera.viewportHeight / 2, 
-											   camera.viewportWidth, 
-											   camera.viewportHeight);
+		Rectangle cameraBounds = new Rectangle(game.camera.position.x - game.camera.viewportWidth / 2, 
+											   game.camera.position.y - game.camera.viewportHeight / 2, 
+											   game.camera.viewportWidth, 
+											   game.camera.viewportHeight);
 		Rectangle mapBounds = new Rectangle(0, 0, mapWidth * tileWidth, mapHeight * tileHeight);
 		if(!mapBounds.contains(cameraBounds)) {
 			float tx = 0;
@@ -352,7 +359,7 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 				ty = -((cameraBounds.y + cameraBounds.height) - mapBounds.height);
 			}
 			
-			camera.translate(tx, ty);
+			game.camera.translate(tx, ty);
 		}
 	}
 	
@@ -414,7 +421,7 @@ public class TestWorldScreen implements Screen, InputProcessor, ContactListener 
 	private MapInstance loadMapInstance(String mapName, String spawnId) {
 		//Load the map
 		TiledMap map = mapLoader.load(String.format("maps/%s.tmx", mapName));
-		OrthoCachedTiledMapRenderer renderer = new OrthoCachedTiledMapSpriteRenderer(map);
+		TiledMapRenderer renderer = new OrthogonalTiledMapRenderer(map, game.batch);
 		
 		//Create box2d world
 		World boxWorld = new World(new Vector2(0, 0), true);

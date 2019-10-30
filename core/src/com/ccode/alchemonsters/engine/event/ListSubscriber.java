@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class ListSubscriber implements Subscriber {
 
-	protected ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
+	public ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
 
 	@Override
 	public void handleMessage(Message currentMessage) {

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
+import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Subscriber;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;

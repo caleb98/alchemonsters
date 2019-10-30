@@ -3,17 +3,25 @@ package com.ccode.alchemonsters;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ccode.alchemonsters.engine.ProcessManager;
 import com.ccode.alchemonsters.engine.ScriptManager;
+import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
 import com.ccode.alchemonsters.engine.event.EventManager;
 
 public class AlchemonstersGame extends Game {
+	
+	private static final int VIRTUAL_SCREEN_WIDTH = 640;
+	private static final int VIRUTAL_SCREEN_HEIGHT = 360;
 	
 	private boolean isExitRequested = false;
 	
@@ -22,6 +30,9 @@ public class AlchemonstersGame extends Game {
 	
 	//Rendering
 	public SpriteBatch batch;
+	public Viewport graphicsView;
+	public Viewport uiView;
+	public OrthographicCamera camera;
 	
 	//Asset Management
 	public final AssetManager assetManager = new AssetManager();
@@ -53,6 +64,9 @@ public class AlchemonstersGame extends Game {
 		Box2D.init();
 		
 		//Rendering setup
+		camera = new OrthographicCamera();
+		graphicsView = new ExtendViewport(VIRTUAL_SCREEN_WIDTH, VIRUTAL_SCREEN_HEIGHT, camera);
+		uiView = new ScreenViewport(camera);
 		batch = new SpriteBatch();
 		UI.initAndLoad();
 		
@@ -84,8 +98,15 @@ public class AlchemonstersGame extends Game {
 	}
 	
 	@Override
+	public void resize(int width, int height) {
+		graphicsView.update(width, height);
+		uiView.update(width, height);
+	}
+	
+	@Override
 	public void dispose () {
 		batch.dispose();
+		assetManager.dispose();
 	}
 	
 	public void requestExit() {

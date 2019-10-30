@@ -21,6 +21,7 @@ import com.ccode.alchemonsters.creature.CreatureBase;
 import com.ccode.alchemonsters.creature.CreatureNature;
 import com.ccode.alchemonsters.creature.CreatureStats;
 import com.ccode.alchemonsters.creature.StatType;
+import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 

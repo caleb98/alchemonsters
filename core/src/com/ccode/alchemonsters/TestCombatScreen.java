@@ -33,6 +33,8 @@ import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
+import com.ccode.alchemonsters.engine.GameScreen;
+import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
@@ -45,13 +47,14 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 import com.ccode.alchemonsters.util.GameRandom;
 
-public class TestCombatScreen extends ListSubscriber implements InputProcessor, Screen, Publisher {
-
-	private final AlchemonstersGame game;
+public class TestCombatScreen extends GameScreen implements InputProcessor, Screen, Publisher {
 	
 	private CreatureEditWindow creatureEdit;
 	private CreatureTeam currentTeam;
 	private int currentId;
+	
+	//Message listener
+	private ListSubscriber sub;
 	
 	//Overall Frame
 	private Label teamATitle;
@@ -102,7 +105,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	private boolean isTeamBDoubleAttack = false;
 	
 	public TestCombatScreen(AlchemonstersGame game) {
-		this.game = game;
+		super(game);
 	}
 	
 	@Override
@@ -110,7 +113,7 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		teamA = new CreatureTeam();
 		teamB = new CreatureTeam();
 		
-		ui = new Stage(new ScreenViewport(), game.batch);
+		ui = new Stage(game.uiView, game.batch);
 		table = new Table(UI.DEFAULT_SKIN);
 		table.setFillParent(true);
 		ui.addActor(table);
@@ -227,6 +230,17 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 			}
 		});
 		teamBuilder.add(startCombatButton).padTop(20);
+		teamBuilder.row();
+		
+		TextButton mainMenuButton = new TextButton("Exit to Main Menu", UI.DEFAULT_SKIN);
+		mainMenuButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new MainMenuScreen(game));
+			}
+		});
+		teamBuilder.add(mainMenuButton).expandY().bottom().left();
+		teamBuilder.row();
 		
 		creatureEdit = new CreatureEditWindow(ui);
 		creatureEdit.setVisible(false);
@@ -260,7 +274,8 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
 		
-		subscribe(MCombatStateChanged.ID);
+		sub = new ListSubscriber();
+		sub.subscribe(MCombatStateChanged.ID);
 	}	
 	
 	private void displayCreatureEditWindow(CreatureTeam t, int id) {
@@ -381,10 +396,15 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 	}
 	
 	@Override
-	public void render(float delta) {
+	public void renderGraphics(float delta) {
+		//no graphics for this screen
+	}
+	
+	@Override
+	public void renderUI(float delta) {
 		
 		Message m;
-		while((m = messageQueue.poll()) != null) {
+		while((m = sub.messageQueue.poll()) != null) {
 			if(m instanceof MCombatStateChanged) {
 				MCombatStateChanged full = (MCombatStateChanged) m;
 				switch(full.next) {
@@ -562,9 +582,6 @@ public class TestCombatScreen extends ListSubscriber implements InputProcessor, 
 		if(isCombat) {
 			battleContext.update();
 		}
-		
-		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		ui.act(delta);
 		ui.draw();
