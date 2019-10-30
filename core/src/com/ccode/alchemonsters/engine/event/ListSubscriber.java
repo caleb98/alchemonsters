@@ -1,6 +1,6 @@
 package com.ccode.alchemonsters.engine.event;
 
-import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * An implementation of the Subscriber interface that handles messages
@@ -8,7 +8,7 @@ import java.util.LinkedList;
  */
 public class ListSubscriber implements Subscriber {
 
-	protected LinkedList<Message> messageQueue = new LinkedList<>();
+	protected ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
 
 	@Override
 	public void handleMessage(Message currentMessage) {
