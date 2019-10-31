@@ -2,7 +2,6 @@ package com.ccode.alchemonsters;
 
 import java.util.Stack;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -18,26 +17,17 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -46,15 +36,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ccode.alchemonsters.engine.GameScreen;
 import com.ccode.alchemonsters.engine.UI;
-import com.ccode.alchemonsters.entity.BodyComponent;
 import com.ccode.alchemonsters.entity.CollisionComponent;
-import com.ccode.alchemonsters.entity.CollisionSystem;
 import com.ccode.alchemonsters.entity.Mappers;
-import com.ccode.alchemonsters.entity.PhysicsSystem;
-import com.ccode.alchemonsters.entity.TransformComponent;
-import com.ccode.alchemonsters.entity.TypeComponent;
-import com.ccode.alchemonsters.entity.TypeComponent.Type;
-import com.ccode.alchemonsters.entity.WarpComponent;
+import com.ccode.alchemonsters.world.MapInstance;
+import com.ccode.alchemonsters.world.MapInstanceLoader;
 
 public class TestWorldScreen extends GameScreen implements InputProcessor, ContactListener {
 	
@@ -79,6 +64,7 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	
 	private boolean renderDebug = false;
 	private boolean followCamera = true;
+	private boolean printInstanceStack = false;
 	
 	//Rendering
 	private ShapeRenderer shapes = new ShapeRenderer();
@@ -176,12 +162,8 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		activeInstance.renderer.setView(game.camera);
 		activeInstance.renderer.render();
 		
-		game.batch.setProjectionMatrix(game.camera.combined);
-		game.batch.begin();		
-		
-		game.batch.draw(player, pBody.getPosition().x, pBody.getPosition().y);
-		
-		game.batch.end();
+		Vector2 playerPos = pBody.getPosition();
+		player.setPosition(playerPos.x, playerPos.y);
 		
 		if(renderDebug) {
 			Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -263,6 +245,11 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		case Keys.F2:
 			followCamera = !followCamera;
 			break;
+			
+		case Keys.F3:
+			printInstanceStack = !printInstanceStack;
+			break;
+			
 		
 		}
 		
@@ -363,6 +350,14 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		}
 	}
 	
+	private void printInstanceStack() {
+		System.out.printf("MapInstance Stack: ");
+		for(int i = 0; i < instanceStack.size(); ++i) {
+			System.out.printf("%s > ", instanceStack.get(i).mapName);
+		}
+		System.out.printf("%s\n", activeInstance.mapName);
+	}
+	
 	/**
 	 * World loading functions
 	 */
@@ -372,13 +367,19 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	
 	public void switchToMap(String mapName, String spawnId) {
 		//Check if the new instance is just moving back up the chain
-		if(instanceStack.size() > 0 && instanceStack.peek().mapName.equals(mapName)) {
-			setActiveInstance(instanceStack.pop());
-			return;
+		for(int i = instanceStack.size() - 1; i >= 0; --i) {
+			if(instanceStack.get(i).mapName.equals(mapName)) {
+				int popnum = instanceStack.size() - 1 - i;
+				for(int p = 0; p < popnum; ++p) instanceStack.pop();
+				setActiveInstance(instanceStack.pop());
+				if(printInstanceStack) printInstanceStack();
+				return;
+			}
 		}
 		
 		//Otherwise, load the new instance
-		MapInstance newInstance = loadMapInstance(mapName, spawnId);
+		MapInstance newInstance = MapInstanceLoader.loadMapInstance(game, this, mapName, spawnId);
+		newInstance.renderer.addSprite(player);
 		Object isRootObj = newInstance.map.getProperties().get("isRoot");
 		if(isRootObj != null && isRootObj instanceof Boolean) {
 			boolean isRoot = (boolean) isRootObj;
@@ -402,6 +403,9 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		else {
 			//TODO: isRoot variable does not exist in the map or not not of boolean type
 		}
+		
+		if(printInstanceStack) printInstanceStack();
+		
 	}
 	
 	private void setActiveInstance(MapInstance instance) {
@@ -416,136 +420,6 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		
 		//Update our reference to the player body
 		pBody = activeInstance.playerBody;
-	}
-	
-	private MapInstance loadMapInstance(String mapName, String spawnId) {
-		//Load the map
-		TiledMap map = mapLoader.load(String.format("maps/%s.tmx", mapName));
-		TiledMapRenderer renderer = new OrthogonalTiledMapRenderer(map, game.batch);
-		
-		//Create box2d world
-		World boxWorld = new World(new Vector2(0, 0), true);
-		boxWorld.setContactListener(this);
-		
-		//Create the entity engine
-		Engine entityEngine = new Engine();
-		entityEngine.addSystem(new PhysicsSystem(boxWorld));
-		entityEngine.addSystem(new CollisionSystem(this));
-		
-		//Add the collision boxes to the world/entity system
-		if(map.getLayers().get("collision") != null) {
-			for(MapObject o : map.getLayers().get("collision").getObjects()) {
-				//TODO: handle other shape collision boxes
-				if(o instanceof RectangleMapObject) {
-					
-					Entity collisionEntity = new Entity();
-					
-					RectangleMapObject col = (RectangleMapObject) o;
-					Rectangle colRect = col.getRectangle();
-							
-					BodyDef colBodyDef = new BodyDef();
-					colBodyDef.position.set(colRect.x + colRect.width / 2, colRect.y + colRect.height / 2);
-					
-					Body colBody = boxWorld.createBody(colBodyDef);
-					PolygonShape colBox = new PolygonShape();
-					colBox.setAsBox(colRect.width / 2, colRect.height / 2);
-					colBody.createFixture(colBox, 0.0f);
-					colBox.dispose();
-					
-					collisionEntity.add(new BodyComponent(colBody));
-					collisionEntity.add(new TransformComponent());
-					collisionEntity.add(new TypeComponent(Type.COLLISION_BOX));
-					entityEngine.addEntity(collisionEntity);
-					
-					colBody.setUserData(collisionEntity);
-					
-				}
-			}
-		}
-		
-		//Add warp area boxes to the world/entity system
-		if(map.getLayers().get("warps") != null) {
-			for(MapObject o : map.getLayers().get("warps").getObjects()) {
-				//TODO: handle other shape collision boxes
-				if(o instanceof RectangleMapObject) {
-					
-					MapProperties props = o.getProperties();
-					if(!props.containsKey("connectedMap")) {
-						System.err.printf("[Error] Unable to load warp area in %s (no connectedMap property.)\n", mapName);
-					}
-					
-					String connectedMap = (String) props.get("connectedMap");
-					String connectedSpawn = props.containsKey("connectedSpawn") ? (String) props.get("connectedSpawn") : "main";
-					
-					Entity warpEntity = new Entity();
-					
-					RectangleMapObject warp = (RectangleMapObject) o;
-					Rectangle warpRect = warp.getRectangle();
-					
-					BodyDef warpBodyDef = new BodyDef();
-					warpBodyDef.position.set(warpRect.x + warpRect.width / 2, warpRect.y + warpRect.height / 2);
-					
-					Body warpBody = boxWorld.createBody(warpBodyDef);
-					PolygonShape warpBox = new PolygonShape();
-					warpBox.setAsBox(warpRect.width / 2, warpRect.height / 2);
-					FixtureDef warpFixDef = new FixtureDef();
-					warpFixDef.isSensor = true;
-					warpFixDef.shape = warpBox;
-					warpBody.createFixture(warpFixDef);
-					
-					warpEntity.add(new BodyComponent(warpBody));
-					warpEntity.add(new TransformComponent());
-					warpEntity.add(new TypeComponent(Type.WARP_AREA));
-					warpEntity.add(new WarpComponent(connectedMap, connectedSpawn));
-					entityEngine.addEntity(warpEntity);
-					
-					warpBody.setUserData(warpEntity);
-					
-				}
-			}
-		}
-		
-		//Add player at spawn (to box2d world/entity engine)		
-		Vector2 playerSpawn = new Vector2();
-		boolean spawnFound = false;
-		if(map.getLayers().get("spawn") != null) {
-			MapLayer spawns = map.getLayers().get("spawn");
-			for(MapObject spawn : spawns.getObjects()) {
-				if(spawn instanceof RectangleMapObject && spawn.getProperties().containsKey("id") && spawn.getProperties().get("id").equals(spawnId)) {
-					Rectangle spawnRect = ((RectangleMapObject) spawn).getRectangle();
-					playerSpawn.set(spawnRect.x, spawnRect.y);
-					spawnFound = true;
-					break;
-				}
-			}
-		}
-		if(!spawnFound) {
-			System.err.printf("[Warning] No spawn point found for map %s.\n", mapName);
-		}
-		
-		Entity playerEntity = new Entity();
-		
-		BodyDef pBodyDef = new BodyDef();
-		pBodyDef.type = BodyType.DynamicBody;
-		pBodyDef.position.set(playerSpawn);
-		
-		Body pBody = boxWorld.createBody(pBodyDef);
-		CircleShape pShape = new CircleShape();
-		pShape.setRadius(16);
-		pShape.setPosition(new Vector2(16, 16));
-		pBody.createFixture(pShape, 0.0f);
-		pShape.dispose();
-		
-		playerEntity.add(new BodyComponent(pBody));
-		playerEntity.add(new TransformComponent());
-		playerEntity.add(new CollisionComponent());
-		playerEntity.add(new TypeComponent(Type.UNIT));
-		entityEngine.addEntity(playerEntity);
-		
-		pBody.setUserData(playerEntity);
-		
-		//Combine into map instance
-		return new MapInstance(mapName, map, renderer, boxWorld, pBody, entityEngine);
 	}
 	
 	/**
@@ -577,25 +451,5 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	@Override public void endContact(Contact contact) {}
 	@Override public void preSolve(Contact contact, Manifold oldManifold) {}
 	@Override public void postSolve(Contact contact, ContactImpulse impulse) {}
-	
-	private class MapInstance {
-		
-		String mapName;
-		TiledMap map;
-		TiledMapRenderer renderer;
-		World boxWorld;
-		Body playerBody;
-		Engine entityEngine;
-		
-		MapInstance(String mapName, TiledMap map, TiledMapRenderer renderer, World boxWorld, Body playerBody, Engine entityEngine) {
-			this.mapName = mapName;
-			this.map = map;
-			this.renderer = renderer;
-			this.boxWorld = boxWorld;
-			this.playerBody = playerBody;
-			this.entityEngine = entityEngine;
-		}
-		
-	}
 
 }
