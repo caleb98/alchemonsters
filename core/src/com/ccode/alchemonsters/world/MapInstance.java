@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
-import com.ccode.alchemonsters.OrthogonalTiledSpriteMapRenderer;
+import com.ccode.alchemonsters.engine.OrthogonalTiledSpriteMapRenderer;
 
 public class MapInstance {
 	

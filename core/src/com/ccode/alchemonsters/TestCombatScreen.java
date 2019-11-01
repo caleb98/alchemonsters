@@ -8,7 +8,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -17,9 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
 import com.ccode.alchemonsters.combat.BattleContext;
@@ -45,6 +44,10 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
+import com.ccode.alchemonsters.ui.CombatConsole;
+import com.ccode.alchemonsters.ui.CreatureEditWindow;
+import com.ccode.alchemonsters.ui.TeamBuilderWindow;
+import com.ccode.alchemonsters.ui.TeamCombatDisplay;
 import com.ccode.alchemonsters.util.GameRandom;
 
 public class TestCombatScreen extends GameScreen implements InputProcessor, Screen, Publisher {
@@ -57,25 +60,28 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	private ListSubscriber sub;
 	
 	//Overall Frame
-	private Label teamATitle;
-	private Label teamA1;
-	private TextButton teamA1Edit;
-	private Label teamA2;
-	private TextButton teamA2Edit;
-	private Label teamA3;
-	private TextButton teamA3Edit;
-	private Label teamA4;
-	private TextButton teamA4Edit;
+	private TeamBuilderWindow teamABuilder;
+	private TeamBuilderWindow teamBBuilder;
 	
-	private Label teamBTitle;
-	private Label teamB1;
-	private TextButton teamB1Edit;
-	private Label teamB2;
-	private TextButton teamB2Edit;
-	private Label teamB3;
-	private TextButton teamB3Edit;
-	private Label teamB4;
-	private TextButton teamB4Edit;
+//	private Label teamATitle;
+//	private Label teamA1;
+//	private TextButton teamA1Edit;
+//	private Label teamA2;
+//	private TextButton teamA2Edit;
+//	private Label teamA3;
+//	private TextButton teamA3Edit;
+//	private Label teamA4;
+//	private TextButton teamA4Edit;
+//	
+//	private Label teamBTitle;
+//	private Label teamB1;
+//	private TextButton teamB1Edit;
+//	private Label teamB2;
+//	private TextButton teamB2Edit;
+//	private Label teamB3;
+//	private TextButton teamB3Edit;
+//	private Label teamB4;
+//	private TextButton teamB4Edit;
 	
 	//TODO: Combat window UI
 	private Window combatWindow;
@@ -119,68 +125,19 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		ui.addActor(table);
 		table.bottom();
 		
-		Window teamBuilder = new Window("Team Setup", UI.DEFAULT_SKIN);
-		teamBuilder.top();
-		teamBuilder.setMovable(false);
-		table.add(teamBuilder).expandY().left().top().fillY().prefWidth(300);
+//		Window teamBuilder = new Window("Team Setup", UI.DEFAULT_SKIN);
+//		teamBuilder.top();
+//		teamBuilder.setMovable(false);
+//		table.add(teamBuilder).expandY().left().top().fillY().prefWidth(300);
 		
-		teamATitle = new Label("Team A", UI.DEFAULT_SKIN);
-		teamBuilder.add(teamATitle).center().padTop(10).left();
-		teamBuilder.row();
+		Table teamBuilders = new Table();
+		teamABuilder = new TeamBuilderWindow(ui, "Team A", teamA);
+		teamBBuilder = new TeamBuilderWindow(ui, "Team B", teamB);
+		teamBuilders.add(teamABuilder).expandY().fill().prefWidth(300);
+		teamBuilders.row();
+		teamBuilders.add(teamBBuilder).expandY().fill().prefWidth(300);
 		
-		teamA1 = new CreatureNameLabel(teamA, 0);
-		teamA1Edit = new EditButton(teamA, 0);
-		teamBuilder.add(teamA1).expandX().left();
-		teamBuilder.add(teamA1Edit).right().fillX();
-		teamBuilder.row();
-		
-		teamA2 = new CreatureNameLabel(teamA, 1);
-		teamA2Edit = new EditButton(teamA, 1);
-		teamBuilder.add(teamA2).left();
-		teamBuilder.add(teamA2Edit).right().fillX();
-		teamBuilder.row();
-		
-		teamA3 = new CreatureNameLabel(teamA, 2);
-		teamA3Edit = new EditButton(teamA, 2);
-		teamBuilder.add(teamA3).expandX().left();
-		teamBuilder.add(teamA3Edit).right().fillX();
-		teamBuilder.row();
-		
-		teamA4 = new CreatureNameLabel(teamA, 3);
-		teamA4Edit = new EditButton(teamA, 3);
-		teamBuilder.add(teamA4).expandX().left();
-		teamBuilder.add(teamA4Edit).right().fillX();
-		teamBuilder.row();
-		
-		teamBuilder.row();
-		
-		teamBTitle = new Label("Team B", UI.DEFAULT_SKIN);
-		teamBuilder.add(teamBTitle).center().padTop(30).left();
-		teamBuilder.row();
-		
-		teamB1 = new CreatureNameLabel(teamB, 0);
-		teamB1Edit = new EditButton(teamB, 0);
-		teamBuilder.add(teamB1).expandX().left();
-		teamBuilder.add(teamB1Edit).right().fillX();
-		teamBuilder.row();
-		
-		teamB2 = new CreatureNameLabel(teamB, 1);
-		teamB2Edit = new EditButton(teamB, 1);
-		teamBuilder.add(teamB2).left();
-		teamBuilder.add(teamB2Edit).right().fillX();
-		teamBuilder.row();
-		
-		teamB3 = new CreatureNameLabel(teamB, 2);
-		teamB3Edit = new EditButton(teamB, 2);
-		teamBuilder.add(teamB3).expandX().left();
-		teamBuilder.add(teamB3Edit).right().fillX();
-		teamBuilder.row();
-		
-		teamB4 = new CreatureNameLabel(teamB, 3);
-		teamB4Edit = new EditButton(teamB, 3);
-		teamBuilder.add(teamB4).expandX().left();
-		teamBuilder.add(teamB4Edit).right().fillX();
-		teamBuilder.row();
+		table.add(teamBuilders).expandY().fill().align(Align.topLeft).prefWidth(300);
 		
 		Dialog errorMessage = new Dialog("Error", UI.DEFAULT_SKIN) {
 			@Override
@@ -229,8 +186,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 				startCombat();
 			}
 		});
-		teamBuilder.add(startCombatButton).padTop(20);
-		teamBuilder.row();
+		//teamBuilder.add(startCombatButton).padTop(20);
+		//teamBuilder.row();
 		
 		TextButton mainMenuButton = new TextButton("Exit to Main Menu", UI.DEFAULT_SKIN);
 		mainMenuButton.addListener(new ClickListener() {
@@ -239,8 +196,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 				game.setScreen(new MainMenuScreen(game));
 			}
 		});
-		teamBuilder.add(mainMenuButton).expandY().bottom().left();
-		teamBuilder.row();
+		//teamBuilder.add(mainMenuButton).expandY().bottom().left();
+		//teamBuilder.row();
 		
 		creatureEdit = new CreatureEditWindow(ui);
 		creatureEdit.setVisible(false);

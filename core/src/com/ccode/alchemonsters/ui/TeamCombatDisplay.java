@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters;
+package com.ccode.alchemonsters.ui;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
