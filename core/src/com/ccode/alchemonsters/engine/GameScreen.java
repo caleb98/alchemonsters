@@ -24,11 +24,9 @@ public abstract class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		//Render graphics
-		game.graphicsView.apply();
 		renderGraphics(delta);
 		
 		//Render ui
-		game.uiView.apply(true);
 		renderUI(delta);
 		
 	}

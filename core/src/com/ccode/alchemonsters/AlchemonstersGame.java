@@ -30,9 +30,10 @@ public class AlchemonstersGame extends Game {
 	
 	//Rendering
 	public SpriteBatch batch;
-	public Viewport graphicsView;
-	public Viewport uiView;
-	public OrthographicCamera camera;
+	public ExtendViewport graphicsView;
+	public OrthographicCamera graphicsCamera;
+	public ScreenViewport uiView;
+	public OrthographicCamera uiCamera;
 	
 	//Asset Management
 	public final AssetManager assetManager = new AssetManager();
@@ -64,9 +65,10 @@ public class AlchemonstersGame extends Game {
 		Box2D.init();
 		
 		//Rendering setup
-		camera = new OrthographicCamera();
-		graphicsView = new ExtendViewport(VIRTUAL_SCREEN_WIDTH, VIRUTAL_SCREEN_HEIGHT, camera);
-		uiView = new ScreenViewport(camera);
+		graphicsCamera = new OrthographicCamera();
+		uiCamera = new OrthographicCamera();
+		graphicsView = new ExtendViewport(VIRTUAL_SCREEN_WIDTH, VIRUTAL_SCREEN_HEIGHT, graphicsCamera);
+		uiView = new ScreenViewport(uiCamera);
 		batch = new SpriteBatch();
 		UI.initAndLoad();
 		

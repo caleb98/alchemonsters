@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="42" nextobjectid="62">
+<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="42" nextobjectid="63">
  <properties>
   <property name="isRoot" type="bool" value="true"/>
  </properties>
@@ -101,20 +101,20 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="32" name="spawn" visible="0">
-  <object id="29" template="spawn.tx" name="MainSpawn" x="128" y="544">
+ <objectgroup id="32" name="spawn">
+  <object id="29" template="spawn.tx" name="MainSpawn" x="32" y="608">
    <properties>
     <property name="id" value="main"/>
    </properties>
   </object>
-  <object id="37" template="spawn.tx" name="RoomDoor" x="303" y="429.667">
+  <object id="62" template="spawn.tx" name="RoomDoor" x="288" y="448">
    <properties>
     <property name="id" value="roomDoor"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="33" name="warps">
-  <object id="34" template="connection.tx" x="288" y="384" width="32" height="20">
+  <object id="34" template="connection.tx" x="288" y="384" width="32" height="18.5">
    <properties>
     <property name="connectedMap" value="room"/>
     <property name="connectedSpawn" value="main"/>

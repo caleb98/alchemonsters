@@ -8,16 +8,14 @@ import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -64,14 +62,12 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	private Vector3 current = new Vector3();
 	private Vector3 last = new Vector3(-1, -1, -1);
 	private Vector3 delta = new Vector3();
-	private Vector3 graphicsCamPos = new Vector3();
 	
 	private boolean renderDebug = false;
 	private boolean followCamera = true;
 	private boolean printInstanceStack = false;
 	
 	//Rendering
-	private ShapeRenderer shapes = new ShapeRenderer();
 	private Sprite player;
 	
 	//Player movement
@@ -153,57 +149,25 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		activeInstance.entityEngine.update(delta);
 		
 		if(followCamera) {
-			graphicsCamPos.set(pBody.getPosition(), 0);
+			game.graphicsCamera.position.set(pBody.getPosition(), 0);
 			correctCamera();
 		}
-		game.camera.position.set(graphicsCamPos);
 		
 		if((fpsTimer -= delta) < 0) {
 			fps = (float) (1.0 / Gdx.graphics.getDeltaTime());
 			fpsTimer += fpsTime;
 		}
 		
-		game.camera.update();
-		activeInstance.renderer.setView(game.camera);
+		game.graphicsCamera.update();
+		activeInstance.renderer.setView(game.graphicsCamera);
 		activeInstance.renderer.render();
 		
 		Vector2 playerPos = pBody.getPosition();
 		player.setPosition(playerPos.x, playerPos.y);
 		
-		if(renderDebug) {
-			Gdx.gl.glEnable(GL20.GL_BLEND);
-			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-			shapes.setProjectionMatrix(game.camera.combined);
-			for(MapLayer l : activeInstance.map.getLayers()) {
-				for(MapObject o : l.getObjects()) {
-					if(o instanceof RectangleMapObject) {
-						RectangleMapObject rectObj = (RectangleMapObject) o;
-						Rectangle rect = rectObj.getRectangle();
-
-						shapes.setColor(0, 0, 1f, 0.25f);
-						shapes.begin(ShapeType.Filled);
-						shapes.rect(rect.x, rect.y, rect.width, rect.height);
-						shapes.end();
-						
-						if(rect.contains(mouseWorld.x, mouseWorld.y)) {
-							shapes.setColor(0, 0, 1f, 0.25f);
-							shapes.begin(ShapeType.Filled);
-							shapes.rect(rect.x, rect.y, rect.width, rect.height);
-							shapes.end();
-						}					
-					}
-				}
-			}
-			Gdx.gl.glDisable(GL20.GL_BLEND);
-			
-			collisionDebug.render(activeInstance.boxWorld, game.camera.combined);
-			
-			shapes.begin(ShapeType.Filled);
-			shapes.circle(mouseWorld.x, mouseWorld.y, 8);
-			shapes.end();
+		if(renderDebug) {			
+			collisionDebug.render(activeInstance.boxWorld, game.graphicsCamera.combined);
 		}
-		
-		System.out.printf("(%.0f, %.0f)\n", mouseWorld.x, mouseWorld.y);
 		
 	}
 	
@@ -291,14 +255,17 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		if(!followCamera) {
-			game.graphicsView.apply();
-			game.graphicsView.unproject(current.set(screenX, screenY, 0));
+			//Set current pos and unproject
+			current.set(-screenX, -screenY, 0);
+			game.graphicsView.unproject(current);
+			current.sub(game.graphicsCamera.position.x, game.graphicsCamera.position.y, 0);
+			//If the touch is down
 			if(!(last.x == -1 && last.y == -1 && last.z == -1)) {
-				game.graphicsView.unproject(delta.set(last.x, last.y, 0));
-				delta.sub(current);
-				graphicsCamPos.add(delta.x, delta.y, 0);
+				delta.set(current.x - last.x, current.y - last.y, 0);
+				game.graphicsCamera.translate(delta);
 			}
-			last.set(screenX, screenY, 0);
+			//Set prev values for next drag call
+			last.set(current);
 			
 			correctCamera();
 		}
@@ -307,12 +274,9 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		game.graphicsView.apply();
-		game.camera.position.set(graphicsCamPos);
 		mouse.set(screenX, screenY);
 		mouseWorld.set(screenX, screenY, 0);
-		game.graphicsView.unproject(mouseWorld.set(screenX, screenY, 0));
-		mouseWorld.add(-game.camera.viewportWidth, -game.camera.viewportHeight, 0);
+		game.graphicsCamera.unproject(mouseWorld);
 		return false;
 	}
 
@@ -325,14 +289,13 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	 * Camera methods
 	 */
 	private void correctCamera() {
-		game.graphicsView.apply();
 		//Correct camera position so that it is locked within the map bounds.
 		//If the map is smaller than the camera size, correct it so that none of the
 		//map is ever off the camera.
-		Rectangle cameraBounds = new Rectangle(graphicsCamPos.x - game.camera.viewportWidth / 2, 
-											   graphicsCamPos.y - game.camera.viewportHeight / 2, 
-											   game.camera.viewportWidth, 
-											   game.camera.viewportHeight);
+		Rectangle cameraBounds = new Rectangle(game.graphicsCamera.position.x - game.graphicsCamera.viewportWidth / 2, 
+											   game.graphicsCamera.position.y - game.graphicsCamera.viewportHeight / 2, 
+											   game.graphicsCamera.viewportWidth, 
+											   game.graphicsCamera.viewportHeight);
 		Rectangle mapBounds = new Rectangle(0, 0, mapWidth * tileWidth, mapHeight * tileHeight);
 		if(!mapBounds.contains(cameraBounds)) {
 			float tx = 0;
@@ -368,7 +331,7 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 				ty = -((cameraBounds.y + cameraBounds.height) - mapBounds.height);
 			}
 			
-			graphicsCamPos.add(tx, ty, 0);
+			game.graphicsCamera.translate(tx, ty);
 		}
 	}
 	
