@@ -80,18 +80,26 @@ public class MapInstanceLoader {
 		Vector2 playerSpawn = new Vector2();
 		boolean spawnFound = false;
 		if(map.getLayers().get("spawn") != null) {
+			
 			MapLayer spawns = map.getLayers().get("spawn");
 			for(MapObject spawn : spawns.getObjects()) {
-				if(spawn instanceof RectangleMapObject && spawn.getProperties().containsKey("id") && spawn.getProperties().get("id").equals(spawnId)) {
+				
+				if(spawn instanceof RectangleMapObject && 
+				   spawn.getProperties().containsKey("id") && 
+				   spawn.getProperties().get("id").equals(spawnId)) {
+					
 					Rectangle spawnRect = ((RectangleMapObject) spawn).getRectangle();
 					playerSpawn.set(spawnRect.x, spawnRect.y);
 					spawnFound = true;
 					break;
+					
 				}
+				
 			}
+			
 		}
 		if(!spawnFound) {
-			System.err.printf("[Warning] No spawn point found for map %s.\n", mapName);
+			System.err.printf("[Warning] No spawn point %s found for map %s.\n", spawnId, mapName);
 		}
 		
 		Entity playerEntity = new Entity();

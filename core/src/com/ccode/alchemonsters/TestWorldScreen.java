@@ -22,7 +22,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -61,6 +64,7 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	private Vector3 current = new Vector3();
 	private Vector3 last = new Vector3(-1, -1, -1);
 	private Vector3 delta = new Vector3();
+	private Vector3 graphicsCamPos = new Vector3();
 	
 	private boolean renderDebug = false;
 	private boolean followCamera = true;
@@ -149,9 +153,10 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		activeInstance.entityEngine.update(delta);
 		
 		if(followCamera) {
-			game.camera.position.set(pBody.getPosition(), 0);
+			graphicsCamPos.set(pBody.getPosition(), 0);
 			correctCamera();
 		}
+		game.camera.position.set(graphicsCamPos);
 		
 		if((fpsTimer -= delta) < 0) {
 			fps = (float) (1.0 / Gdx.graphics.getDeltaTime());
@@ -174,9 +179,14 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 					if(o instanceof RectangleMapObject) {
 						RectangleMapObject rectObj = (RectangleMapObject) o;
 						Rectangle rect = rectObj.getRectangle();
+
+						shapes.setColor(0, 0, 1f, 0.25f);
+						shapes.begin(ShapeType.Filled);
+						shapes.rect(rect.x, rect.y, rect.width, rect.height);
+						shapes.end();
 						
 						if(rect.contains(mouseWorld.x, mouseWorld.y)) {
-							shapes.setColor(0, 0, 0.5f, 0.25f);
+							shapes.setColor(0, 0, 1f, 0.25f);
 							shapes.begin(ShapeType.Filled);
 							shapes.rect(rect.x, rect.y, rect.width, rect.height);
 							shapes.end();
@@ -187,7 +197,13 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 			Gdx.gl.glDisable(GL20.GL_BLEND);
 			
 			collisionDebug.render(activeInstance.boxWorld, game.camera.combined);
+			
+			shapes.begin(ShapeType.Filled);
+			shapes.circle(mouseWorld.x, mouseWorld.y, 8);
+			shapes.end();
 		}
+		
+		System.out.printf("(%.0f, %.0f)\n", mouseWorld.x, mouseWorld.y);
 		
 	}
 	
@@ -275,11 +291,12 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		if(!followCamera) {
-			game.camera.unproject(current.set(screenX, screenY, 0));
+			game.graphicsView.apply();
+			game.graphicsView.unproject(current.set(screenX, screenY, 0));
 			if(!(last.x == -1 && last.y == -1 && last.z == -1)) {
-				game.camera.unproject(delta.set(last.x, last.y, 0));
+				game.graphicsView.unproject(delta.set(last.x, last.y, 0));
 				delta.sub(current);
-				game.camera.position.add(delta.x, delta.y, 0);
+				graphicsCamPos.add(delta.x, delta.y, 0);
 			}
 			last.set(screenX, screenY, 0);
 			
@@ -290,8 +307,12 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
+		game.graphicsView.apply();
+		game.camera.position.set(graphicsCamPos);
 		mouse.set(screenX, screenY);
-		game.camera.unproject(mouseWorld.set(screenX, screenY, 0));
+		mouseWorld.set(screenX, screenY, 0);
+		game.graphicsView.unproject(mouseWorld.set(screenX, screenY, 0));
+		mouseWorld.add(-game.camera.viewportWidth, -game.camera.viewportHeight, 0);
 		return false;
 	}
 
@@ -304,11 +325,12 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	 * Camera methods
 	 */
 	private void correctCamera() {
+		game.graphicsView.apply();
 		//Correct camera position so that it is locked within the map bounds.
 		//If the map is smaller than the camera size, correct it so that none of the
 		//map is ever off the camera.
-		Rectangle cameraBounds = new Rectangle(game.camera.position.x - game.camera.viewportWidth / 2, 
-											   game.camera.position.y - game.camera.viewportHeight / 2, 
+		Rectangle cameraBounds = new Rectangle(graphicsCamPos.x - game.camera.viewportWidth / 2, 
+											   graphicsCamPos.y - game.camera.viewportHeight / 2, 
 											   game.camera.viewportWidth, 
 											   game.camera.viewportHeight);
 		Rectangle mapBounds = new Rectangle(0, 0, mapWidth * tileWidth, mapHeight * tileHeight);
@@ -346,7 +368,7 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 				ty = -((cameraBounds.y + cameraBounds.height) - mapBounds.height);
 			}
 			
-			game.camera.translate(tx, ty);
+			graphicsCamPos.add(tx, ty, 0);
 		}
 	}
 	
@@ -372,6 +394,51 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 				int popnum = instanceStack.size() - 1 - i;
 				for(int p = 0; p < popnum; ++p) instanceStack.pop();
 				setActiveInstance(instanceStack.pop());
+				
+				//Check for a spawn
+				MapLayer spawnLayer = activeInstance.map.getLayers().get("spawn");
+				if(spawnLayer != null) {
+					for(MapObject o : spawnLayer.getObjects()) {
+						
+						//Look through all spawn points and look for a spawn with the
+						//given spawnId.
+						if(o instanceof RectangleMapObject && 
+						   o.getProperties().containsKey("id") &&
+						   o.getProperties().get("id").equals(spawnId)) {
+						
+							//Cache user data (Entity) and delete old body
+							Object pEntity = pBody.getUserData();
+							activeInstance.boxWorld.destroyBody(pBody);
+							
+							//Get spawn pos
+							Rectangle spawnRect = ((RectangleMapObject) o).getRectangle();
+							Vector2 spawnPos = new Vector2(spawnRect.x, spawnRect.y);
+							
+							//Create new body def
+							BodyDef pBodyDef = new BodyDef();
+							pBodyDef.type = BodyType.DynamicBody;
+							pBodyDef.position.set(spawnPos);
+							
+							//Create body
+							pBody = activeInstance.boxWorld.createBody(pBodyDef);
+							CircleShape pShape = new CircleShape();
+							pShape.setRadius(16);
+							pShape.setPosition(new Vector2(16, 16));
+							pBody.createFixture(pShape, 0.0f);
+							pShape.dispose();
+							
+							activeInstance.playerBody = pBody;
+							
+							pBody.setUserData(pEntity);
+							
+						}
+						
+					}
+				}
+				else {
+					//TODO: error, no spawn layer
+				}
+				
 				if(printInstanceStack) printInstanceStack();
 				return;
 			}
