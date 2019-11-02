@@ -1,7 +1,7 @@
 package com.ccode.alchemonsters.combat.moves;
 
 import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.ailments.StatusAilment;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.util.GameRandom;
@@ -26,7 +26,7 @@ public class MoveActionAilmentApplicator implements MoveAction {
 	}
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, CreatureTeam sourceTeam, Creature target, CreatureTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
 		if(!(GameRandom.nextFloat() <= chance)) {
 			return;
 		}

@@ -9,26 +9,26 @@ public class BattleContext {
 	public DynamicVariables variables = new DynamicVariables();
 	
 	public BattleController teamAController;
-	public CreatureTeam teamA;
+	public BattleTeam teamA;
 	
 	public BattleController teamBController;
-	public CreatureTeam teamB;
+	public BattleTeam teamB;
 	
 	public Battleground battleground;
 	
-	public BattleContext(BattleController teamAControl, CreatureTeam teamA, 
-						 BattleController teamBControl, CreatureTeam teamB) {
+	public BattleContext(BattleController teamAControl, BattleTeam teamA, 
+						 BattleController teamBControl, BattleTeam teamB) {
 		
 		teamAController = teamAControl;
 		this.teamA = teamA;
 		teamBController = teamBControl;
 		this.teamB = teamB;
 		
-		for(Creature c : teamA.creatures) {
+		for(Creature c : teamA.team.creatures) {
 			if(c != null)
 				c.currentContext = this;
 		}
-		for(Creature c : teamB.creatures) {
+		for(Creature c : teamB.team.creatures) {
 			if(c != null)
 				c.currentContext = this;
 		}
@@ -38,12 +38,12 @@ public class BattleContext {
 	}
 	
 	public void update() {
-		for(Creature c : teamA.creatures) {
+		for(Creature c : teamA.team.creatures) {
 			if(c != null && c.currentAilment != null	) {
 				c.currentAilment.update();
 			}
 		}
-		for(Creature c : teamB.creatures) {
+		for(Creature c : teamB.team.creatures) {
 			if(c != null && c.currentAilment != null	) {
 				c.currentAilment.update();
 			}
@@ -51,11 +51,11 @@ public class BattleContext {
 	}
 	
 	public void endCombat() {
-		for(Creature c : teamA.creatures) {
+		for(Creature c : teamA.team.creatures) {
 			if(c != null)
 				c.currentContext = null;
 		}
-		for(Creature c : teamB.creatures) {
+		for(Creature c : teamB.team.creatures) {
 			if(c != null)
 				c.currentContext = null;
 		}

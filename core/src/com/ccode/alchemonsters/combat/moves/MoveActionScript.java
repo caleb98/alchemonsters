@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.ScriptManager;
 
@@ -20,7 +20,7 @@ public class MoveActionScript implements MoveAction, Serializable {
 	public LuaValue scriptFunction;
 
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, CreatureTeam sourceTeam, Creature target, CreatureTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
 		try {
 			scriptFunction.invoke(new LuaValue[] {
 				CoerceJavaToLua.coerce(move), 

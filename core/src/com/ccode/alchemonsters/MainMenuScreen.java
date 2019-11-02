@@ -43,7 +43,7 @@ public class MainMenuScreen extends GameScreen {
 		startButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new TestCombatScreen(game));
+				game.setScreen(new TestSoloCombatScreen(game));
 			}
 		});
 		

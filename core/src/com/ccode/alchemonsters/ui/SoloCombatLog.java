@@ -20,12 +20,12 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatWeatherChanged;
 
-public class CombatConsole extends ScrollPane implements Subscriber {
+public class SoloCombatLog extends ScrollPane implements Subscriber {
 
 	private LinkedList<Message> messageQueue = new LinkedList<>();
 	private TextArea consoleArea;
 	
-	public CombatConsole() {
+	public SoloCombatLog() {
 		super(new TextArea("", UI.DEFAULT_SKIN));
 		consoleArea = (TextArea) getActor();
 		consoleArea.setDisabled(true);
@@ -98,15 +98,15 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 					break;
 					
 				case MAIN_PHASE_2:
-					if(full.context.teamA.active().calcTotalSpeed() >= 2 * full.context.teamB.active().calcTotalSpeed()) {
+					if(full.context.teamA.active(0).calcTotalSpeed() >= 2 * full.context.teamB.active(0).calcTotalSpeed()) {
 						println(String.format("%s is much faster than %s! They can attack twice...", 
-								full.context.teamA.active().personalName,
-								full.context.teamB.active().personalName));
+								full.context.teamA.active(0).personalName,
+								full.context.teamB.active(0).personalName));
 					}
 					else {
 						println(String.format("%s is much faster than %s! They can attack twice...", 
-								full.context.teamB.active().personalName,
-								full.context.teamA.active().personalName));
+								full.context.teamB.active(0).personalName,
+								full.context.teamA.active(0).personalName));
 					}
 					println("Entering Main Phase 2...");
 					break;
@@ -120,8 +120,8 @@ public class CombatConsole extends ScrollPane implements Subscriber {
 			 else if(m instanceof MCombatTeamActiveChanged) {
 				 MCombatTeamActiveChanged full = (MCombatTeamActiveChanged) m;
 				 println(String.format("Switched from %s to %s.", 
-						 full.team.creatures[full.prevActive].personalName, 
-						 full.team.creatures[full.nextActive].personalName));
+						 full.team.get(full.prevActive).personalName, 
+						 full.team.get(full.nextActive).personalName));
 			 }
 			 else if(m instanceof MCombatStatBuffApplied) {
 				 MCombatStatBuffApplied full = (MCombatStatBuffApplied) m;

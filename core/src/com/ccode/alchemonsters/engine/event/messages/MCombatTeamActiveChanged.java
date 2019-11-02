@@ -2,7 +2,7 @@ package com.ccode.alchemonsters.engine.event.messages;
 
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleController;
-import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.engine.event.Message;
 
 public class MCombatTeamActiveChanged extends Message {
@@ -11,11 +11,11 @@ public class MCombatTeamActiveChanged extends Message {
 	
 	public final BattleContext context;
 	public final BattleController control;
-	public final CreatureTeam team;
+	public final BattleTeam team;
 	public final int prevActive;
 	public final int nextActive;
 	
-	public MCombatTeamActiveChanged(BattleContext context, BattleController control, CreatureTeam team, int oldActive, int newActive) {
+	public MCombatTeamActiveChanged(BattleContext context, BattleController control, BattleTeam team, int oldActive, int newActive) {
 		super(ID);
 		this.context = context;
 		this.control = control;

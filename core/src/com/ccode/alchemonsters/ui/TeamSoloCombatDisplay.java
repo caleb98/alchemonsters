@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleController;
-import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.event.Message;
@@ -25,7 +25,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 
-public class TeamCombatDisplay extends Table implements Subscriber, BattleController {
+public class TeamSoloCombatDisplay extends Table implements Subscriber, BattleController {
 
 	private Label activeName;
 	private ProgressBar activeHPDisplay;
@@ -51,7 +51,7 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 	
 	private LinkedList<Message> messageQueue = new LinkedList<>();
 	
-	private CreatureTeam team;
+	private BattleTeam team;
 	private int[] inactives = new int[3];
 	
 	private int chargingMove = -1;
@@ -59,7 +59,7 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 	
 	private boolean isCombatActive = false;
 	
-	public TeamCombatDisplay(String teamName, CreatureTeam team) {
+	public TeamSoloCombatDisplay(String teamName, BattleTeam team) {
 		super(UI.DEFAULT_SKIN);
 		this.team = team;
 		
@@ -216,53 +216,53 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 	}
 	
 	private void updateAllDisplay() {
-		activeName.setText(team.active().personalName);
-		activeHPDisplay.setRange(0, team.active().maxHealth);
-		activeHPDisplay.setValue(team.active().currentHealth);
-		activeHPDisplayLabel.setText(String.format("%2s / %2s", team.active().currentHealth, team.active().maxHealth));
-		activeMPDisplay.setRange(0, team.active().maxMana);
-		activeMPDisplay.setValue(team.active().currentMana);
-		activeMPDisplayLabel.setText(String.format("%2s / %2s", team.active().currentMana, team.active().maxMana));
+		activeName.setText(team.active(0).personalName);
+		activeHPDisplay.setRange(0, team.active(0).maxHealth);
+		activeHPDisplay.setValue(team.active(0).currentHealth);
+		activeHPDisplayLabel.setText(String.format("%2s / %2s", team.active(0).currentHealth, team.active(0).maxHealth));
+		activeMPDisplay.setRange(0, team.active(0).maxMana);
+		activeMPDisplay.setValue(team.active(0).currentMana);
+		activeMPDisplayLabel.setText(String.format("%2s / %2s", team.active(0).currentMana, team.active(0).maxMana));
 		
 		int insert = 0;
-		for(int i = 0; i < team.creatures.length; ++i) {
-			if(i != team.active) {
+		for(int i = 0; i < team.creatures().length; ++i) {
+			if(i != team.activeId(0)) {
 				inactives[insert] = i;
 				insert++;
 			}
 		}
 		
 		//Setup inactives
-		if(team.creatures[inactives[0]] != null) {
-			inactive1Name.setText(team.creatures[inactives[0]].personalName);
-			inactive1HP.setRange(0, team.creatures[inactives[0]].maxHealth);
-			inactive1HP.setValue(team.creatures[inactives[0]].currentHealth);
-			inactive1MP.setRange(0, team.creatures[inactives[0]].maxMana);
-			inactive1MP.setValue(team.creatures[inactives[0]].currentMana);
+		if(team.get(inactives[0]) != null) {
+			inactive1Name.setText(team.get(inactives[0]).personalName);
+			inactive1HP.setRange(0, team.get(inactives[0]).maxHealth);
+			inactive1HP.setValue(team.get(inactives[0]).currentHealth);
+			inactive1MP.setRange(0, team.get(inactives[0]).maxMana);
+			inactive1MP.setValue(team.get(inactives[0]).currentMana);
 		}
 		
-		if(team.creatures[inactives[1]] != null) {
-			inactive2Name.setText(team.creatures[inactives[1]].personalName);
-			inactive2HP.setRange(0, team.creatures[inactives[1]].maxHealth);
-			inactive2HP.setValue(team.creatures[inactives[1]].currentHealth);
-			inactive2MP.setRange(0, team.creatures[inactives[1]].maxMana);
-			inactive2MP.setValue(team.creatures[inactives[1]].currentMana);
+		if(team.get(inactives[1]) != null) {
+			inactive2Name.setText(team.get(inactives[1]).personalName);
+			inactive2HP.setRange(0, team.get(inactives[1]).maxHealth);
+			inactive2HP.setValue(team.get(inactives[1]).currentHealth);
+			inactive2MP.setRange(0, team.get(inactives[1]).maxMana);
+			inactive2MP.setValue(team.get(inactives[1]).currentMana);
 		}
 		
-		if(team.creatures[inactives[2]] != null) {
-			inactive3Name.setText(team.creatures[inactives[2]].personalName);
-			inactive3HP.setRange(0, team.creatures[inactives[2]].maxHealth);
-			inactive3HP.setValue(team.creatures[inactives[2]].currentHealth);
-			inactive3MP.setRange(0, team.creatures[inactives[2]].maxMana);
-			inactive3MP.setValue(team.creatures[inactives[2]].currentMana);
+		if(team.get(inactives[2]) != null) {
+			inactive3Name.setText(team.get(inactives[2]).personalName);
+			inactive3HP.setRange(0, team.get(inactives[2]).maxHealth);
+			inactive3HP.setValue(team.get(inactives[2]).currentHealth);
+			inactive3MP.setRange(0, team.get(inactives[2]).maxMana);
+			inactive3MP.setValue(team.get(inactives[2]).currentMana);
 		}
 	}
 	
 	private void updateActiveDisplay() {
-		activeHPDisplay.setValue(team.active().currentHealth);
-		activeHPDisplayLabel.setText(String.format("%2s / %2s", team.active().currentHealth, team.active().maxHealth));
-		activeMPDisplay.setValue(team.active().currentMana);
-		activeMPDisplayLabel.setText(String.format("%2s / %2s", team.active().currentMana, team.active().maxMana));
+		activeHPDisplay.setValue(team.active(0).currentHealth);
+		activeHPDisplayLabel.setText(String.format("%2s / %2s", team.active(0).currentHealth, team.active(0).maxHealth));
+		activeMPDisplay.setValue(team.active(0).currentMana);
+		activeMPDisplayLabel.setText(String.format("%2s / %2s", team.active(0).currentMana, team.active(0).maxMana));
 	}
 	
 	private void initCreatureDisplays() {
@@ -352,16 +352,16 @@ public class TeamCombatDisplay extends Table implements Subscriber, BattleContro
 			switch(a.type) {
 			
 			case MOVE:
-				String moveName = team.active().moves[a.id];
+				String moveName = team.active(0).moves[a.id];
 				if(isCharging()) {
 					stringVer.add("Continue charging " + moveName);
 					break;
 				}
-				stringVer.add("Use move " + team.active().moves[a.id] + " [" + MoveDatabase.getMove(moveName).manaCost + " mana]");
+				stringVer.add("Use move " + team.active(0).moves[a.id] + " [" + MoveDatabase.getMove(moveName).manaCost + " mana]");
 				break;
 				
 			case SWITCH:
-				stringVer.add("Switch to " + team.creatures[a.id].personalName);
+				stringVer.add("Switch to " + team.get(a.id).personalName);
 				break;
 				
 			case USE:

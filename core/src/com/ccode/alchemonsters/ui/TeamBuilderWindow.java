@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.engine.UI;
 
@@ -23,6 +24,7 @@ public class TeamBuilderWindow extends Window {
 	
 	private CreatureTeam team;
 	private CreatureEditWindow editWindow;
+	private int currentEditId;
 	
 	public TeamBuilderWindow(Stage ui, String teamName, CreatureTeam team) {
 		super("Team Editor", UI.DEFAULT_SKIN);
@@ -59,6 +61,17 @@ public class TeamBuilderWindow extends Window {
 		row();
 		
 		editWindow = new CreatureEditWindow(ui);
+		editWindow.addAcceptListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if(editWindow.isEditComplete()) {
+					team.creatures[currentEditId] = editWindow.getEditedCreature();
+				}
+			}
+		});
+		editWindow.setVisible(false);
+		editWindow.getTitleLabel().setText(teamName + " Creature Editor");
+		ui.addActor(editWindow);
 		
 		this.team = team;
 		
@@ -72,6 +85,8 @@ public class TeamBuilderWindow extends Window {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
 					editWindow.show(team.creatures[id]);
+					System.out.println("chud");
+					currentEditId = id;
 				}
 			});
 		}
@@ -93,7 +108,7 @@ public class TeamBuilderWindow extends Window {
 			if(team.creatures[id] == null) {
 				setText("<empty>");
 			}
-			else if(!team.creatures[id].personalName.equals(getText())) {
+			else if(!team.creatures[id].personalName.equals(getText().toString())) {
 				setText(team.creatures[id].personalName);
 			}
 		}
