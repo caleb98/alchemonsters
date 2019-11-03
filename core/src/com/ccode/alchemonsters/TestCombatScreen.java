@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
@@ -61,6 +62,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	private TeamCombatDisplay teamADisplay;
 	private TeamCombatDisplay teamBDisplay;
 	private SoloCombatLog combatTextDisplay;
+	private Dialog errorMessage;
 	
 	//Scene2d ui
 	private Stage ui;
@@ -92,9 +94,9 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	@Override
 	public void show() {
 		teamA = new CreatureTeam();
-		battleTeamA = new BattleTeam(teamA, 2);
+		//battleTeamA = new BattleTeam(teamA, 2);
 		teamB = new CreatureTeam();
-		battleTeamB = new BattleTeam(teamB, 2);
+		//battleTeamB = new BattleTeam(teamB, 2);
 		
 		ui = new Stage(game.uiView, game.batch);
 		table = new Table(UI.DEFAULT_SKIN);
@@ -110,7 +112,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		teamBuilders.add(teamBBuilder).expandY().fill().prefWidth(300);
 		teamBuilders.row();
 		
-		Dialog errorMessage = new Dialog("Error", UI.DEFAULT_SKIN) {
+		errorMessage = new Dialog("Error", UI.DEFAULT_SKIN) {
 			@Override
 			protected void result(Object object) {
 				boolean close = (boolean) object;
@@ -125,44 +127,24 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		Window menuWindow = new Window("Options", UI.DEFAULT_SKIN);
 		menuWindow.center();
 		
-		TextButton startCombatButton = new TextButton("Start 1v1", UI.DEFAULT_SKIN);
-		startCombatButton.addListener(new ClickListener() {
+		
+		
+		TextButton start1v1 = new TextButton("Start 1v1", UI.DEFAULT_SKIN);
+		start1v1.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if(battleTeamA.active(0) == null) {
-					boolean hasAvailableActive = false;
-					for(int i = 0; i < battleTeamA.creatures().length; ++i) {
-						if(battleTeamA.get(i) != null) {
-							battleTeamA.setActive(0, i);
-							hasAvailableActive = true;
-							break;
-						}
-					}
-					if(!hasAvailableActive) {
-						errorMessage.show(ui);
-						return;
-					}
-					teamADisplay.updateActives();
-				}
-				if(battleTeamB.active(0) == null) {
-					boolean hasAvailableActive = false;
-					for(int i = 0; i < battleTeamB.creatures().length; ++i) {
-						if(battleTeamB.get(i) != null) {
-							battleTeamB.setActive(0, i);
-							hasAvailableActive = true;
-							break;
-						}
-					}
-					if(!hasAvailableActive) {
-						errorMessage.show(ui);
-						return;
-					}
-					teamBDisplay.updateActives();
-				}
-				startCombat();
+				startCombat(1);
 			}
 		});
-		menuWindow.add(startCombatButton);
+		TextButton start2v2 = new TextButton("Start 2v2", UI.DEFAULT_SKIN);
+		start2v2.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				startCombat(2);
+			}
+		});
+		menuWindow.add(start1v1).expandX().fillX();
+		menuWindow.add(start2v2).expandX().fillX();
 		menuWindow.row();
 		
 		TextButton mainMenuButton = new TextButton("Exit to Main Menu", UI.DEFAULT_SKIN);
@@ -183,8 +165,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		combatWindow = new Window("Combat Display", UI.DEFAULT_SKIN);
 		combatWindow.setMovable(false);
 		
-		teamADisplay = new TeamCombatDisplay("Team A", battleTeamA);
-		teamBDisplay = new TeamCombatDisplay("Team B", battleTeamB);
+		teamADisplay = new TeamCombatDisplay("Team A");
+		teamBDisplay = new TeamCombatDisplay("Team B");
 		
 		combatTextDisplay = new SoloCombatLog();
 		
@@ -205,7 +187,43 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		sub.subscribe(MCombatTeamActiveChanged.ID);
 	}	
 
-	private void startCombat() {
+	private void startCombat(int positions) {
+		battleTeamA = new BattleTeam(teamA, positions);
+		battleTeamB = new BattleTeam(teamB, positions);
+		
+		//Make sure that there is at least one mon to be active for each team.
+		if(teamA.getNumCreatures() == 0 || teamB.getNumCreatures() == 0) {
+			errorMessage.show(ui);
+			return;
+		}
+		
+		int activeFillA = Math.min(positions, teamA.getNumCreatures());
+		int activeFillB = Math.min(positions, teamB.getNumCreatures());
+		
+		for(int i = 0; i < activeFillA; ++i) {
+			if(battleTeamA.active(i) == null) {
+				for(int k = 0; k < battleTeamA.creatures().length; ++k) {
+					if(!battleTeamA.isActive(k) && battleTeamA.get(k) != null) {
+						battleTeamA.setActive(i, k);
+					}
+				}
+			}
+		}
+		
+		for(int i = 0; i < activeFillB; ++i) {
+			if(battleTeamB.active(i) == null) {
+				for(int k = 0; k < battleTeamB.creatures().length; ++k) {
+					if(!battleTeamB.isActive(k) && battleTeamB.get(k) != null) {
+						battleTeamB.setActive(i, k);
+					}
+				}
+			}
+		}
+		
+		//Setup display windows
+		teamADisplay.setup(battleTeamA, ui);
+		teamBDisplay.setup(battleTeamB, ui);
+		
 		//Combat setup
 		battleContext = new BattleContext(teamADisplay.getControllers(), battleTeamA, teamBDisplay.getControllers(), battleTeamB);
 		
@@ -256,19 +274,21 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			switch(move.turnType) {
 			
 			case CHARGE:
-				//First check for dreamscape
+				//First check for dreamscape, which makes charge moves occur instantly
 				if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
 					publish(new MCombatChargeStarted(battleContext, team.active(activePos), other.active(action.targetPos), move));
 					for(MoveAction a : move.actions) {
-						a.activate(move, battleContext, team.active(0), team, other.active(0), other);
+						a.activate(move, battleContext, team.active(activePos), team, other.active(action.targetPos), other);
 					}
 					team.active(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
 					publish(new MCombatChargeFinished(battleContext, team.active(activePos), other.active(action.targetPos), move));
 				}
+				//If they aren't  charging already, then start the charge
 				else if(!control.isCharging()) {
 					control.setCharging(action.id, action.targetPos);
 					publish(new MCombatChargeStarted(battleContext, team.active(activePos), other.active(action.targetPos), move));
 				}
+				//Otherwise they were already charging, so execute the move
 				else {
 					control.stopCharging();
 					for(MoveAction a : move.actions) {
@@ -280,7 +300,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 				break;
 				
 			case DELAYED:
-				delayedMoves.add(new DelayedMoveInfo(team, team.active(activePos), move, other, move.delayAmount));
+				delayedMoves.add(new DelayedMoveInfo(team, team.active(activePos), move, other, action.targetPos, move.delayAmount));
 				break;
 				
 			case RECHARGE:
@@ -359,8 +379,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 					break;
 					
 				case END_PHASE:
-					if(!areActivesDead()) {
-						//TODO: speed double hit check
+					teamADisplay.updateActives();
+					if(!checkNeedsActiveSwap()) {
 						setCombatState(CombatState.MAIN_PHASE_1);
 					}
 					else {
@@ -372,22 +392,26 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 					//Apply damage from sandstorm
 					if(battleContext.battleground.weather == WeatherType.SANDSTORM) {
 						
-						for(ElementType t : battleTeamA.active(0).base.types) {
-							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-								battleTeamA.active(0).currentHealth -= battleTeamA.active(0).maxHealth / 16f;
-								break;
+						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
+							for(ElementType t : battleTeamA.active(i).base.types) {
+								if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+									battleTeamA.active(i).currentHealth -= battleTeamA.active(i).maxHealth / 16f;
+									break;
+								}
 							}
 						}
 						
-						for(ElementType t : battleTeamB.active(0).base.types) {
-							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-								battleTeamB.active(0).currentHealth -= battleTeamB.active(0).maxHealth / 16f;
-								break;
+						for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
+							for(ElementType t : battleTeamB.active(i).base.types) {
+								if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+									battleTeamB.active(i).currentHealth -= battleTeamB.active(i).maxHealth / 16f;
+									break;
+								}
 							}
 						}
-						
+							
 						//Check for sandstorm death
-						if(areActivesDead()) {
+						if(checkNeedsActiveSwap()) {
 							if(battleTeamA.isDefeated()) {
 								publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
 								battleContext.endCombat();
@@ -411,34 +435,42 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 					//Apply healing from dreamscape if applicable
 					if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
 						
-						battleTeamA.active(0).currentHealth += battleTeamA.active(0).maxHealth / 16f;
-						if(battleTeamA.active(0).currentHealth > battleTeamA.active(0).maxHealth) 
-							battleTeamA.active(0).currentHealth = battleTeamA.active(0).maxHealth;
+						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
+							battleTeamA.active(i).currentHealth += battleTeamA.active(i).maxHealth / 16f;
+							if(battleTeamA.active(i).currentHealth > battleTeamA.active(i).maxHealth) 
+								battleTeamA.active(i).currentHealth = battleTeamA.active(i).maxHealth;
+						}
 						
-						battleTeamB.active(0).currentHealth += battleTeamB.active(0).maxHealth / 16f;
-						if(battleTeamB.active(0).currentHealth > battleTeamB.active(0).maxHealth) 
-							battleTeamB.active(0).currentHealth = battleTeamB.active(0).maxHealth;
+						for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
+							battleTeamB.active(i).currentHealth += battleTeamB.active(i).maxHealth / 16f;
+							if(battleTeamB.active(i).currentHealth > battleTeamB.active(i).maxHealth) 
+								battleTeamB.active(i).currentHealth = battleTeamB.active(i).maxHealth;
+						}
 						
 					}
 					
 					//Apply healing from tempest if applicable
 					if(battleContext.battleground.weather == WeatherType.TEMPEST) {
 						
-						for(ElementType t : battleTeamA.active(0).base.types) {
-							if(t == ElementType.UNDEAD) {
-								battleTeamA.active(0).currentHealth += battleTeamA.active(0).maxHealth / 16f;
-								if(battleTeamA.active(0).currentHealth > battleTeamA.active(0).maxHealth) 
-									battleTeamA.active(0).currentHealth = battleTeamA.active(0).maxHealth;
-								break;
+						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
+							for(ElementType t : battleTeamA.active(i).base.types) {
+								if(t == ElementType.UNDEAD) {
+									battleTeamA.active(i).currentHealth += battleTeamA.active(i).maxHealth / 16f;
+									if(battleTeamA.active(i).currentHealth > battleTeamA.active(i).maxHealth) 
+										battleTeamA.active(i).currentHealth = battleTeamA.active(i).maxHealth;
+									break;
+								}
 							}
 						}
 						
-						for(ElementType t : battleTeamB.active(0).base.types) {
-							if(t == ElementType.UNDEAD) {
-								battleTeamB.active(0).currentHealth += battleTeamB.active(0).maxHealth / 16f;
-								if(battleTeamB.active(0).currentHealth > battleTeamB.active(0).maxHealth) 
-									battleTeamB.active(0).currentHealth = battleTeamB.active(0).maxHealth;
-								break;
+						for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
+							for(ElementType t : battleTeamB.active(i).base.types) {
+								if(t == ElementType.UNDEAD) {
+									battleTeamB.active(i).currentHealth += battleTeamB.active(i).maxHealth / 16f;
+									if(battleTeamB.active(i).currentHealth > battleTeamB.active(i).maxHealth) 
+										battleTeamB.active(i).currentHealth = battleTeamB.active(i).maxHealth;
+									break;
+								}
 							}
 						}
 						
@@ -462,13 +494,13 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 					}
 					else if(isTeamBDoubleAttack) {
 						setDefaultControllerActions(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB);
-						teamADisplay.getControllers()[doubleAttackPosition].refresh();
+						teamBDisplay.getControllers()[doubleAttackPosition].refresh();
 					}
 					isWaitingOnActionSelect = true;
-					
 					break;
 					
 				case ACTIVE_DEATH_SWAP:
+					//Trigger the following once only when we first enter this battle state
 					if(!isWaitingOnDeathSwitchSelect) {
 						
 						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
@@ -476,6 +508,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 							if(creature.isDead()) {
 								teamADisplay.getControllers()[i].refresh();
 								teamADisplay.getControllers()[i].filterActions((a)->{return a.type != BattleActionType.SWITCH;});
+								teamADisplay.updateStrings();
 							}
 						}
 						
@@ -484,6 +517,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 							if(creature.isDead()) {
 								teamBDisplay.getControllers()[i].refresh();
 								teamBDisplay.getControllers()[i].filterActions((a)->{return a.type != BattleActionType.SWITCH;});
+								teamBDisplay.updateStrings();
 							}
 						}
 
@@ -525,6 +559,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 				}
 				
 				isWaitingOnDeathSwitchSelect = false;
+				teamADisplay.updateActives();
+				teamBDisplay.updateActives();
 				setCombatState(CombatState.MAIN_PHASE_1);
 			}
 		}
@@ -552,15 +588,27 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		return true;
 	}
 	
-	private boolean areActivesDead() {
+	private boolean checkNeedsActiveSwap() {
 		for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-			if(battleTeamA.active(i).isDead()) {
-				return true;
+			if(battleTeamA.active(i) != null && battleTeamA.active(i).isDead()) {
+				//One of the actives is dead, make sure that
+				//we have a replacement possibility.
+				for(int k = 0; k < battleTeamA.creatures().length; ++k) {
+					if(!battleTeamA.isActive(k) && battleTeamA.get(k) != null && !battleTeamA.get(k).isDead()) {
+						return true;
+					}
+				}
 			}
 		}
 		for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-			if(battleTeamB.active(i).isDead()) {
-				return true;
+			if(battleTeamB.active(i) != null && battleTeamB.active(i).isDead()) {
+				//One of the actives is dead, make sure that
+				//we have a replacement possibility.
+				for(int k = 0; k < battleTeamB.creatures().length; ++k) {
+					if(!battleTeamB.isActive(k) && battleTeamB.get(k) != null && !battleTeamB.get(k).isDead()) {
+						return true;
+					}
+				}
 			}
 		}
 		
@@ -582,8 +630,15 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	
 	private void setDefaultControllerActions(BattleController control, int position,  BattleTeam team) {
 		Creature creature = team.active(position);
+		if(creature == null) {
+			return;
+		}
+		
 		ArrayList<BattleAction> actions = new ArrayList<>();
 		
+		if(control == null) {
+			System.out.println("null!");
+		}
 		//Check for special charging case - we'll need different actions
 		if(control.isCharging()) {
 			actions.add(new BattleAction(BattleActionType.MOVE, control.getChargingTargetPos(), control.getCharging()));
@@ -605,16 +660,22 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		}
 		
 		//Add moves targeting each of the enemies
-		int numEnemies = (team == battleTeamA) ? battleTeamB.getNumActives() : battleTeamA.getNumActives();
-		for(int tar = 0; tar < numEnemies; ++tar) {
+		BattleTeam enemyTeam = (team == battleTeamA) ? battleTeamB : battleTeamA;
+		for(int tar = 0; tar < enemyTeam.getNumActives(); ++tar) {
+			//This target is dead, so dont allow targeting it
+			if(enemyTeam.active(tar) == null || enemyTeam.active(tar).isDead()) {
+				continue;
+			}
 			for(int i = 0; i < creature.moves.length; ++i) {
 				Move move = MoveDatabase.getMove(creature.moves[i]);
 				if(creature.currentMana >= move.manaCost) {
 					actions.add(new BattleAction(BattleActionType.MOVE, tar, i));
 				}
 			}
-			actions.add(new BattleAction(BattleActionType.WAIT, tar, 0));
 		}
+		
+
+		actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
 		
 		control.setAvailableActions(actions);
 	}
@@ -623,9 +684,16 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		//Triple contains <team of unit, active position id, the action fctiveId(activePos), action.id);or that unit>
 		ArrayList<Triple<BattleTeam, Integer, BattleAction>> monActions = new ArrayList<>();
 		for(int i = 0; i < teamADisplay.getControllers().length; ++i) {
+			//Ignore dead/absent mons
+			if(battleTeamA.active(i) == null || battleTeamA.active(i).isDead()) {
+				continue;
+			}
 			monActions.add(new Triple<>(battleTeamA, i, teamADisplay.getControllers()[i].getSelectedAction()));
 		}
 		for(int i = 0; i < teamBDisplay.getControllers().length; ++i) {
+			if(battleTeamB.active(i) == null || battleTeamB.active(i).isDead()) {
+				continue;
+			}
 			monActions.add(new Triple<>(battleTeamB, i, teamBDisplay.getControllers()[i].getSelectedAction()));
 		}
 		
@@ -633,7 +701,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			return a.c.compareTo(b.c);
 		});
 		
-		//Process all switch/use actions 
+		//Process all switch, use, and wait actions 
 		Iterator<Triple<BattleTeam, Integer, BattleAction>> iter = monActions.iterator();
 		while(iter.hasNext()) {
 			Triple<BattleTeam, Integer, BattleAction> info = iter.next();
@@ -650,57 +718,47 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			}
 		}
 		
-		//
+		//Remaining actions are move
+		monActions.sort((new Comparator<Triple<BattleTeam, Integer, BattleAction>>() {
 
-		monActions.sort((a, b)->{
-			//Get the moves
-			Move aMove = MoveDatabase.getMove(a.a.active(a.b).moves[a.c.id]);
-			Move bMove = MoveDatabase.getMove(b.a.active(b.b).moves[b.c.id]);
-			
-			//Compare by priority first
-			if(aMove.priority > bMove.priority) {
-				return 1;
+			@Override
+			public int compare(Triple<BattleTeam, Integer, BattleAction> a, Triple<BattleTeam, Integer, BattleAction> b) {
+				//Get the moves
+				Move aMove = MoveDatabase.getMove(a.a.active(a.b).moves[a.c.id]);
+				Move bMove = MoveDatabase.getMove(b.a.active(b.b).moves[b.c.id]);
+				
+				//Compare by priority first
+				if(aMove.priority > bMove.priority) {
+					return 1;
+				}
+				else if(aMove.priority < bMove.priority) {
+					return -1;
+				}
+				
+				//If priorities were equal, compare by speed
+				Creature aMon = a.a.active(a.b);
+				Creature bMon = b.a.active(b.b);
+				int aSpeed = aMon.calcTotalSpeed();
+				int bSpeed = bMon.calcTotalSpeed();
+				
+				if(aSpeed > bSpeed) {
+					return 1;
+				}
+				else if(aSpeed < bSpeed) {
+					return -1;
+				}
+				
+				//If speeds were equal, select randomly
+				return GameRandom.nextBoolean() ? -1 : 1;
 			}
-			else if(aMove.priority < bMove.priority) {
-				return -1;
-			}
 			
-			//If priorities were equal, compare by speed
-			Creature aMon = a.a.active(a.b);
-			Creature bMon = b.a.active(b.b);
-			int aSpeed = aMon.calcTotalSpeed();
-			int bSpeed = bMon.calcTotalSpeed();
-			
-			if(aSpeed > bSpeed) {
-				return 1;
-			}
-			else if(aSpeed < bSpeed) {
-				return -1;
-			}
-			
-			//If speeds were equal, select randomly
-			return GameRandom.nextBoolean() ? -1 : 1;
-		});
+		}).reversed());
 		
 		//Run the rest of the actions
-		//This will be all the moves followed by any "wait" actions
+		//This will be all the moves
 		for(Triple<BattleTeam, Integer, BattleAction> info : monActions) {
 			doBattleAction(teamADisplay.getControllers()[info.b], info.b, info.a, info.a == battleTeamA ? battleTeamB : battleTeamA);
 		}
-		
-		//Check for double attack
-		//First sort by speed
-		monActions.sort((a, b)->{
-			int aSpeed = a.a.active(a.b).calcTotalSpeed();
-			int bSpeed = b.a.active(b.b).calcTotalSpeed();
-			
-			if(aSpeed != bSpeed) {
-				return aSpeed - bSpeed;
-			}
-			else {
-				return GameRandom.nextBoolean() ? -1 : 1;
-			}
-		});
 		
 		//Do delayed moves
 		Iterator<DelayedMoveInfo> delays = delayedMoves.iterator();
@@ -709,7 +767,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			if(inf.delayTurns == 0) {
 				Move move = inf.move;
 				for(MoveAction a : move.actions) {
-					a.activate(move, battleContext, inf.sourceCreature, inf.sourceTeam, inf.targetTeam.active(0), inf.targetTeam);
+					a.activate(move, battleContext, inf.sourceCreature, inf.sourceTeam, inf.targetTeam.active(inf.targetPos), inf.targetTeam);
 				}
 				inf.sourceCreature.variables.setVariable("_PREVIOUS_MOVE", move);
 				delays.remove();
@@ -733,6 +791,25 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			return;
 		}
 		
+		//Check for double attack
+		//First sort by speed
+		monActions.sort((new Comparator<Triple<BattleTeam, Integer, BattleAction>>() {
+
+			@Override
+			public int compare(Triple<BattleTeam, Integer, BattleAction> a, Triple<BattleTeam, Integer, BattleAction> b) {
+				int aSpeed = a.a.active(a.b).calcTotalSpeed();
+				int bSpeed = b.a.active(b.b).calcTotalSpeed();
+				
+				if(aSpeed != bSpeed) {
+					return aSpeed - bSpeed;
+				}
+				else {
+					return GameRandom.nextBoolean() ? -1 : 1;
+				}
+			}
+			
+		}).reversed());
+		
 		if(monActions.size() == 1) {
 			//Only one mon did a move, but we still want the possibility for
 			//a double attack. Check this mon's speed against the highest 
@@ -742,13 +819,17 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			
 			int maxSpeed = 0;
 			for(int activeIndex : otherTeam.getActives()) {
+				//Ignore empty slots or dead mons
+				if(otherTeam.get(activeIndex) == null || otherTeam.get(activeIndex).isDead()) {
+					continue;
+				}
 				int thisSpeed = otherTeam.get(activeIndex).calcTotalSpeed();
 				if(thisSpeed > maxSpeed) {
 					maxSpeed = thisSpeed;
 				}
 			}
 			
-			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed() >= 1.5 * maxSpeed) {
+			if(firstInfo.a.active(firstInfo.b).calcTotalSpeed() >= 1.5 * maxSpeed) {
 				//There should be a double attack
 				if(firstInfo.a == battleTeamA) {
 					isTeamADoubleAttack = true;
@@ -769,15 +850,20 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			int secondSpeed = secondInfo.a.active(secondInfo.b).calcTotalSpeed();
 			
 			if(firstSpeed >= 1.5 * secondSpeed) {
+				Creature doubleAttackMon;
 				//There should be a double attack
 				if(firstInfo.a == battleTeamA) {
 					isTeamADoubleAttack = true;
+					doubleAttackMon = battleTeamA.active(firstInfo.b);
 				}
 				else {
-					isTeamBDoubleAttack = false;
+					isTeamBDoubleAttack = true;
+					doubleAttackMon = battleTeamB.active(firstInfo.b);
 				}
 				doubleAttackPosition = firstInfo.b;
+				battleContext.variables.setVariable("_PREV_DOUBLE_ATTACK_MON", doubleAttackMon);
 				setCombatState(CombatState.MAIN_PHASE_2);
+				return;
 			}
 		}
 		
@@ -862,13 +948,15 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		Creature sourceCreature;
 		Move move;
 		BattleTeam targetTeam;
+		int targetPos;
 		int delayTurns;
 		
-		public DelayedMoveInfo(BattleTeam team, Creature creature, Move move, BattleTeam target, int turns) {
+		public DelayedMoveInfo(BattleTeam team, Creature creature, Move move, BattleTeam target, int targetPos, int turns) {
 			sourceTeam = team;
 			sourceCreature = creature;
 			this.move = move;
 			targetTeam = target;
+			this.targetPos = targetPos;
 			delayTurns = turns;
 		}
 		

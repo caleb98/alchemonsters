@@ -38,7 +38,7 @@ public class MoveActionDamage implements MoveAction {
 			
 			case OPPONENT:
 				damage = getDamageAgainst(move, context, source, target, power, isCrit, isStab);
-				target.currentHealth -= damage;
+				target.modifyHealth(-damage);
 				publish(new MCombatDamageDealt(context, source, target, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
 				
@@ -48,7 +48,7 @@ public class MoveActionDamage implements MoveAction {
 				
 			case SELF:
 				damage = getDamageAgainst(move, context, source, source, power, isCrit, isStab);
-				source.currentHealth -= damage;
+				source.modifyHealth(-damage);
 				publish(new MCombatDamageDealt(context, source, source, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
 				

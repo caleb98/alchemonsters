@@ -54,11 +54,4 @@ public class Move {
 		return GameRandom.nextFloat() < accuracy;
 	}
 	
-	public static enum TurnType {
-		INSTANT,
-		CHARGE,
-		RECHARGE,
-		DELAYED
-	}
-	
 }

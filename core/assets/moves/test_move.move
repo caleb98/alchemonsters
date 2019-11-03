@@ -8,10 +8,11 @@
 	moveType: "MAGIC",
 	actions: [
 		{
-			class: "SetWeather",
-			weather: "DELUGE"
+			class: "Damage",
+			target: "OPPONENT",
+			power: 50
 		}
 	],
-	turnType: "INSTANT",
+	turnType: "DELAYED",
 	priority: 0
 }

@@ -107,6 +107,12 @@ public class Creature {
 		variables.clear();
 	}
 	
+	public void modifyHealth(int value) {
+		currentHealth += value;
+		if(currentHealth > maxHealth) currentHealth = maxHealth;
+		else if(currentHealth < 0) currentHealth = 0;
+	}
+	
 	public int calcTotalMagicAtk() {
 		int total =  (int) ((LEVEL_ONE_STAT_VALUE + 
 				      		(base.baseMagicAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 

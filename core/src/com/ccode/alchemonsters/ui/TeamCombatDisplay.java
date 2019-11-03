@@ -2,8 +2,12 @@ package com.ccode.alchemonsters.ui;
 
 import java.util.LinkedList;
 
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
@@ -29,13 +33,43 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 	
 	private LinkedList<Message> messageQueue = new LinkedList<>();
 	
+	private String teamName;
 	private BattleTeam team;
 	private Cell<InactiveDisplay>[] allDisplays;
 	private TextButton submitActionsButton;
+	private Label actionsSubmittedIndicator;
+	private boolean[] isActionSelected;
+	private Dialog sameActionError;
 	
-	public TeamCombatDisplay(String teamName, BattleTeam team) {
+	private boolean isSetup = false;
+	
+	public TeamCombatDisplay(String teamName) {
 		super(UI.DEFAULT_SKIN);
+		this.teamName = teamName;
+		
+		sameActionError = new Dialog("Error", UI.DEFAULT_SKIN) {
+			@Override
+			protected void result(Object object) {
+				boolean close = (boolean) object;
+				if(close) {
+					hide();
+				}
+			}
+		};
+		sameActionError.text("Cannot select multiple mons to\n"
+				           + "swap to the same mon.");
+		sameActionError.button("Close", true);
+		
+		subscribe(MCombatStarted.ID);
+		subscribe(MCombatFinished.ID);
+		subscribe(MCombatDamageDealt.ID);
+		subscribe(MCombatTeamActiveChanged.ID);
+	}
+	
+	public void setup(BattleTeam team, Stage ui) {
 		this.team = team;
+		
+		clear();
 		
 		top();
 		add(new Label(teamName, UI.DEFAULT_SKIN)).padTop(20);
@@ -44,12 +78,18 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		int numActives = team.getNumActives();
 		int numInactives = 4 - numActives;
 		
+		isActionSelected = new boolean[numActives];
+		for(int i = 0; i < isActionSelected.length; ++i) {
+			isActionSelected[i] = false;
+		}
+		
 		allDisplays = new Cell[numActives + numInactives];
 		
 		int activeCounter = 0;
 		for(int i = 0; i < team.creatures().length; ++i) {
 			if(team.isActive(i)) {
 				allDisplays[i] = add((InactiveDisplay) new ActiveDisplay(i, activeCounter)).pad(10);
+				activeCounter++;
 			}
 			else {
 				allDisplays[i] = add(new InactiveDisplay(i)).pad(10);
@@ -57,56 +97,113 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 			row();
 		}
 		
+		Table submitRow = new Table(UI.DEFAULT_SKIN);
 		submitActionsButton = new TextButton("Submit Actions", UI.DEFAULT_SKIN);
 		submitActionsButton.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				for(Cell<InactiveDisplay> disp : allDisplays) {
+				String[] selectedActions = new String[numActives];
+				int[] selectedIndexes = new int[numActives];
+				ActiveDisplay[] displays = new ActiveDisplay[numActives];
+				
+				//Get all of the action strings that have been selected
+				int activeIndex = 0;
+				for(int i = 0; i < allDisplays.length; ++i) {
+					Cell<InactiveDisplay> disp = allDisplays[i];
 					if(disp.getActor() instanceof ActiveDisplay) {
 						ActiveDisplay active = (ActiveDisplay) disp.getActor();
+						
+						displays[activeIndex] = active;
+						
+						if(team.active(active.activeId) == null || team.active(active.activeId).isDead()) {
+							//If the unit is dead we still need to
+							//update their controller to have an action
+							//selected, so just set it to 0 since 
+							//none of the actions will be executed anyway.
+							selectedActions[activeIndex] = null;
+							selectedIndexes[activeIndex] = 0;
+							activeIndex++;
+							continue;
+						}
+						
 						int selected = active.actionStrings.getSelectedIndex();
-						active.controller.setSelectedAction(selected);
+						selectedActions[activeIndex] = active.actionStrings.getSelected();
+						selectedIndexes[activeIndex] = selected;
+						activeIndex++;
 					}
 				}
+				
+				//Check to make sure that we're not trying to sawp to the
+				//same creature from multiple different active mons.
+				for(String a : selectedActions) {
+					for(String b : selectedActions) {
+						if(a != null && b != null && a != b && a.equals(b)) {
+							//Tried to swap to the same creature. Show
+							//the error dialog.
+							sameActionError.show(ui);
+							return;
+						}
+					}
+				}
+				
+				//No overlaps, so run the actions;
+				for(int i = 0; i < selectedIndexes.length; ++i) {
+					displays[i].controller.setSelectedAction(selectedIndexes[i]);
+				}
+				
 			}
 		});
-		add(submitActionsButton).padTop(20);
+		submitRow.add(submitActionsButton);
 		
-		subscribe(MCombatStarted.ID);
-		subscribe(MCombatFinished.ID);
-		subscribe(MCombatDamageDealt.ID);
-		subscribe(MCombatTeamActiveChanged.ID);
+		actionsSubmittedIndicator = new Label("Submitted", UI.DEFAULT_SKIN);
+		actionsSubmittedIndicator.setVisible(false);
+		submitRow.add(actionsSubmittedIndicator);
+		
+		add(submitRow).padTop(20);
+		
+		isSetup = true;
 	}
 
 	@Override
-	public void act(float delta) {
+	public void act(float delta) {		
 		super.act(delta);
-		Message m;
-		while((m = messageQueue.poll()) != null) {		
-			if(m instanceof MCombatStarted) {
-				updateStrings();
-			}
-			else if(m instanceof MCombatFinished) {
-				updateStrings();
-			}
-			else if(m instanceof MCombatDamageDealt) {
-				updateStrings();
-			}
-			else if(m instanceof MCombatTeamActiveChanged) {
-				MCombatTeamActiveChanged full = (MCombatTeamActiveChanged) m;
-				if(full.team == team) {
-					Cell oldActive = allDisplays[full.prevActive];
-					Cell newActive = allDisplays[full.nextActive];
-					
-					InactiveDisplay newInactiveDisp = new InactiveDisplay(full.prevActive);
-					ActiveDisplay newActiveDisp = new ActiveDisplay(full.nextActive, team.getIdPosition(full.nextActive));
-					
-					oldActive.setActor(newInactiveDisp);
-					newActive.setActor(newActiveDisp);
-					
+		
+		if(isSetup) {
+			Message m;
+			while((m = messageQueue.poll()) != null) {		
+				if(m instanceof MCombatStarted) {
 					updateStrings();
 				}
+				else if(m instanceof MCombatFinished) {
+					updateStrings();
+				}
+				else if(m instanceof MCombatDamageDealt) {
+					updateStrings();
+				}
+				else if(m instanceof MCombatTeamActiveChanged) {
+					MCombatTeamActiveChanged full = (MCombatTeamActiveChanged) m;
+					if(full.team == team) {
+						Cell oldActive = allDisplays[full.prevActive];
+						Cell newActive = allDisplays[full.nextActive];
+						
+						InactiveDisplay newInactiveDisp = new InactiveDisplay(full.prevActive);
+						ActiveDisplay newActiveDisp = new ActiveDisplay(full.nextActive, team.getIdPosition(full.nextActive));
+						
+						oldActive.setActor(newInactiveDisp);
+						newActive.setActor(newActiveDisp);
+						
+						updateStrings();
+					}
+				}
 			}
+			
+			for(boolean isSelected : isActionSelected) {
+				if(!isSelected) {
+					actionsSubmittedIndicator.setVisible(false);
+					return;
+				}
+			}
+			actionsSubmittedIndicator.setVisible(true);
 		}
 	}
 	
@@ -216,12 +313,45 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 			add(actionStrings);
 			row();
 			
+			actionStrings.addListener(new EventListener() {
+				@Override
+				public boolean handle(Event event) {
+					return false;
+				}
+			});
+			
+		}
+		
+		@Override
+		public void act(float delta) {
+			super.act(delta);
+			isActionSelected[activeId] = controller.isActionSelected();
 		}
 		
 		@Override
 		void updateStrings() {
 			//Update other relevant strings
 			super.updateStrings();
+			
+			//See if this mon is dead and there's no other mon
+			//that can be swapped in.
+			if(team.active(activeId) != null && team.active(activeId).isDead()) {
+				boolean isSwapAvailable = false;
+				
+				for(int i = 0; i < team.creatures().length; ++i) {
+					if(!team.isActive(i) && team.get(i) != null && !team.get(i).isDead()) {
+						isSwapAvailable = true;
+						break;
+					}
+				}
+				
+				if(!isSwapAvailable) {
+					Array<String> strings = new Array<>();
+					strings.add("< Dead >");
+					actionStrings.setItems(strings);
+					return;
+				}
+			}
 	
 			Array<String> stringVer = new Array<>();
 			for(BattleAction a : controller.getAvailableActions()) {

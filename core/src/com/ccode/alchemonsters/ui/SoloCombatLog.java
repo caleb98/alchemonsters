@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
+import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Subscriber;
@@ -98,17 +99,8 @@ public class SoloCombatLog extends ScrollPane implements Subscriber {
 					break;
 					
 				case MAIN_PHASE_2:
-					//TODO; make this work for nvn battles
-//					if(full.context.teamA.active(0).calcTotalSpeed() >= 2 * full.context.teamB.active(0).calcTotalSpeed()) {
-//						println(String.format("%s is much faster than %s! They can attack twice...", 
-//								full.context.teamA.active(0).personalName,
-//								full.context.teamB.active(0).personalName));
-//					}
-//					else {
-//						println(String.format("%s is much faster than %s! They can attack twice...", 
-//								full.context.teamB.active(0).personalName,
-//								full.context.teamA.active(0).personalName));
-//					}
+					Creature doubleAttacker = full.context.variables.getAs(Creature.class, "_PREV_DOUBLE_ATTACK_MON");
+					println(String.format("%s was fast enough for a second attack!", doubleAttacker.personalName));
 					println("Entering Main Phase 2...");
 					break;
 					

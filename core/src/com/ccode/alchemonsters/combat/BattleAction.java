@@ -5,8 +5,8 @@ public class BattleAction implements Comparable<BattleAction> {
 	public enum BattleActionType {
 		SWITCH,
 		USE,
-		MOVE,
 		WAIT,
+		MOVE,
 	}
 	
 	public final BattleActionType type;
@@ -17,9 +17,6 @@ public class BattleAction implements Comparable<BattleAction> {
 		this.type = type;
 		this.targetPos = targetPos;
 		this.id = id;
-		if(id == 3) {
-			System.out.println("bruh moment");
-		}
 	}
 	
 	@Override

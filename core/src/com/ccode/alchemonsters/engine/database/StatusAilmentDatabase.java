@@ -28,7 +28,7 @@ public class StatusAilmentDatabase {
 						if(m instanceof MCombatDamageDealt) {
 							MCombatDamageDealt damage = (MCombatDamageDealt) m;
 							if(!damage.isTriggered && damage.target == target) {
-								source.currentHealth -= damage.amount / 4;
+								source.modifyHealth(-damage.amount / 4);
 								publish(new MCombatDamageDealt(context, source, target, id, ElementType.VOID, damage.amount / 4, true, false, true));
 							}
 						}

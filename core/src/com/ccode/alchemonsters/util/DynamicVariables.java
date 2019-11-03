@@ -30,6 +30,10 @@ public class DynamicVariables {
 		return (float) variables.get(name);
 	}
 	
+	public <T> T getAs(Class<T> type, String name) {
+		return type.cast(variables.get(name));
+	}
+	
 	public void clear() {
 		variables.clear();
 	}
