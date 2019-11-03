@@ -68,7 +68,9 @@ public class AlchemonstersGame extends Game {
 		graphicsCamera = new OrthographicCamera();
 		uiCamera = new OrthographicCamera();
 		graphicsView = new ExtendViewport(VIRTUAL_SCREEN_WIDTH, VIRUTAL_SCREEN_HEIGHT, graphicsCamera);
+		graphicsView.apply();
 		uiView = new ScreenViewport(uiCamera);
+		uiView.apply();
 		batch = new SpriteBatch();
 		UI.initAndLoad();
 		
@@ -102,7 +104,9 @@ public class AlchemonstersGame extends Game {
 	@Override
 	public void resize(int width, int height) {
 		graphicsView.update(width, height);
-		uiView.update(width, height);
+		graphicsView.apply();
+		uiView.update(width, height, true);
+		uiView.apply();
 	}
 	
 	@Override

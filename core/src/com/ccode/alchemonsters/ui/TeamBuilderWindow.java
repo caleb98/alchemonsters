@@ -85,7 +85,6 @@ public class TeamBuilderWindow extends Window {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
 					editWindow.show(team.creatures[id]);
-					System.out.println("chud");
 					currentEditId = id;
 				}
 			});

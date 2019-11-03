@@ -8,20 +8,20 @@ public class BattleContext {
 	public CombatState currentState;
 	public DynamicVariables variables = new DynamicVariables();
 	
-	public BattleController teamAController;
+	public BattleController[] teamAControls;
 	public BattleTeam teamA;
 	
-	public BattleController teamBController;
+	public BattleController[] teamBControls;
 	public BattleTeam teamB;
 	
 	public Battleground battleground;
 	
-	public BattleContext(BattleController teamAControl, BattleTeam teamA, 
-						 BattleController teamBControl, BattleTeam teamB) {
+	public BattleContext(BattleController[] teamAControl, BattleTeam teamA, 
+						 BattleController[] teamBControl, BattleTeam teamB) {
 		
-		teamAController = teamAControl;
+		teamAControls = teamAControl;
 		this.teamA = teamA;
-		teamBController = teamBControl;
+		teamBControls = teamBControl;
 		this.teamB = teamB;
 		
 		for(Creature c : teamA.team.creatures) {

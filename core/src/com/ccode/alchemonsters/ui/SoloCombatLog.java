@@ -98,16 +98,17 @@ public class SoloCombatLog extends ScrollPane implements Subscriber {
 					break;
 					
 				case MAIN_PHASE_2:
-					if(full.context.teamA.active(0).calcTotalSpeed() >= 2 * full.context.teamB.active(0).calcTotalSpeed()) {
-						println(String.format("%s is much faster than %s! They can attack twice...", 
-								full.context.teamA.active(0).personalName,
-								full.context.teamB.active(0).personalName));
-					}
-					else {
-						println(String.format("%s is much faster than %s! They can attack twice...", 
-								full.context.teamB.active(0).personalName,
-								full.context.teamA.active(0).personalName));
-					}
+					//TODO; make this work for nvn battles
+//					if(full.context.teamA.active(0).calcTotalSpeed() >= 2 * full.context.teamB.active(0).calcTotalSpeed()) {
+//						println(String.format("%s is much faster than %s! They can attack twice...", 
+//								full.context.teamA.active(0).personalName,
+//								full.context.teamB.active(0).personalName));
+//					}
+//					else {
+//						println(String.format("%s is much faster than %s! They can attack twice...", 
+//								full.context.teamB.active(0).personalName,
+//								full.context.teamA.active(0).personalName));
+//					}
 					println("Entering Main Phase 2...");
 					break;
 					

@@ -9,12 +9,17 @@ public class BattleAction implements Comparable<BattleAction> {
 		WAIT,
 	}
 	
-	public BattleActionType type;
-	public int id;
+	public final BattleActionType type;
+	public final int targetPos;
+	public final int id;
 
-	public BattleAction(BattleActionType type, int id) {
+	public BattleAction(BattleActionType type, int targetPos, int id) {
 		this.type = type;
+		this.targetPos = targetPos;
 		this.id = id;
+		if(id == 3) {
+			System.out.println("bruh moment");
+		}
 	}
 	
 	@Override

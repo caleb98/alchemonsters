@@ -18,7 +18,7 @@ public interface BattleController {
 	 * Sets the move that this controller is charging
 	 * @param charging 
 	 */
-	public void setCharging(int move);
+	public void setCharging(int move, int tar);
 	public void stopCharging();
 	/**
 	 * Checks to see if a controller is charging any move
@@ -29,6 +29,7 @@ public interface BattleController {
 	 * @return the index of the move the active creature is charging
 	 */
 	public int getCharging();
+	public int getChargingTargetPos();
 	
 	public void setRecharging(boolean isRecharging);
 	public boolean isRecharging();

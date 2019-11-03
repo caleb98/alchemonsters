@@ -17,6 +17,17 @@ public class BattleTeam {
 		}
 	}
 	
+	/**
+	 * @return a copy of the indexes of the active mons. Changing this value will not change the active mons in this object
+	 */
+	public int[] getActives() {
+		int[] copy = new int[actives.length];
+		for(int i = 0; i < actives.length; ++i) {
+			copy[i] = actives[i];
+		}
+		return copy;
+	}
+	
 	public Creature active(int position) {
 		return team.creatures[actives[position]];
 	}
@@ -34,6 +45,28 @@ public class BattleTeam {
 			}
 		}
 		actives[position] = id;
+	}
+	
+	public boolean isActive(int id) {
+		for(int i : actives)	{
+			if(i == id) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public int getIdPosition(int id) {
+		for(int i = 0; i < actives.length; ++i) {
+			if(actives[i] == id) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public int getNumActives() {
+		return actives.length;
 	}
 	
 	public Creature get(int index) {
