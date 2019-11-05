@@ -8,7 +8,7 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
 import com.ccode.alchemonsters.AlchemonstersGame;
 
 public class DesktopLauncher {
-	public static void main (String[] arg) {
+	public static void main (String[] arg) throws Exception {
 		
 		//TODO: remove for release!
 		//Run the texture packer
@@ -30,5 +30,6 @@ public class DesktopLauncher {
 		config.foregroundFPS = 250;
 		
 		new LwjglApplication(new AlchemonstersGame(), config);
+		
 	}
 }
