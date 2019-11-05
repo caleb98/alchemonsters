@@ -46,7 +46,7 @@ public class GenericUnitController implements UnitController {
 	
 	@Override
 	public void setSelectedAction(int selectedIndex) {
-		
+		selectedAction = selectedIndex;
 	}
 
 	@Override

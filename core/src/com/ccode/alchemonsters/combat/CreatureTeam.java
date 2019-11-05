@@ -8,11 +8,13 @@ import com.ccode.alchemonsters.creature.Creature;
  * @author caleb
  */
 public class CreatureTeam {
+	
+	public static final int TEAM_SIZE = 4;
 
 	public Creature[] creatures;
 	
 	public CreatureTeam() {
-		creatures = new Creature[4];
+		creatures = new Creature[TEAM_SIZE];
 	}
 	
 	public void swap(int from, int to) {
@@ -22,6 +24,9 @@ public class CreatureTeam {
 		creatures[from] = temp;
 	}
 	
+	/**
+	 * @return the total number of creatures on this team. null positions do not count towards this value
+	 */
 	public int getNumCreatures() {
 		int count = 0;
 		for(int i = 0; i < creatures.length; ++i) {

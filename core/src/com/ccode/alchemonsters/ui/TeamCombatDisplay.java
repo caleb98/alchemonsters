@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Array;
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.BattleTeam;
+import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.GenericUnitController;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.UI;
@@ -76,24 +77,21 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		row();
 		
 		int numActives = team.getNumActives();
-		int numInactives = 4 - numActives;
 		
 		isActionSelected = new boolean[numActives];
 		for(int i = 0; i < isActionSelected.length; ++i) {
 			isActionSelected[i] = false;
 		}
 		
-		allDisplays = new Cell[numActives + numInactives];
+		allDisplays = new Cell[CreatureTeam.TEAM_SIZE];
 		
-		int activeCounter = 0;
-		for(int i = 0; i < team.creatures().length; ++i) {
-			if(team.isActive(i)) {
-				allDisplays[i] = add((InactiveDisplay) new ActiveDisplay(i, activeCounter)).pad(10);
-				activeCounter++;
-			}
-			else {
-				allDisplays[i] = add(new InactiveDisplay(i)).pad(10);
-			}
+		for(int i = 0; i < team.getNumActives(); ++i) {
+			allDisplays[i] = add((InactiveDisplay) new ActiveDisplay(i)).pad(10);
+			row();
+		}
+		
+		for(int i = team.getNumActives(); i < CreatureTeam.TEAM_SIZE; ++i) {
+			allDisplays[i] = add(new InactiveDisplay(i)).pad(10);
 			row();
 		}
 		
@@ -107,30 +105,25 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 				ActiveDisplay[] displays = new ActiveDisplay[numActives];
 				
 				//Get all of the action strings that have been selected
-				int activeIndex = 0;
-				for(int i = 0; i < allDisplays.length; ++i) {
+				for(int i = 0; i < team.getNumActives(); ++i) {
 					Cell<InactiveDisplay> disp = allDisplays[i];
-					if(disp.getActor() instanceof ActiveDisplay) {
-						ActiveDisplay active = (ActiveDisplay) disp.getActor();
+					ActiveDisplay active = (ActiveDisplay) disp.getActor();
 						 
-						displays[activeIndex] = active;
-						
-						if(team.active(active.activeId) == null || team.active(active.activeId).isDead()) {
-							//If the unit is dead we still need to
-							//update their controller to have an action
-							//selected, so just set it to 0 since 
-							//none of the actions will be executed anyway.
-							selectedActions[activeIndex] = null;
-							selectedIndexes[activeIndex] = 0;
-							activeIndex++;
-							continue;
-						}
-						
-						int selected = active.actionStrings.getSelectedIndex();
-						selectedActions[activeIndex] = active.actionStrings.getSelected();
-						selectedIndexes[activeIndex] = selected;
-						activeIndex++;
+					displays[i] = active;
+					
+					if(team.get(active.teamId) == null || team.get(active.teamId).isDead()) {
+						//If the unit is dead we still need to
+						//update their controller to have an action
+						//selected, so just set it to 0 since 
+						//none of the actions will be executed anyway.
+						selectedActions[i] = null;
+						selectedIndexes[i] = 0;
+						continue;
 					}
+					
+					int selected = active.actionStrings.getSelectedIndex();
+					selectedActions[i] = active.actionStrings.getSelected();
+					selectedIndexes[i] = selected;
 				}
 				
 				//Check to make sure that we're not trying to sawp to the
@@ -147,8 +140,9 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 				}
 				
 				//No overlaps, so run the actions;
-				for(int i = 0; i < selectedIndexes.length; ++i) {
+				for(int i = 0; i < team.getNumActives(); ++i) {
 					displays[i].controller.setSelectedAction(selectedIndexes[i]);
+					displays[i].controller.submitAction();
 				}
 				
 			}
@@ -181,19 +175,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 					updateStrings();
 				}
 				else if(m instanceof MCombatTeamActiveChanged) {
-					MCombatTeamActiveChanged full = (MCombatTeamActiveChanged) m;
-					if(full.team == team) {
-						Cell oldActive = allDisplays[full.prevActive];
-						Cell newActive = allDisplays[full.nextActive];
-						
-						InactiveDisplay newInactiveDisp = new InactiveDisplay(full.prevActive);
-						ActiveDisplay newActiveDisp = new ActiveDisplay(full.nextActive, team.getIdPosition(full.nextActive));
-						
-						oldActive.setActor(newInactiveDisp);
-						newActive.setActor(newActiveDisp);
-						
-						updateStrings();
-					}
+					updateStrings();
 				}
 			}
 			
@@ -207,23 +189,6 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		}
 	}
 	
-	public void updateActives() {
-		for(int i = 0; i < allDisplays.length; ++i) {
-			InactiveDisplay old = allDisplays[i].getActor();
-			//Currently an active display, but not active mon
-			if((old instanceof ActiveDisplay && !team.isActive(i))) {
-				InactiveDisplay newInactive = new InactiveDisplay(i);
-				allDisplays[i].setActor(newInactive);
-			}
-			//Currently inactive display, but is an active mon
-			else if(!(old instanceof ActiveDisplay) && team.isActive(i)) {
-				ActiveDisplay newActive = new ActiveDisplay(i, team.getIdPosition(i));
-				allDisplays[i].setActor(newActive);
-			}
-		}
-		updateStrings();
-	}
-	
 	public void updateStrings() {
 		for(Cell<InactiveDisplay> disp : allDisplays) {
 			disp.getActor().updateStrings();
@@ -232,13 +197,8 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 	
 	public UnitController[] getControllers() {
 		UnitController[] controllers = new UnitController[team.getNumActives()];
-		int controlNum = 0;
-		for(Cell<InactiveDisplay> disp : allDisplays) {
-			if(disp.getActor() instanceof ActiveDisplay) {
-				ActiveDisplay active = (ActiveDisplay) disp.getActor();
-				controllers[controlNum] = active.controller;
-				controlNum++;
-			}
+		for(int i = 0; i < team.getNumActives(); ++i) {
+			controllers[i] = ((ActiveDisplay) allDisplays[i].getActor()).controller;
 		}
 		return controllers;
 	}
@@ -299,13 +259,11 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 	private class ActiveDisplay extends InactiveDisplay {
 		
 		GenericUnitController controller = new GenericUnitController();
-		int activeId;
 		
 		SelectBox<String> actionStrings;
 		
-		ActiveDisplay(int teamId, int activeId) {
+		ActiveDisplay(int teamId) {
 			super(teamId);
-			this.activeId = activeId;
 			
 			add(new Label("Select Action: ", UI.DEFAULT_SKIN));
 			actionStrings = new SelectBox<String>(UI.DEFAULT_SKIN);
@@ -325,7 +283,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		@Override
 		public void act(float delta) {
 			super.act(delta);
-			isActionSelected[activeId] = controller.isActionSubmitted();
+			isActionSelected[teamId] = controller.isActionSubmitted();
 		}
 		
 		@Override
@@ -335,11 +293,11 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 			
 			//See if this mon is dead and there's no other mon
 			//that can be swapped in.
-			if(team.active(activeId) != null && team.active(activeId).isDead()) {
+			if(team.get(teamId) != null && team.get(teamId).isDead()) {
 				boolean isSwapAvailable = false;
 				
-				for(int i = 0; i < team.creatures().length; ++i) {
-					if(!team.isActive(i) && team.get(i) != null && !team.get(i).isDead()) {
+				for(int i = team.getNumActives(); i < CreatureTeam.TEAM_SIZE; ++i) {
+					if(!team.get(i).isDead()) {
 						isSwapAvailable = true;
 						break;
 					}
@@ -358,12 +316,12 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 				switch(a.type) {
 				
 				case MOVE:
-					String moveName = team.active(activeId).moves[a.id];
+					String moveName = team.get(teamId).moves[a.id];
 					if(controller.isCharging()) {
 						stringVer.add("Continue charging " + moveName);
 						break;
 					}
-					stringVer.add(String.format("Use move %s [%s mana] (target: %s)", team.active(activeId).moves[a.id], MoveDatabase.getMove(moveName).manaCost, a.targetPos));
+					stringVer.add(String.format("Use move %s [%s mana] (target: %s)", team.get(teamId).moves[a.id], MoveDatabase.getMove(moveName).manaCost, a.targetPos));
 					break;
 					
 				case SWITCH:
