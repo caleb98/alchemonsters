@@ -3,10 +3,11 @@ package com.ccode.alchemonsters.combat;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
-public class GenericBattleController implements BattleController {
+public class GenericUnitController implements UnitController {
 	
 	private ArrayList<BattleAction> actions = new ArrayList<>();
-	private int selectedAction = -1;
+	private int selectedAction = -1; //Index of selected action in the actions list
+	private boolean isActionSubmitted = false; 
 	
 	private int chargingMove = -1;
 	private int chargingTargetPos = -1;
@@ -24,8 +25,13 @@ public class GenericBattleController implements BattleController {
 	}
 
 	@Override
-	public boolean isActionSelected() {
-		return selectedAction != -1;
+	public boolean isActionSubmitted() {
+		return isActionSubmitted;
+	}
+	
+	@Override
+	public void submitAction() {
+		isActionSubmitted = true;
 	}
 
 	@Override
@@ -38,8 +44,9 @@ public class GenericBattleController implements BattleController {
 		}
 	}
 	
-	public void setSelectedAction(int action) {
-		selectedAction = action;
+	@Override
+	public void setSelectedAction(int selectedIndex) {
+		
 	}
 
 	@Override
@@ -81,6 +88,7 @@ public class GenericBattleController implements BattleController {
 	@Override
 	public void refresh() {
 		selectedAction = -1;
+		isActionSubmitted = false;
 	}
 
 	@Override

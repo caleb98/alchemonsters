@@ -16,9 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.ccode.alchemonsters.combat.BattleAction;
-import com.ccode.alchemonsters.combat.BattleController;
+import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.BattleTeam;
-import com.ccode.alchemonsters.combat.GenericBattleController;
+import com.ccode.alchemonsters.combat.GenericUnitController;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
@@ -230,8 +230,8 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		}
 	}
 	
-	public BattleController[] getControllers() {
-		BattleController[] controllers = new BattleController[team.getNumActives()];
+	public UnitController[] getControllers() {
+		UnitController[] controllers = new UnitController[team.getNumActives()];
 		int controlNum = 0;
 		for(Cell<InactiveDisplay> disp : allDisplays) {
 			if(disp.getActor() instanceof ActiveDisplay) {
@@ -298,7 +298,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 	
 	private class ActiveDisplay extends InactiveDisplay {
 		
-		GenericBattleController controller = new GenericBattleController();
+		GenericUnitController controller = new GenericUnitController();
 		int activeId;
 		
 		SelectBox<String> actionStrings;
@@ -325,7 +325,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		@Override
 		public void act(float delta) {
 			super.act(delta);
-			isActionSelected[activeId] = controller.isActionSelected();
+			isActionSelected[activeId] = controller.isActionSubmitted();
 		}
 		
 		@Override

@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Align;
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
 import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.BattleController;
+import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
@@ -259,7 +259,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		publish(message);
 	}
 	
-	private void doBattleAction(BattleController control, int activePos, BattleTeam team, BattleTeam other) {
+	private void doBattleAction(UnitController control, int activePos, BattleTeam team, BattleTeam other) {
 		if(team.active(activePos).isDead() && control.getSelectedAction().type != BattleActionType.SWITCH) {
 			return;
 		}
@@ -575,13 +575,13 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	}
 	
 	private boolean areTeamActionsSelected() {
-		for(BattleController c : teamADisplay.getControllers()) {
-			if(!c.isActionSelected()) {
+		for(UnitController c : teamADisplay.getControllers()) {
+			if(!c.isActionSubmitted()) {
 				return false;
 			}
 		}
-		for(BattleController c : teamBDisplay.getControllers()) {
-			if(!c.isActionSelected()) {
+		for(UnitController c : teamBDisplay.getControllers()) {
+			if(!c.isActionSubmitted()) {
 				return false;
 			}
 		}
@@ -615,9 +615,9 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		return false;
 	}
 	
-	private void setDefaultControllerActions(BattleController[] controls, BattleTeam team) {
+	private void setDefaultControllerActions(UnitController[] controls, BattleTeam team) {
 		for(int position = 0; position < controls.length; ++position) {
-			BattleController control = controls[position];
+			UnitController control = controls[position];
 			setDefaultControllerActions(control, position, team);
 		}
 		if(team == battleTeamA) {
@@ -628,7 +628,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		}
 	}
 	
-	private void setDefaultControllerActions(BattleController control, int position,  BattleTeam team) {
+	private void setDefaultControllerActions(UnitController control, int position,  BattleTeam team) {
 		Creature creature = team.active(position);
 		if(creature == null) {
 			return;

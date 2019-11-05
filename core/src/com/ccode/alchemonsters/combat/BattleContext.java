@@ -8,16 +8,16 @@ public class BattleContext {
 	public CombatState currentState;
 	public DynamicVariables variables = new DynamicVariables();
 	
-	public BattleController[] teamAControls;
+	public UnitController[] teamAControls;
 	public BattleTeam teamA;
 	
-	public BattleController[] teamBControls;
+	public UnitController[] teamBControls;
 	public BattleTeam teamB;
 	
 	public Battleground battleground;
 	
-	public BattleContext(BattleController[] teamAControl, BattleTeam teamA, 
-						 BattleController[] teamBControl, BattleTeam teamB) {
+	public BattleContext(UnitController[] teamAControl, BattleTeam teamA, 
+						 UnitController[] teamBControl, BattleTeam teamB) {
 		
 		teamAControls = teamAControl;
 		this.teamA = teamA;

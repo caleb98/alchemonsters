@@ -1,7 +1,7 @@
 package com.ccode.alchemonsters.engine.event.messages;
 
 import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.BattleController;
+import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.engine.event.Message;
 
@@ -10,12 +10,12 @@ public class MCombatTeamActiveChanged extends Message {
 	public static final String ID = "COMBAT_TEAM_ACTIVE_CHANGED";
 	
 	public final BattleContext context;
-	public final BattleController control;
+	public final UnitController control;
 	public final BattleTeam team;
 	public final int prevActive;
 	public final int nextActive;
 	
-	public MCombatTeamActiveChanged(BattleContext context, BattleController control, BattleTeam team, int oldActive, int newActive) {
+	public MCombatTeamActiveChanged(BattleContext context, UnitController control, BattleTeam team, int oldActive, int newActive) {
 		super(ID);
 		this.context = context;
 		this.control = control;

@@ -6,13 +6,28 @@ import java.util.function.Predicate;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.util.Pair;
 
-public interface BattleController {
+/**
+ * A controller interface for managing and directing the actions
+ * of a single creature unit in battle.
+ * @author caleb
+ *
+ */
+public interface UnitController {
 	
+	//Action Modification Functions
 	public void setAvailableActions(ArrayList<BattleAction> actions);
 	public ArrayList<BattleAction> getAvailableActions();
-	public boolean isActionSelected();
-	public BattleAction getSelectedAction();
 	public void filterActions(Predicate<BattleAction> filter);
+	
+	//Action Selection Functions 
+	public boolean isActionSubmitted();
+	public void submitAction();
+	public BattleAction getSelectedAction();
+	public void setSelectedAction(int selectedIndex);
+	
+	// ************************************* 
+	//          CHARGING FUNCTIONS
+	// *************************************
 	
 	/**
 	 * Sets the move that this controller is charging
@@ -30,6 +45,10 @@ public interface BattleController {
 	 */
 	public int getCharging();
 	public int getChargingTargetPos();
+	
+	// ************************************* 
+	//         RECHARGING FUNCTIONS
+	// *************************************
 	
 	public void setRecharging(boolean isRecharging);
 	public boolean isRecharging();
