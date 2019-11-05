@@ -112,7 +112,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 					Cell<InactiveDisplay> disp = allDisplays[i];
 					if(disp.getActor() instanceof ActiveDisplay) {
 						ActiveDisplay active = (ActiveDisplay) disp.getActor();
-						
+						 
 						displays[activeIndex] = active;
 						
 						if(team.active(active.activeId) == null || team.active(active.activeId).isDead()) {
