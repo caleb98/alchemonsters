@@ -511,7 +511,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 							Creature creature = battleTeamA.get(i);
 							if(creature.isDead()) {
 								teamADisplay.getControllers()[i].refresh();
-								teamADisplay.getControllers()[i].filterActions((a)->{return a.type != BattleActionType.SWITCH;});
+								teamADisplay.getControllers()[i].filterAvailableActions((a)->{return a.type != BattleActionType.SWITCH;});
 								teamADisplay.updateStrings();
 							}
 						}
@@ -520,7 +520,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 							Creature creature = battleTeamB.get(i);
 							if(creature.isDead()) {
 								teamBDisplay.getControllers()[i].refresh();
-								teamBDisplay.getControllers()[i].filterActions((a)->{return a.type != BattleActionType.SWITCH;});
+								teamBDisplay.getControllers()[i].filterAvailableActions((a)->{return a.type != BattleActionType.SWITCH;});
 								teamBDisplay.updateStrings();
 							}
 						}
@@ -646,14 +646,14 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		//Check for special charging case - we'll need different actions
 		if(control.isCharging()) {
 			actions.add(new BattleAction(BattleActionType.MOVE, control.getChargingTargetPos(), control.getCharging()));
-			control.setAvailableActions(actions);
+			control.setAllActions(actions);
 			return;
 		}
 		
 		if(control.isRecharging()) {
 			//TODO: this uses -1 for target index because the "wait" action doesn't have a logical target, maybe a problem?
 			actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
-			control.setAvailableActions(actions);
+			control.setAllActions(actions);
 			return;
 		}
 		
@@ -681,7 +681,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 
 		actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
 		
-		control.setAvailableActions(actions);
+		control.setAllActions(actions);
 	}
 	
 	private void doBattlePhase() {

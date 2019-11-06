@@ -5,7 +5,8 @@ import java.util.function.Predicate;
 
 public class GenericUnitController implements UnitController {
 	
-	private ArrayList<BattleAction> actions = new ArrayList<>();
+	private ArrayList<BattleAction> allActions = new ArrayList<>();
+	private ArrayList<BattleAction> availableActions = new ArrayList<>();
 	private int selectedAction = -1; //Index of selected action in the actions list
 	private boolean isActionSubmitted = false; 
 	
@@ -15,15 +16,45 @@ public class GenericUnitController implements UnitController {
 	private boolean isRecharging = false;
 	
 	@Override
-	public void setAvailableActions(ArrayList<BattleAction> actions) {
-		this.actions = actions;
+	public void setAllActions(ArrayList<BattleAction> actions) {
+		allActions.clear();
+		availableActions.clear();
+		
+		allActions.addAll(actions);
+		availableActions.addAll(actions);
+	}
+
+	@Override
+	public ArrayList<BattleAction> getAllActions() {
+		return allActions;
+	}
+	
+	@Override
+	public void filterAllActions(Predicate<BattleAction> filter) {
+		allActions.removeIf(filter);
+		resetAvailableActions();
+	}
+
+	@Override
+	public void filterAvailableActions(Predicate<BattleAction> filter) {
+		BattleAction current = isActionSubmitted ? getSelectedAction() : null;
+		availableActions.removeIf(filter);
+		if(!availableActions.contains(current)) {
+			refresh();
+		}
 	}
 
 	@Override
 	public ArrayList<BattleAction> getAvailableActions() {
-		return actions;
+		return availableActions;
 	}
-
+	
+	@Override
+	public void resetAvailableActions() {
+		availableActions.clear();
+		availableActions.addAll(allActions);
+	}
+	
 	@Override
 	public boolean isActionSubmitted() {
 		return isActionSubmitted;
@@ -40,7 +71,7 @@ public class GenericUnitController implements UnitController {
 			return null;
 		}
 		else {
-			return actions.get(selectedAction);
+			return availableActions.get(selectedAction);
 		}
 	}
 	
@@ -89,11 +120,6 @@ public class GenericUnitController implements UnitController {
 	public void refresh() {
 		selectedAction = -1;
 		isActionSubmitted = false;
-	}
-
-	@Override
-	public void filterActions(Predicate<BattleAction> filter) {
-		actions.removeIf(filter);
 	}
 	
 }

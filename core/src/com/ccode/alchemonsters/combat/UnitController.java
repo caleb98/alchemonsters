@@ -15,9 +15,49 @@ import com.ccode.alchemonsters.util.Pair;
 public interface UnitController {
 	
 	//Action Modification Functions
-	public void setAvailableActions(ArrayList<BattleAction> actions);
+	/**
+	 * Sets all possible actions available to this unit.
+	 * This list ignores constraints from the context of
+	 * the battle/combat.
+	 * Calls to this method should result in any filters
+	 * previously placed on this unit's actions to be removed.
+	 * @param actions
+	 */
+	public void setAllActions(ArrayList<BattleAction> actions);
+	/**
+	 * Gets all the possible actions available to this unit.
+	 * The returned list will ignore all constraints from the
+	 * context of the battle.
+	 * @return
+	 */
+	public ArrayList<BattleAction> getAllActions();
+	/*
+	 * Filters the list of all actions available to this unit.
+	 * Calling this method should also cause all filters applied
+	 * to the filtered action list to be removed, and the filtered
+	 * action list should be updated to reflect the new all filtered
+	 * list.
+	 */
+	public void filterAllActions(Predicate<BattleAction> filter);
+	/**
+	 * Filters the actions available to this unit based on a given
+	 * predicate. Implementations of this function should result in
+	 * the same return value for {@link #getAllActions()} but a 
+	 * filtered return value for {@link #getAvailableActions()}.
+	 * @param filter
+	 */
+	public void filterAvailableActions(Predicate<BattleAction> filter);
+	/**
+	 * Gets all currently available actions for this unit. This
+	 * list will not include those that have been filtered out.
+	 * @return
+	 */
 	public ArrayList<BattleAction> getAvailableActions();
-	public void filterActions(Predicate<BattleAction> filter);
+	/**
+	 * Removes all filters imposed on the list of available
+	 * actions.
+	 */
+	public void resetAvailableActions();
 	
 	//Action Selection Functions 
 	public boolean isActionSubmitted();

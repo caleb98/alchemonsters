@@ -16,10 +16,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.ccode.alchemonsters.combat.BattleAction;
-import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CreatureTeam;
-import com.ccode.alchemonsters.combat.GenericUnitController;
+import com.ccode.alchemonsters.combat.TeamController;
+import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
@@ -37,10 +37,10 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 	private String teamName;
 	private BattleTeam team;
 	private Cell<InactiveDisplay>[] allDisplays;
-	private TextButton submitActionsButton;
-	private Label actionsSubmittedIndicator;
-	private boolean[] isActionSelected;
 	private Dialog sameActionError;
+	
+	private TeamController teamController;
+	private UnitController[] activeControllers;
 	
 	private boolean isSetup = false;
 	
@@ -78,13 +78,14 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		
 		int numActives = team.getNumActives();
 		
-		isActionSelected = new boolean[numActives];
-		for(int i = 0; i < isActionSelected.length; ++i) {
-			isActionSelected[i] = false;
-		}
+		//Set up controls
+		teamController = new TeamController(numActives);
+		activeControllers = teamController.getControls();
 		
+		//Create array of all the displays
 		allDisplays = new Cell[CreatureTeam.TEAM_SIZE];
 		
+		//Create the displays and add them to the array
 		for(int i = 0; i < team.getNumActives(); ++i) {
 			allDisplays[i] = add((InactiveDisplay) new ActiveDisplay(i)).pad(10);
 			row();
@@ -94,66 +95,6 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 			allDisplays[i] = add(new InactiveDisplay(i)).pad(10);
 			row();
 		}
-		
-		Table submitRow = new Table(UI.DEFAULT_SKIN);
-		submitActionsButton = new TextButton("Submit Actions", UI.DEFAULT_SKIN);
-		submitActionsButton.addListener(new ClickListener(){
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				String[] selectedActions = new String[numActives];
-				int[] selectedIndexes = new int[numActives];
-				ActiveDisplay[] displays = new ActiveDisplay[numActives];
-				
-				//Get all of the action strings that have been selected
-				for(int i = 0; i < team.getNumActives(); ++i) {
-					Cell<InactiveDisplay> disp = allDisplays[i];
-					ActiveDisplay active = (ActiveDisplay) disp.getActor();
-						 
-					displays[i] = active;
-					
-					if(team.get(active.teamId) == null || team.get(active.teamId).isDead()) {
-						//If the unit is dead we still need to
-						//update their controller to have an action
-						//selected, so just set it to 0 since 
-						//none of the actions will be executed anyway.
-						selectedActions[i] = null;
-						selectedIndexes[i] = 0;
-						continue;
-					}
-					
-					int selected = active.actionStrings.getSelectedIndex();
-					selectedActions[i] = active.actionStrings.getSelected();
-					selectedIndexes[i] = selected;
-				}
-				
-				//Check to make sure that we're not trying to sawp to the
-				//same creature from multiple different active mons.
-				for(String a : selectedActions) {
-					for(String b : selectedActions) {
-						if(a != null && b != null && a != b && a.equals(b)) {
-							//Tried to swap to the same creature. Show
-							//the error dialog.
-							sameActionError.show(ui);
-							return;
-						}
-					}
-				}
-				
-				//No overlaps, so run the actions;
-				for(int i = 0; i < team.getNumActives(); ++i) {
-					displays[i].controller.setSelectedAction(selectedIndexes[i]);
-					displays[i].controller.submitAction();
-				}
-				
-			}
-		});
-		submitRow.add(submitActionsButton);
-		
-		actionsSubmittedIndicator = new Label("Submitted", UI.DEFAULT_SKIN);
-		actionsSubmittedIndicator.setVisible(false);
-		submitRow.add(actionsSubmittedIndicator);
-		
-		add(submitRow).padTop(20);
 		
 		isSetup = true;
 	}
@@ -178,14 +119,6 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 					updateStrings();
 				}
 			}
-			
-			for(boolean isSelected : isActionSelected) {
-				if(!isSelected) {
-					actionsSubmittedIndicator.setVisible(false);
-					return;
-				}
-			}
-			actionsSubmittedIndicator.setVisible(true);
 		}
 	}
 	
@@ -196,11 +129,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 	}
 	
 	public UnitController[] getControllers() {
-		UnitController[] controllers = new UnitController[team.getNumActives()];
-		for(int i = 0; i < team.getNumActives(); ++i) {
-			controllers[i] = ((ActiveDisplay) allDisplays[i].getActor()).controller;
-		}
-		return controllers;
+		return activeControllers;
 	}
 	
 	@Override
@@ -258,9 +187,9 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 	
 	private class ActiveDisplay extends InactiveDisplay {
 		
-		GenericUnitController controller = new GenericUnitController();
-		
 		SelectBox<String> actionStrings;
+		TextButton submitButton;
+		Label submitConfirm;
 		
 		ActiveDisplay(int teamId) {
 			super(teamId);
@@ -270,11 +199,18 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 			actionStrings.setItems("Action 1", "Action 2", "...");
 			add(actionStrings);
 			row();
+			submitButton = new TextButton("Submit", UI.DEFAULT_SKIN);
+			add(submitButton);
+			submitConfirm = new Label("Submitted", UI.DEFAULT_SKIN);
+			add(submitConfirm);
+			row();
 			
-			actionStrings.addListener(new EventListener() {
+			submitButton.addListener(new ClickListener() {
 				@Override
-				public boolean handle(Event event) {
-					return false;
+				public void clicked(InputEvent event, float x, float y) {
+					activeControllers[teamId].setSelectedAction(actionStrings.getSelectedIndex());
+					activeControllers[teamId].submitAction();
+					TeamCombatDisplay.this.updateStrings();
 				}
 			});
 			
@@ -283,7 +219,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		@Override
 		public void act(float delta) {
 			super.act(delta);
-			isActionSelected[teamId] = controller.isActionSubmitted();
+			submitConfirm.setVisible(activeControllers[teamId].isActionSubmitted());
 		}
 		
 		@Override
@@ -312,12 +248,12 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 			}
 	
 			Array<String> stringVer = new Array<>();
-			for(BattleAction a : controller.getAvailableActions()) {
+			for(BattleAction a : activeControllers[teamId].getAvailableActions()) {
 				switch(a.type) {
 				
 				case MOVE:
 					String moveName = team.get(teamId).moves[a.id];
-					if(controller.isCharging()) {
+					if(activeControllers[teamId].isCharging()) {
 						stringVer.add("Continue charging " + moveName);
 						break;
 					}
@@ -334,7 +270,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 					break;
 					
 				case WAIT:
-					if(controller.isRecharging()) {
+					if(activeControllers[teamId].isRecharging()) {
 						stringVer.add("Wait (recharge)");
 						break;
 					}
