@@ -174,7 +174,12 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 				return;
 			}
 			
-			name.setText(creature.personalName);
+			if(creature.isDead()) {
+				name.setText(creature.personalName + " <Dead>");
+			}
+			else {
+				name.setText(creature.personalName);
+			}
 			hpBar.setRange(0, creature.maxHealth);
 			hpBar.setValue(creature.currentHealth);
 			hpLabel.setText(String.format("%s/%s", creature.currentHealth, creature.maxHealth));
