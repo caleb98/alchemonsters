@@ -18,7 +18,10 @@ public class MainMenuScreen extends GameScreen {
 	private Stage ui;
 	private Table table;
 	private Image titleHighlight;
-	private float highlightHue = 0f;
+	private float highlightB = 0.2f;
+	private float bChange = 0.1f;
+	private float highlightR = 0.2f;
+	private float rChange = 0.1f;
 	
 	public MainMenuScreen(AlchemonstersGame game) {
 		super(game);
@@ -83,11 +86,26 @@ public class MainMenuScreen extends GameScreen {
 	
 	@Override
 	public void renderUI(float delta) {
-		highlightHue += delta * 35f;
-		while(highlightHue > 360f) {
-			highlightHue -= 360f;
+		highlightB += delta * bChange;
+		if(highlightB > 0.5f) {
+			highlightB = 0.5f;
+			bChange = -bChange;
 		}
-		titleHighlight.setColor(titleHighlight.getColor().fromHsv(highlightHue, 1f, 0.2f));
+		if(highlightB < 0.2f) {
+			highlightB = 0.2f;
+			bChange = -bChange;
+		}
+		
+		highlightR += delta * rChange;
+		if(highlightR > 0.5f) {
+			highlightR = 0.5f;
+			rChange = -rChange;
+		}
+		if(highlightR < 0.2f) {
+			highlightR = 0.2f;
+			rChange = -rChange;
+		}
+		titleHighlight.setColor(titleHighlight.getColor().set(highlightR, 0, highlightB, 1f));
 		
 		ui.act(delta);
 		ui.draw();

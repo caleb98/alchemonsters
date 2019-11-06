@@ -243,6 +243,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 					Array<String> strings = new Array<>();
 					strings.add("< Dead >");
 					actionStrings.setItems(strings);
+					activeControllers[teamId].submitAction();
 					return;
 				}
 			}

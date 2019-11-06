@@ -511,7 +511,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 							Creature creature = battleTeamA.get(i);
 							if(creature.isDead()) {
 								teamADisplay.getControllers()[i].refresh();
-								teamADisplay.getControllers()[i].filterAvailableActions((a)->{return a.type != BattleActionType.SWITCH;});
+								teamADisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
 								teamADisplay.updateStrings();
 							}
 						}
@@ -520,7 +520,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 							Creature creature = battleTeamB.get(i);
 							if(creature.isDead()) {
 								teamBDisplay.getControllers()[i].refresh();
-								teamBDisplay.getControllers()[i].filterAvailableActions((a)->{return a.type != BattleActionType.SWITCH;});
+								teamBDisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
 								teamBDisplay.updateStrings();
 							}
 						}
