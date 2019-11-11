@@ -11,7 +11,7 @@ public class EventManager {
 	private static final HashMap<String, Set<Subscriber>> subscribers = new HashMap<>();
 	private static boolean isDeInitRequested = false;
 	
-	public static void init() {
+	public static void start() {
 		Thread eventManagerThread = new Thread(()->{			
 			synchronized(messageQueue) {
 				while(!isDeInitRequested) {

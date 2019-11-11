@@ -21,12 +21,12 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatWeatherChanged;
 
-public class SoloCombatLog extends ScrollPane implements Subscriber {
+public class CombatLog extends ScrollPane implements Subscriber {
 
 	private LinkedList<Message> messageQueue = new LinkedList<>();
 	private TextArea consoleArea;
 	
-	public SoloCombatLog() {
+	public CombatLog() {
 		super(new TextArea("", UI.DEFAULT_SKIN));
 		consoleArea = (TextArea) getActor();
 		consoleArea.setDisabled(true);

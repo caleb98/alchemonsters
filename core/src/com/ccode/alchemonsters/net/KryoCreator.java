@@ -1,5 +1,6 @@
 package com.ccode.alchemonsters.net;
 
+import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
@@ -14,7 +15,6 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatWeatherChanged;
-import com.ccode.alchemonsters.net.TestNet.TestNetChild;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.EndPoint;
@@ -25,7 +25,10 @@ public class KryoCreator {
 	private static void registerClasses(EndPoint endpoint) {
 		Kryo kryo = endpoint.getKryo();
 		
-		//Register all classes
+		//Combat specific classes
+		kryo.register(BattleContext.class);
+		
+		//Register message classes
 		kryo.register(MCombatAilmentApplied.class);
 		kryo.register(MCombatAilmentRemoved.class);
 		kryo.register(MCombatChargeFinished.class);
@@ -42,8 +45,13 @@ public class KryoCreator {
 		kryo.register(MCombatWeatherChanged.class);
 		
 		//Network-specific classes
-		kryo.register(TestNet.class);
-		kryo.register(TestNetChild.class);
+		kryo.register(NetErrorMessage.class);
+		kryo.register(NetFilterAllActions.class);
+		kryo.register(NetFilterAvailableActions.class);
+		kryo.register(NetJoinVersus.class);
+		kryo.register(NetRefreshControl.class);
+		kryo.register(NetResetAvailableActions.class);
+		kryo.register(NetSetActions.class);
 		
 	}
 	

@@ -42,9 +42,9 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
-import com.ccode.alchemonsters.ui.SoloCombatLog;
+import com.ccode.alchemonsters.ui.CombatLog;
 import com.ccode.alchemonsters.ui.TeamBuilderWindow;
-import com.ccode.alchemonsters.ui.TeamCombatDisplay;
+import com.ccode.alchemonsters.ui.TeamCombatDisplayController;
 import com.ccode.alchemonsters.util.GameRandom;
 import com.ccode.alchemonsters.util.Triple;
 
@@ -59,9 +59,9 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	
 	//Combat window UI
 	private Window combatWindow;
-	private TeamCombatDisplay teamADisplay;
-	private TeamCombatDisplay teamBDisplay;
-	private SoloCombatLog combatTextDisplay;
+	private TeamCombatDisplayController teamADisplay;
+	private TeamCombatDisplayController teamBDisplay;
+	private CombatLog combatTextDisplay;
 	private Dialog errorMessage;
 	
 	//Scene2d ui
@@ -165,10 +165,10 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		combatWindow = new Window("Combat Display", UI.DEFAULT_SKIN);
 		combatWindow.setMovable(false);
 		
-		teamADisplay = new TeamCombatDisplay("Team A");
-		teamBDisplay = new TeamCombatDisplay("Team B");
+		teamADisplay = new TeamCombatDisplayController("Team A");
+		teamBDisplay = new TeamCombatDisplayController("Team B");
 		
-		combatTextDisplay = new SoloCombatLog();
+		combatTextDisplay = new CombatLog();
 		
 		Table teamDisplayTable = new Table();
 		teamDisplayTable.add(teamADisplay).expand().fill().left();

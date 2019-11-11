@@ -51,7 +51,7 @@ public class AlchemonstersGame extends Game {
 		processManager = new ProcessManager();
 		
 		//Init event system
-		EventManager.init();
+		EventManager.start();
 		
 		//Init script manager
 		ScriptManager.init();
