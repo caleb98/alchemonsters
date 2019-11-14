@@ -75,9 +75,8 @@ public class AlchemonstersGame extends Game {
 		UI.initAndLoad();
 		
 		//Set initial screen
-		//setScreen(mainMenu);
-		setScreen(new MainMenuScreen(this));
-		
+		//setScreen(new MainMenuScreen(this));
+		setScreen(new TestOnlineVersusScreen(this));
 		
 	}
 	

@@ -24,6 +24,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
+import com.ccode.alchemonsters.net.NetActionSelected;
 import com.ccode.alchemonsters.net.NetErrorMessage;
 import com.ccode.alchemonsters.net.NetJoinVersus;
 import com.ccode.alchemonsters.util.GameRandom;
@@ -601,6 +602,11 @@ public class VersusServer extends Listener implements Publisher {
 		MCombatStateChanged changed = new MCombatStateChanged(context, context.currentState, next);
 		context.currentState = next;
 		publish(changed);
+		switch(next) {
+		
+		
+		
+		}
 	}
 	
 	private void sendContextUpdate() {
@@ -610,39 +616,53 @@ public class VersusServer extends Listener implements Publisher {
 	@Override
 	public void received(Connection connection, Object object) {
 		if(object instanceof NetJoinVersus) {
-			NetJoinVersus m = (NetJoinVersus) object;
+			handleNetJoin(connection, (NetJoinVersus) object);
+		}
+		else if(object instanceof NetActionSelected) {
+			handleNetActionSelected(connection, (NetActionSelected) object);
+		}
+	}
+	
+	private void handleNetActionSelected(Connection connection, NetActionSelected select) {
+		if(connection == teamAConnection) {
+			teamAControls[select.activePos].setSelectedAction(select.actionSelected);
+		}
+		else if(connection == teamBConnection) {
 			
-			//Make sure there's space for the new player
-			if(teamAConnection != null && teamBConnection != null) {
-				connection.sendTCP(new NetErrorMessage("Error: Lobby full."));
-				return;
-			}
+		}
+	}
+	
+	private void handleNetJoin(Connection connection, NetJoinVersus join) {
+		//Make sure there's space for the new player
+		if(teamAConnection != null && teamBConnection != null) {
+			connection.sendTCP(new NetErrorMessage("Error: Lobby full."));
+			return;
+		}
+		
+		//See where the player should be added
+		if(teamAConnection == null) {
+			teamAConnection = connection;
+			teamA = join.team;
 			
-			//See where the player should be added
-			if(teamAConnection == null) {
-				teamAConnection = connection;
-				teamA = m.team;
-				
-				NetworkedTeamController controls = new NetworkedTeamController(connection, m.numActives);
-				teamAControls = controls.getControls();
-			}
-			else if(teamBConnection == null) {
-				teamBConnection = connection;
-				teamB = m.team;
-				
-				NetworkedTeamController controls = new NetworkedTeamController(connection, m.numActives);
-				teamBControls = controls.getControls();
-			}
-			else {
-				//TODO: this should never happen
-				connection.sendTCP(new NetErrorMessage("Error: Unable to join lobby. Slots available but no null connections."));
-				return;
-			}
+			NetworkedTeamController controls = new NetworkedTeamController(connection, join.numActives);
+			teamAControls = controls.getControls();
+		}
+		else if(teamBConnection == null) {
+			teamBConnection = connection;
+			teamB = join.team;
 			
-			//Check to see if the combat should be started.
-			if(teamAConnection != null && teamBConnection != null) {
-				startCombat();
-			}
+			NetworkedTeamController controls = new NetworkedTeamController(connection, join.numActives);
+			teamBControls = controls.getControls();
+		}
+		else {
+			//TODO: this should never happen
+			connection.sendTCP(new NetErrorMessage("Error: Unable to join lobby. Slots available but no null connections."));
+			return;
+		}
+		
+		//Check to see if the combat should be started.
+		if(teamAConnection != null && teamBConnection != null) {
+			startCombat();
 		}
 	}
 	

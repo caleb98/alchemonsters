@@ -15,7 +15,7 @@ public class ServerLauncher {
 		
 		//Create the server
 		Server server = KryoCreator.createServer();
-		server.addListener(new ServerListener());
+		server.addListener(new VersusServer());
 		
 		//Start the event manager thread
 		EventManager.start();

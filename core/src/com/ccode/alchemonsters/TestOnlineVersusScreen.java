@@ -63,17 +63,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		Table leftPane = new Table();
 		teamBuilder = new TeamBuilderWindow(ui, "Team", myTeam);
 		leftPane.add(teamBuilder).expandY().fill().prefWidth(300);
-		
-		errorMessage = new Dialog("Error", UI.DEFAULT_SKIN) {
-			protected void result(Object object) {
-				boolean close = (boolean) object;
-				if(close) {
-					hide();
-				}
-			}
-		};
-		errorMessage.text("Unable to start combat with empty team.\nPlease add at least one mon to your team.");
-		errorMessage.button("Close", true);
+		leftPane.row();
 		
 		Window menuWindow = new Window("Options", UI.DEFAULT_SKIN);
 		menuWindow.center();
@@ -117,11 +107,35 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		
 		table.add(combatWindow).expand().fill();
 		
+		//Setup the error message
+		errorMessage = new Dialog("Error", UI.DEFAULT_SKIN) {
+			protected void result(Object object) {
+				boolean close = (boolean) object;
+				if(close) {
+					hide();
+				}
+			}
+		};
+		errorMessage.text("Unable to start combat with empty team.\nPlease add at least one mon to your team.");
+		errorMessage.button("Close", true);
+		
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
 		
 		sub = new ListSubscriber();
 		
+	}
+	
+	@Override
+	public void renderGraphics(float delta) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void renderUI(float delta) {
+		ui.act(delta);
+		ui.draw();
 	}
 
 	@Override
@@ -170,18 +184,6 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	public boolean scrolled(int amount) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	@Override
-	public void renderGraphics(float delta) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void renderUI(float delta) {
-		// TODO Auto-generated method stub
-		
 	}	
 
 }

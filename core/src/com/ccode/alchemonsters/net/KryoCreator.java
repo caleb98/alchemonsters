@@ -45,6 +45,7 @@ public class KryoCreator {
 		kryo.register(MCombatWeatherChanged.class);
 		
 		//Network-specific classes
+		kryo.register(NetActionSelected.class);
 		kryo.register(NetErrorMessage.class);
 		kryo.register(NetFilterAllActions.class);
 		kryo.register(NetFilterAvailableActions.class);
