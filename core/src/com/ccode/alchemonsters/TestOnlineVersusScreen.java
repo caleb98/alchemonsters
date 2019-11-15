@@ -251,11 +251,13 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 			
 			case NetErrorMessage.ERR_JOIN_ERROR:
 				if(isWaitingForJoin) {
-					
+					System.out.println(err.message);
+					isWaitingForJoin = false;
 				}
 				break;
 				
 			case NetErrorMessage.ERR_LOBBY_FULL:
+				if(isWaitingForJoin)
 				System.out.println("Error, lobby full.");
 				break;
 			
