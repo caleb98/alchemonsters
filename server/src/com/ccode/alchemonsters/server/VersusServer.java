@@ -26,6 +26,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 import com.ccode.alchemonsters.net.NetActionSelected;
 import com.ccode.alchemonsters.net.NetErrorMessage;
+import com.ccode.alchemonsters.net.NetJoinSuccess;
 import com.ccode.alchemonsters.net.NetJoinVersus;
 import com.ccode.alchemonsters.util.GameRandom;
 import com.ccode.alchemonsters.util.Triple;
@@ -635,7 +636,7 @@ public class VersusServer extends Listener implements Publisher {
 	private void handleNetJoin(Connection connection, NetJoinVersus join) {
 		//Make sure there's space for the new player
 		if(teamAConnection != null && teamBConnection != null) {
-			connection.sendTCP(new NetErrorMessage("Error: Lobby full."));
+			connection.sendTCP(new NetErrorMessage("Error: Lobby full.", NetErrorMessage.ERR_LOBBY_FULL));
 			return;
 		}
 		
@@ -646,6 +647,7 @@ public class VersusServer extends Listener implements Publisher {
 			
 			NetworkedTeamController controls = new NetworkedTeamController(connection, join.numActives);
 			teamAControls = controls.getControls();
+			connection.sendTCP(new NetJoinSuccess());
 		}
 		else if(teamBConnection == null) {
 			teamBConnection = connection;
@@ -653,10 +655,12 @@ public class VersusServer extends Listener implements Publisher {
 			
 			NetworkedTeamController controls = new NetworkedTeamController(connection, join.numActives);
 			teamBControls = controls.getControls();
+			connection.sendTCP(new NetJoinSuccess());
 		}
 		else {
 			//TODO: this should never happen
-			connection.sendTCP(new NetErrorMessage("Error: Unable to join lobby. Slots available but no null connections."));
+			connection.sendTCP(new NetErrorMessage("Error: Unable to join lobby. Slots available but no null connections.",
+												   NetErrorMessage.ERR_JOIN_ERROR));
 			return;
 		}
 		

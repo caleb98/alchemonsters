@@ -1,5 +1,7 @@
 package com.ccode.alchemonsters;
 
+import java.io.IOException;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -12,14 +14,24 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.ccode.alchemonsters.combat.BattleContext;
+import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.engine.GameScreen;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.event.ListSubscriber;
+import com.ccode.alchemonsters.net.ClientTeamController;
+import com.ccode.alchemonsters.net.ClientUnitController;
+import com.ccode.alchemonsters.net.KryoCreator;
+import com.ccode.alchemonsters.net.NetErrorMessage;
+import com.ccode.alchemonsters.net.NetJoinSuccess;
+import com.ccode.alchemonsters.net.NetJoinVersus;
 import com.ccode.alchemonsters.ui.CombatLog;
 import com.ccode.alchemonsters.ui.TeamBuilderWindow;
 import com.ccode.alchemonsters.ui.TeamCombatDisplay;
 import com.ccode.alchemonsters.ui.TeamCombatDisplayController;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 
 public class TestOnlineVersusScreen extends GameScreen implements InputProcessor {
 
@@ -42,9 +54,14 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	
 	//Team
 	private CreatureTeam myTeam;
+	private ClientUnitController[] myControls;
 	
 	//Battle state stuff
 	private BattleContext battleContext;
+	
+	//Network
+	private Client client;
+	private boolean isWaitingForJoin = false;
 	
 	public TestOnlineVersusScreen(AlchemonstersGame game) {
 		super(game);
@@ -70,6 +87,26 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		
 		//TODO: start combat and create connection
 		TextButton start1v1 = new TextButton("Start 1v1", UI.DEFAULT_SKIN);
+		start1v1.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				//TODO: start 1v1 connection
+				try {
+					client = KryoCreator.createClient();
+					client.addListener(new VersusClientListener());
+					client.connect(5000, "localhost", 48372);
+					
+					BattleTeam team = new BattleTeam(myTeam, 1);
+					myControls = new ClientTeamController(client, 1).getControls();
+					
+					client.sendTCP(new NetJoinVersus("Team", team, 1));
+					isWaitingForJoin = true;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 		TextButton start2v2 = new TextButton("Start 2v2", UI.DEFAULT_SKIN);
 		menuWindow.add(start1v1).expandX().fillX();
 		menuWindow.add(start2v2).expandX().fillX();
@@ -80,6 +117,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				//TODO: exit combat and close connection
+				game.setScreen(new MainMenuScreen(game));
 			}
 		});
 		menuWindow.add(mainMenuButton);
@@ -185,6 +223,46 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		// TODO Auto-generated method stub
 		return false;
 	}	
+	
+	private class VersusClientListener extends Listener {
+		
+		@Override
+		public void received(Connection connection, Object object) {
+			if(object instanceof NetJoinSuccess) {
+				if(isWaitingForJoin) {
+					
+				}
+				else {
+					//TODO: wasn't waiting for join, so we probably need error handling here
+				}
+			}
+			else if(object instanceof NetErrorMessage) {
+				handleErrorMessage((NetErrorMessage) object);
+			}
+		}
+		
+		@Override
+		public void disconnected(Connection connection) {
+			
+		}
+		
+		private void handleErrorMessage(NetErrorMessage err) {
+			switch(err.errno) {
+			
+			case NetErrorMessage.ERR_JOIN_ERROR:
+				if(isWaitingForJoin) {
+					
+				}
+				break;
+				
+			case NetErrorMessage.ERR_LOBBY_FULL:
+				System.out.println("Error, lobby full.");
+				break;
+			
+			}
+		}
+		
+	}
 
 }
 

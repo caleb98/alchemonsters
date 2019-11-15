@@ -2,26 +2,30 @@ package com.ccode.alchemonsters.net;
 
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
-import com.ccode.alchemonsters.combat.GenericUnitController;
 import com.ccode.alchemonsters.combat.UnitController;
+import com.esotericsoftware.kryonet.Connection;
 
 public class ClientTeamController {
 
 	private TeamUnitController[] activeControllers;
 	
-	public ClientTeamController(int numActives) {
+	public ClientTeamController(Connection conn, int numActives) {
 		activeControllers = new TeamUnitController[numActives];
 		for(int i = 0; i < activeControllers.length; ++i) {
-			activeControllers[i] = new TeamUnitController();
+			activeControllers[i] = new TeamUnitController(conn, i);
 		}
 	}
 	
-	public UnitController[] getControls() {
+	public ClientUnitController[] getControls() {
 		return activeControllers;
 	}
 	
-	private class TeamUnitController extends GenericUnitController {
+	private class TeamUnitController extends ClientUnitController {
 		
+		public TeamUnitController(Connection conn, int activePos) {
+			super(conn, activePos);
+		}
+
 		@Override
 		public void setSelectedAction(int selectedIndex) {
 			super.setSelectedAction(selectedIndex);
