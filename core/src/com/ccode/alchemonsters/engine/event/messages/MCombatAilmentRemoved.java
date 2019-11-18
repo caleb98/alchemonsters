@@ -14,6 +14,15 @@ public class MCombatAilmentRemoved extends Message {
 	public final String cause;
 	public final String ailmentName;
 	
+	private MCombatAilmentRemoved() {
+		super(ID);
+		context = null;
+		source = null;
+		target = null;
+		cause = null;
+		ailmentName = null;
+	}
+	
 	public MCombatAilmentRemoved(BattleContext context, Creature source, Creature target, String cause, String ailmentName) {
 		super(ID);
 		this.context = context;

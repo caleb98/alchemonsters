@@ -64,10 +64,12 @@ public class VersusServer extends Listener implements Publisher {
 		
 		//Reset health and mana values
 		for(Creature c : teamA.team.creatures) {
-			c.rest();
+			if(c != null)
+				c.rest();
 		}
 		for(Creature c : teamB.team.creatures) {
-			c.rest();
+			if(c != null)
+				c.rest();
 		}
 		
 		context = new BattleContext(teamAControls, teamA, teamBControls, teamB);
@@ -614,6 +616,9 @@ public class VersusServer extends Listener implements Publisher {
 		
 	}
 	
+	//*******************************************
+	// Network Methods
+	//*******************************************
 	@Override
 	public void received(Connection connection, Object object) {
 		if(object instanceof NetJoinVersus) {
@@ -664,8 +669,18 @@ public class VersusServer extends Listener implements Publisher {
 			return;
 		}
 		
+		System.out.printf(
+			"Client %s joined!\n\tTeam:\t1. %s\n\t\t2. %s\n\t\t3. %s\n\t\t4. %s\n",
+			connection.getRemoteAddressTCP(),
+			join.team.get(0) == null ? "<empty>" : join.team.get(0).personalName,
+			join.team.get(1) == null ? "<empty>" : join.team.get(1).personalName,
+			join.team.get(2) == null ? "<empty>" : join.team.get(2).personalName,
+			join.team.get(3) == null ? "<empty>" : join.team.get(3).personalName
+		);
+		
 		//Check to see if the combat should be started.
 		if(teamAConnection != null && teamBConnection != null) {
+			System.out.println("Two players connected. Starting combat!");
 			startCombat();
 		}
 	}

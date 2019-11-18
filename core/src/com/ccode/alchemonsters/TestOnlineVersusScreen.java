@@ -190,6 +190,13 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		error.show(ui);
 	}
 	
+	private void showInfoMessage(String s) {
+		Dialog message = new Dialog("Info", UI.DEFAULT_SKIN);
+		message.text(s);
+		message.button("OK");
+		message.show(ui);
+	}
+	
 	@Override
 	public void renderGraphics(float delta) {
 
@@ -255,7 +262,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		public void received(Connection connection, Object object) {
 			if(object instanceof NetJoinSuccess) {
 				if(isWaitingForJoin) {
-					System.out.println("we're in!");
+					showInfoMessage("Connected!");
 				}
 				else {
 					//TODO: wasn't waiting for join, so we probably need error handling here
@@ -276,14 +283,17 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 			
 			case NetErrorMessage.ERR_JOIN_ERROR:
 				if(isWaitingForJoin) {
+					showErrorMessage(err.message);
 					System.out.println(err.message);
 					isWaitingForJoin = false;
 				}
 				break;
 				
 			case NetErrorMessage.ERR_LOBBY_FULL:
-				if(isWaitingForJoin)
-				System.out.println("Error, lobby full.");
+				if(isWaitingForJoin) {
+					showErrorMessage(err.message);
+					System.out.println("Error, lobby full.");
+				}
 				break;
 			
 			}

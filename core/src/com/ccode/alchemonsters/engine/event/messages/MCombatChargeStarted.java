@@ -14,6 +14,14 @@ public class MCombatChargeStarted extends Message {
 	public final Creature target;
 	public final Move chargingMove;
 	
+	private MCombatChargeStarted() {
+		super(ID);
+		context = null;
+		source = null;
+		target = null;
+		chargingMove = null;
+	}
+	
 	public MCombatChargeStarted(BattleContext context, Creature source, Creature target, Move chargingMove) {
 		super(ID);
 		this.context = context;

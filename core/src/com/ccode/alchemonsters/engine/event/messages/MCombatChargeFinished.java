@@ -14,6 +14,14 @@ public class MCombatChargeFinished extends Message {
 	public final Creature target;
 	public final Move chargingMove;
 	
+	private MCombatChargeFinished() {
+		super(ID);
+		context = null;
+		source = null;
+		target = null;
+		chargingMove = null;
+	}
+	
 	public MCombatChargeFinished(BattleContext context, Creature source, Creature target, Move chargingMove) {
 		super(ID);
 		this.context = context;

@@ -143,6 +143,7 @@ public class KryoCreator {
 		kryo.register(NetErrorMessage.class);
 		kryo.register(NetFilterAllActions.class);
 		kryo.register(NetFilterAvailableActions.class);
+		kryo.register(NetJoinSuccess.class);
 		kryo.register(NetJoinVersus.class);
 		kryo.register(NetRefreshControl.class);
 		kryo.register(NetResetAvailableActions.class);
@@ -163,6 +164,8 @@ public class KryoCreator {
 	
 	public static Client createClient() {
 		Client client = new Client();
+		//TODO: remove this! its only for debugging!!!!
+		client.setTimeout(0);
 		registerClasses(client);
 		return client;
 	}

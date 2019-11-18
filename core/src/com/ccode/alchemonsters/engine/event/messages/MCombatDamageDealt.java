@@ -33,8 +33,9 @@ public class MCombatDamageDealt extends Message {
 		cause = null;
 		elementType = null;
 		amount = -1;
-		isHit = null;
-		isCrit = null;
+		isHit = false;
+		isCrit = false;
+		isTriggered = false;
 	}
 	
 	public MCombatDamageDealt(BattleContext context, Creature source, Creature target, String cause,
