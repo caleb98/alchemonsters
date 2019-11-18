@@ -229,7 +229,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		teamBDisplay.setup(battleTeamB, ui);
 		
 		//Combat setup
-		battleContext = new BattleContext(teamADisplay.getControllers(), battleTeamA, teamBDisplay.getControllers(), battleTeamB);
+		battleContext = new BattleContext(battleTeamA, battleTeamB);
 		
 		battleTeamA.startCombat();
 		battleTeamB.startCombat();
@@ -253,7 +253,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		battleContext.battleground.weather = WeatherType.NORMAL;
 		
 		combatTextDisplay.clear();
-		publish(new MCombatStarted(battleContext, battleTeamA, battleTeamB));
+		publish(new MCombatStarted(battleContext));
 		setCombatState(CombatState.MAIN_PHASE_1);
 	}
 	
@@ -367,13 +367,11 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 					}
 					if(battleTeamA.isDefeated()) {
 						publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
-						battleContext.endCombat();
 						isCombat = false;
 						return;
 					}
 					else if(battleTeamB.isDefeated()) {
 						publish(new MCombatFinished(battleContext, battleTeamA, battleTeamB));
-						battleContext.endCombat();
 						isCombat = false;
 						return;
 					}
@@ -418,13 +416,11 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 						if(checkNeedsActiveSwap()) {
 							if(battleTeamA.isDefeated()) {
 								publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
-								battleContext.endCombat();
 								isCombat = false;
 								break;
 							}
 							else if(battleTeamB.isDefeated()) {
 								publish(new MCombatFinished(battleContext, battleTeamA, battleTeamB));
-								battleContext.endCombat();
 								isCombat = false;
 								break;
 							}
@@ -742,8 +738,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 				//If priorities were equal, compare by speed
 				Creature aMon = a.a.get(a.b);
 				Creature bMon = b.a.get(b.b);
-				int aSpeed = aMon.calcTotalSpeed();
-				int bSpeed = bMon.calcTotalSpeed();
+				int aSpeed = aMon.calcTotalSpeed(battleContext);
+				int bSpeed = bMon.calcTotalSpeed(battleContext);
 				
 				if(aSpeed > bSpeed) {
 					return 1;
@@ -784,13 +780,11 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		//Check for defeat
 		if(battleTeamA.isDefeated()) {
 			publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
-			battleContext.endCombat();
 			isCombat = false;
 			return;
 		}
 		else if(battleTeamB.isDefeated()) {
 			publish(new MCombatFinished(battleContext, battleTeamA, battleTeamB));
-			battleContext.endCombat();
 			isCombat = false;
 			return;
 		}
@@ -801,8 +795,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 
 			@Override
 			public int compare(Triple<BattleTeam, Integer, BattleAction> a, Triple<BattleTeam, Integer, BattleAction> b) {
-				int aSpeed = a.a.get(a.b).calcTotalSpeed();
-				int bSpeed = b.a.get(b.b).calcTotalSpeed();
+				int aSpeed = a.a.get(a.b).calcTotalSpeed(battleContext);
+				int bSpeed = b.a.get(b.b).calcTotalSpeed(battleContext);
 				
 				if(aSpeed != bSpeed) {
 					return aSpeed - bSpeed;
@@ -827,13 +821,13 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 				if(otherTeam.get(activeIndex) == null || otherTeam.get(activeIndex).isDead()) {
 					continue;
 				}
-				int thisSpeed = otherTeam.get(activeIndex).calcTotalSpeed();
+				int thisSpeed = otherTeam.get(activeIndex).calcTotalSpeed(battleContext);
 				if(thisSpeed > maxSpeed) {
 					maxSpeed = thisSpeed;
 				}
 			}
 			
-			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed() >= 1.5 * maxSpeed) {
+			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed(battleContext) >= 1.5 * maxSpeed) {
 				//There should be a double attack
 				if(firstInfo.a == battleTeamA) {
 					isTeamADoubleAttack = true;
@@ -850,8 +844,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			//speed of the second mon
 			Triple<BattleTeam, Integer, BattleAction> firstInfo = monActions.get(0);
 			Triple<BattleTeam, Integer, BattleAction> secondInfo = monActions.get(1);
-			int firstSpeed = firstInfo.a.get(firstInfo.b).calcTotalSpeed();
-			int secondSpeed = secondInfo.a.get(secondInfo.b).calcTotalSpeed();
+			int firstSpeed = firstInfo.a.get(firstInfo.b).calcTotalSpeed(battleContext);
+			int secondSpeed = secondInfo.a.get(secondInfo.b).calcTotalSpeed(battleContext);
 			
 			if(firstSpeed >= 1.5 * secondSpeed) {
 				Creature doubleAttackMon;

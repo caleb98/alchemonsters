@@ -238,7 +238,7 @@ public class TeamCombatDisplayController extends Table implements Subscriber {
 				boolean isSwapAvailable = false;
 				
 				for(int i = team.getNumActives(); i < CreatureTeam.TEAM_SIZE; ++i) {
-					if(!team.get(i).isDead()) {
+					if(team.get(i) != null && !team.get(i).isDead()) {
 						isSwapAvailable = true;
 						break;
 					}

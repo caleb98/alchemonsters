@@ -2,6 +2,7 @@ package com.ccode.alchemonsters.net;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleContext;
@@ -41,6 +42,7 @@ import com.ccode.alchemonsters.creature.CreatureNature;
 import com.ccode.alchemonsters.creature.CreatureStats;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.creature.StatType;
+import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
@@ -59,6 +61,9 @@ import com.ccode.alchemonsters.util.DynamicVariables;
 import com.ccode.alchemonsters.util.Pair;
 import com.ccode.alchemonsters.util.Triple;
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.EndPoint;
 import com.esotericsoftware.kryonet.Server;
@@ -73,6 +78,7 @@ public class KryoCreator {
 		kryo.register(HashMap.class);
 		kryo.register(String.class);
 		kryo.register(String[].class);
+		kryo.register(UUID.class, new UUIDSerializer());
 		
 		//com.ccode.alchemonsters.combat
 		kryo.register(BattleAction.class);
@@ -123,6 +129,7 @@ public class KryoCreator {
 		kryo.register(StatType.class);
 		
 		//com.ccode.alchemonsters.engine.event.message
+		kryo.register(Message.class);
 		kryo.register(MCombatAilmentApplied.class);
 		kryo.register(MCombatAilmentRemoved.class);
 		kryo.register(MCombatChargeFinished.class);
@@ -168,6 +175,25 @@ public class KryoCreator {
 		client.setTimeout(0);
 		registerClasses(client);
 		return client;
+	}
+	
+	public static class UUIDSerializer extends Serializer<UUID> {
+		
+		public UUIDSerializer() {
+			setImmutable(true);
+		}
+
+		@Override
+		public void write(Kryo kryo, Output output, UUID uuid) {
+			output.writeLong(uuid.getMostSignificantBits());
+			output.writeLong(uuid.getLeastSignificantBits());
+		}
+
+		@Override
+		public UUID read(Kryo kryo, Input input, Class<UUID> type) {
+			return new UUID(input.readLong(), input.readLong());
+		}
+		
 	}
 	
 }

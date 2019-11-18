@@ -27,7 +27,6 @@ public class Creature {
 	public int maxMana;
 	public float critChance = 0.05f;
 	public DynamicVariables variables = new DynamicVariables();
-	public BattleContext currentContext;
 	
 	public StatBuffs buffs = new StatBuffs();
 	public StatusAilment currentAilment;
@@ -113,7 +112,7 @@ public class Creature {
 		else if(currentHealth < 0) currentHealth = 0;
 	}
 	
-	public int calcTotalMagicAtk() {
+	public int calcTotalMagicAtk(BattleContext currentContext) {
 		int total =  (int) ((LEVEL_ONE_STAT_VALUE + 
 				      		(base.baseMagicAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
 				      		(currentLevel / 100f) * attunementValues.magicAtk +
@@ -133,7 +132,7 @@ public class Creature {
 		return total;
 	}
 	
-	public int calcTotalMagicDef() {
+	public int calcTotalMagicDef(BattleContext currentContext) {
 		int total =  (int) ((LEVEL_ONE_STAT_VALUE + 
 							(base.baseMagicDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
 							(currentLevel / 100f) * attunementValues.magicDef +
@@ -152,7 +151,7 @@ public class Creature {
 		return total;
 	}
 	
-	public int calcTotalPhysAtk() {
+	public int calcTotalPhysAtk(BattleContext currentContext) {
 		int total =  (int) ((LEVEL_ONE_STAT_VALUE + 
 							(base.basePhysAtk - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
 							(currentLevel / 100f) * attunementValues.physAtk +
@@ -172,7 +171,7 @@ public class Creature {
 		return total;
 	}
 	
-	public int calcTotalPhysDef() {
+	public int calcTotalPhysDef(BattleContext currentContext) {
 		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
 						   (base.basePhysDef - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
 						   (currentLevel / 100f) * attunementValues.physDef +
@@ -183,7 +182,7 @@ public class Creature {
 	}
 	
 
-	public int calcTotalPen() {
+	public int calcTotalPen(BattleContext currentContext) {
 		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
 			      		   (base.basePenetration - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
 			      		   (currentLevel / 100f) * attunementValues.penetration +
@@ -193,7 +192,7 @@ public class Creature {
 		return total;
 	}
 	
-	public int calcTotalRes() {
+	public int calcTotalRes(BattleContext currentContext) {
 		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
 				      	   (base.baseResistance - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
 				      	   (currentLevel / 100f) * attunementValues.resistance +
@@ -213,7 +212,7 @@ public class Creature {
 		return total;
 	}
 	
-	public int calcTotalSpeed() {
+	public int calcTotalSpeed(BattleContext currentContext) {
 		int total = (int) ((LEVEL_ONE_STAT_VALUE + 
 			      		   (base.baseSpeed - LEVEL_ONE_STAT_VALUE) * (currentLevel / 100f) + 
 			      		   (currentLevel / 100f) * attunementValues.speed +

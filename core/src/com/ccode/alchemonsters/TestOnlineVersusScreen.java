@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -19,6 +21,10 @@ import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.engine.GameScreen;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.event.ListSubscriber;
+import com.ccode.alchemonsters.engine.event.Message;
+import com.ccode.alchemonsters.engine.event.Publisher;
+import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
+import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.net.ClientTeamController;
 import com.ccode.alchemonsters.net.ClientUnitController;
 import com.ccode.alchemonsters.net.KryoCreator;
@@ -33,13 +39,18 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
-public class TestOnlineVersusScreen extends GameScreen implements InputProcessor {
+public class TestOnlineVersusScreen extends GameScreen implements InputProcessor, Publisher {
 
+	private static final String UUID_NAME = "_MULTIPLAYER_UUID";
+	
+	private UUID myID;
+	
 	//Message listener
 	private ListSubscriber sub;
 	
 	//Overall frame
 	private TeamBuilderWindow teamBuilder;
+	private TextField ipInput;
 	
 	//Combat windown UI
 	private Window combatWindow;
@@ -68,6 +79,8 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 
 	@Override
 	public void show() {
+		myID = UUID.randomUUID();
+		
 		myTeam = new CreatureTeam();
 		
 		ui = new Stage(game.uiView, game.batch);
@@ -84,7 +97,11 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		Window menuWindow = new Window("Options", UI.DEFAULT_SKIN);
 		menuWindow.center();
 		
-		//TODO: start combat and create connection
+		ipInput = new TextField("localhost", UI.DEFAULT_SKIN);
+		menuWindow.add(ipInput).expandX().fillX();
+		menuWindow.row();
+		
+		Table startButtons = new Table();
 		TextButton start1v1 = new TextButton("Start 1v1", UI.DEFAULT_SKIN);
 		start1v1.addListener(new ClickListener() {
 			@Override
@@ -99,8 +116,9 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 				startConnection(2);
 			}
 		});
-		menuWindow.add(start1v1).expandX().fillX();
-		menuWindow.add(start2v2).expandX().fillX();
+		startButtons.add(start1v1).expandX().fillX();
+		startButtons.add(start2v2).expandX().fillX();
+		menuWindow.add(startButtons).expandX().fillX();
 		menuWindow.row();
 		
 		TextButton mainMenuButton = new TextButton("Exit to Main Menu", UI.DEFAULT_SKIN);
@@ -111,7 +129,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 				game.setScreen(new MainMenuScreen(game));
 			}
 		});
-		menuWindow.add(mainMenuButton);
+		menuWindow.add(mainMenuButton).expandX().fillX();
 		menuWindow.row();
 		
 		leftPane.add(menuWindow).fill();
@@ -130,7 +148,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		Table teamDisplayTable = new Table();
 		teamDisplayTable.add(myTeamDisplay).expand().fill().left();
 		teamDisplayTable.add(theirTeamDisplay).expand().fill().right();
-		combatWindow.add(teamDisplayTable);
+		combatWindow.add(teamDisplayTable).expandX().fillX();
 		combatWindow.row();
 		combatWindow.add(combatTextDisplay).expand().fill().padTop(20);
 		
@@ -140,7 +158,8 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		Gdx.input.setInputProcessor(multi);
 		
 		sub = new ListSubscriber();
-		
+		sub.subscribe(MCombatStarted.ID);
+		sub.subscribe(MCombatStateChanged.ID);
 	}
 	
 	private void startConnection(int numActives) {
@@ -164,13 +183,14 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		
 		//Start connections
 		(new Thread(()->{
-			try {
+			try {			
 				client = KryoCreator.createClient();
 				client.addListener(new VersusClientListener());
 				client.start();
-				client.connect(5000, "localhost", 48372);
+				client.connect(5000, ipInput.getText(), 48372);
 				
 				BattleTeam team = new BattleTeam(myTeam, numActives);
+				team.variables.setVariable(UUID_NAME, myID);
 				myControls = new ClientTeamController(client, numActives).getControls();
 				
 				client.sendTCP(new NetJoinVersus("Team", team, numActives));
@@ -199,7 +219,29 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	
 	@Override
 	public void renderGraphics(float delta) {
-
+		while(sub.messageQueue.peek() != null) {
+			Message m = sub.messageQueue.poll();
+			if(m instanceof MCombatStarted) {
+				MCombatStarted full = (MCombatStarted) m;
+				if(full.teamA.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
+					myTeamDisplay.setup(full.teamA, ui);
+					theirTeamDisplay.setup(full.teamB, ui);
+				}
+				else if(full.teamB.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
+					myTeamDisplay.setup(full.teamB, ui);
+					theirTeamDisplay.setup(full.teamA, ui);
+				}
+				else {
+					//TODO: should never happen
+					showErrorMessage("No team with matching UUID!");
+					client.close();
+				}
+			}
+			else if(m instanceof MCombatStateChanged) {
+				
+			}
+		}
+		
 	}
 
 	@Override
@@ -260,6 +302,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		
 		@Override
 		public void received(Connection connection, Object object) {
+			
 			if(object instanceof NetJoinSuccess) {
 				if(isWaitingForJoin) {
 					showInfoMessage("Connected!");
@@ -268,9 +311,15 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 					//TODO: wasn't waiting for join, so we probably need error handling here
 				}
 			}
+			
 			else if(object instanceof NetErrorMessage) {
 				handleErrorMessage((NetErrorMessage) object);
 			}
+			
+			else if(object instanceof Message) {
+				publish((Message) object); 
+			}
+			
 		}
 		
 		@Override
@@ -293,6 +342,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 				if(isWaitingForJoin) {
 					showErrorMessage(err.message);
 					System.out.println("Error, lobby full.");
+					client.close();
 				}
 				break;
 			

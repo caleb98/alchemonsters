@@ -36,7 +36,6 @@ public class BattleTeam {
 	}
 	
 	public void startCombat() {
-		variables.clear();
 		for(Creature c : team.creatures) {
 			if(c != null) {
 				c.startCombat();

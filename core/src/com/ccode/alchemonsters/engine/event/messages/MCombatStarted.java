@@ -19,11 +19,11 @@ public class MCombatStarted extends Message {
 		teamB = null;
 	}
 	
-	public MCombatStarted(BattleContext context, BattleTeam teamA, BattleTeam teamB) {
+	public MCombatStarted(BattleContext context) {
 		super(ID);
 		this.context = context;
-		this.teamA = teamA;
-		this.teamB = teamB;
+		this.teamA = context.teamA;
+		this.teamB = context.teamB;
 	}
 	
 }

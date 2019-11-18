@@ -17,6 +17,7 @@ import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
+import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeStarted;
@@ -72,14 +73,11 @@ public class VersusServer extends Listener implements Publisher {
 				c.rest();
 		}
 		
-		context = new BattleContext(teamAControls, teamA, teamBControls, teamB);
+		//Create the battle context
+		context = new BattleContext(teamA, teamB);
 		
-		publish(new MCombatStarted(context, teamA, teamB));
+		publish(new MCombatStarted(context));
 		setCombatState(CombatState.MAIN_PHASE_1);
-	}
-	
-	private void endCombat() {
-		context.endCombat();
 	}
 	
 	//*******************************************
@@ -145,8 +143,8 @@ public class VersusServer extends Listener implements Publisher {
 				//If priorities were equal, compare by speed
 				Creature aMon = a.a.get(a.b);
 				Creature bMon = b.a.get(b.b);
-				int aSpeed = aMon.calcTotalSpeed();
-				int bSpeed = bMon.calcTotalSpeed();
+				int aSpeed = aMon.calcTotalSpeed(context);
+				int bSpeed = bMon.calcTotalSpeed(context);
 				
 				if(aSpeed > bSpeed) {
 					return 1;
@@ -187,12 +185,10 @@ public class VersusServer extends Listener implements Publisher {
 		//Check for defeat
 		if(teamA.isDefeated()) {
 			publish(new MCombatFinished(context, teamB, teamA));
-			endCombat();
 			return;
 		}
 		else if(teamB.isDefeated()) {
 			publish(new MCombatFinished(context, teamA, teamB));
-			endCombat();
 			return;
 		}
 		
@@ -202,8 +198,8 @@ public class VersusServer extends Listener implements Publisher {
 
 			@Override
 			public int compare(Triple<BattleTeam, Integer, BattleAction> a, Triple<BattleTeam, Integer, BattleAction> b) {
-				int aSpeed = a.a.get(a.b).calcTotalSpeed();
-				int bSpeed = b.a.get(b.b).calcTotalSpeed();
+				int aSpeed = a.a.get(a.b).calcTotalSpeed(context);
+				int bSpeed = b.a.get(b.b).calcTotalSpeed(context);
 				
 				if(aSpeed != bSpeed) {
 					return aSpeed - bSpeed;
@@ -228,13 +224,13 @@ public class VersusServer extends Listener implements Publisher {
 				if(otherTeam.get(activeIndex) == null || otherTeam.get(activeIndex).isDead()) {
 					continue;
 				}
-				int thisSpeed = otherTeam.get(activeIndex).calcTotalSpeed();
+				int thisSpeed = otherTeam.get(activeIndex).calcTotalSpeed(context);
 				if(thisSpeed > maxSpeed) {
 					maxSpeed = thisSpeed;
 				}
 			}
 			
-			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed() >= 1.5 * maxSpeed) {
+			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed(context) >= 1.5 * maxSpeed) {
 				//There should be a double attack
 				if(firstInfo.a == teamA) {
 					isTeamADoubleAttack = true;
@@ -251,8 +247,8 @@ public class VersusServer extends Listener implements Publisher {
 			//speed of the second mon
 			Triple<BattleTeam, Integer, BattleAction> firstInfo = monActions.get(0);
 			Triple<BattleTeam, Integer, BattleAction> secondInfo = monActions.get(1);
-			int firstSpeed = firstInfo.a.get(firstInfo.b).calcTotalSpeed();
-			int secondSpeed = secondInfo.a.get(secondInfo.b).calcTotalSpeed();
+			int firstSpeed = firstInfo.a.get(firstInfo.b).calcTotalSpeed(context);
+			int secondSpeed = secondInfo.a.get(secondInfo.b).calcTotalSpeed(context);
 			
 			if(firstSpeed >= 1.5 * secondSpeed) {
 				Creature doubleAttackMon;
@@ -284,12 +280,10 @@ public class VersusServer extends Listener implements Publisher {
 		}
 		if(teamA.isDefeated()) {
 			publish(new MCombatFinished(context, teamB, teamA));
-			endCombat();
 			return;
 		}
 		else if(teamB.isDefeated()) {
 			publish(new MCombatFinished(context, teamA, teamB));
-			endCombat();
 			return;
 		}
 		else {
@@ -333,12 +327,10 @@ public class VersusServer extends Listener implements Publisher {
 			if(checkNeedsActiveSwap()) {
 				if(teamA.isDefeated()) {
 					publish(new MCombatFinished(context, teamB, teamA));
-					endCombat();
 					return;
 				}
 				else if(teamB.isDefeated()) {
 					publish(new MCombatFinished(context, teamA, teamB));
-					endCombat();
 					return;
 				}
 				else {
@@ -642,6 +634,7 @@ public class VersusServer extends Listener implements Publisher {
 		//Make sure there's space for the new player
 		if(teamAConnection != null && teamBConnection != null) {
 			connection.sendTCP(new NetErrorMessage("Error: Lobby full.", NetErrorMessage.ERR_LOBBY_FULL));
+			System.out.printf("Refusing new connection from %s. Reason: Lobby full.\n", connection.getRemoteAddressTCP());
 			return;
 		}
 		
@@ -695,6 +688,17 @@ public class VersusServer extends Listener implements Publisher {
 			
 		}
 	}
+	
+	@Override
+	public void publish(Message message) {
+		Publisher.super.publish(message);
+		if(teamAConnection != null && teamAConnection.isConnected()) {
+			teamAConnection.sendTCP(message);
+		}
+		if(teamBConnection != null && teamBConnection.isConnected()) {
+			teamBConnection.sendTCP(message);
+		}
+ 	}
 	
 	private class DelayedMoveInfo {
 		

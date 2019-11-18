@@ -14,6 +14,14 @@ public class DynamicVariables {
 		return variables.put(name, value) != null;
 	}
 	
+	public void removeVariable(String name) {
+		variables.remove(name);
+	}
+	
+	public boolean hasVariable(String name) {
+		return variables.containsKey(name);
+	}
+	
 	public Object getVariable(String name) {
 		return variables.get(name);
 	}

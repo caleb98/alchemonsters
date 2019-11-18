@@ -79,13 +79,13 @@ public class MoveActionDamage implements MoveAction {
 	}
 	
 	public  int getDamageAgainst(Move move, BattleContext context, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
-		float sourceAttack = move.moveType == MoveType.MAGIC ? source.calcTotalMagicAtk() : source.calcTotalPhysAtk();
-		float targetDefense = move.moveType == MoveType.MAGIC ? target.calcTotalMagicDef() : target.calcTotalPhysDef();	
+		float sourceAttack = move.moveType == MoveType.MAGIC ? source.calcTotalMagicAtk(context) : source.calcTotalPhysAtk(context);
+		float targetDefense = move.moveType == MoveType.MAGIC ? target.calcTotalMagicDef(context) : target.calcTotalPhysDef(context);	
 		
 		float rawDamage = ((200 + (sourceAttack - 200)) * 2.9f * power) / 200f;
 		
 		float defenseReduction = rawDamage * (targetDefense / (targetDefense + 0.5f * rawDamage)) + (targetDefense * power) / 1500f;
-		float penResRatio = source.calcTotalPen() / (float) target.calcTotalRes();
+		float penResRatio = source.calcTotalPen(context) / (float) target.calcTotalRes(context);
 		
 		float actual = Math.max((rawDamage - defenseReduction) * penResRatio * (11 - source.currentLevel / 10f), 1);
 		
