@@ -12,6 +12,13 @@ public class MCombatStateChanged extends Message {
 	public final CombatState previous;
 	public final CombatState next;
 	
+	private MCombatStateChanged() {
+		super(ID);
+		context = null;
+		previous = null;
+		next = null;
+	}
+	
 	public MCombatStateChanged(BattleContext context, CombatState previous, CombatState next) {
 		super(ID);
 		this.context = context;

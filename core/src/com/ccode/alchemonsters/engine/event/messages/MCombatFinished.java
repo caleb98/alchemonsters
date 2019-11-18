@@ -11,6 +11,13 @@ public class MCombatFinished extends Message {
 	public final BattleContext context;
 	public final BattleTeam won;
 	public final BattleTeam lost;
+
+	private MCombatFinished() {
+		super(ID);
+		context = null;
+		won = null;
+		lost = null;
+	}
 	
 	public MCombatFinished(BattleContext context, BattleTeam won, BattleTeam lost) {
 		super(ID);

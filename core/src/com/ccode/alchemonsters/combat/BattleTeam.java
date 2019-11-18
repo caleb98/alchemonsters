@@ -9,6 +9,10 @@ public class BattleTeam {
 	public int numActives;
 	public DynamicVariables variables = new DynamicVariables();
 	
+	private BattleTeam() {
+		team = null;
+	}
+	
 	public BattleTeam(CreatureTeam team, int activePositions) {
 		this.team = team;
 		numActives = activePositions;

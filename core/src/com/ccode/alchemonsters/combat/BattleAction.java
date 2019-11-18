@@ -13,6 +13,12 @@ public class BattleAction implements Comparable<BattleAction> {
 	public final int targetPos;
 	public final int id;
 
+	private BattleAction() {
+		type = null;
+		targetPos = -1;
+		id = -1;
+	}
+	
 	public BattleAction(BattleActionType type, int targetPos, int id) {
 		this.type = type;
 		this.targetPos = targetPos;

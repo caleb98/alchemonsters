@@ -21,10 +21,6 @@ public class MoveActionAilmentApplicator implements MoveAction {
 	 */
 	public float chance = 1f;
 	
-	public MoveActionAilmentApplicator() {
-		// TODO Auto-generated constructor stub
-	}
-	
 	@Override
 	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
 		if(!(GameRandom.nextFloat() <= chance)) {

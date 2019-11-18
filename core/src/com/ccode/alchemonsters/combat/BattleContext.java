@@ -16,6 +16,8 @@ public class BattleContext {
 	
 	public Battleground battleground;
 	
+	private BattleContext() {}
+	
 	public BattleContext(UnitController[] teamAControl, BattleTeam teamA, 
 						 UnitController[] teamBControl, BattleTeam teamB) {
 		

@@ -12,6 +12,13 @@ public class MCombatStarted extends Message {
 	public final BattleTeam teamA;
 	public final BattleTeam teamB;
 	
+	private MCombatStarted() {
+		super(ID);
+		context = null;
+		teamA = null;
+		teamB = null;
+	}
+	
 	public MCombatStarted(BattleContext context, BattleTeam teamA, BattleTeam teamB) {
 		super(ID);
 		this.context = context;

@@ -14,6 +14,8 @@ public class StatusAilment extends ListSubscriber {
 	public String cause;
 	public StatusAilmentEffect effect;
 	
+	private StatusAilment() {}
+	
 	public StatusAilment(BattleContext context, Creature source, Creature target, String cause, String ailmentName) {
 		this.context = context;
 		this.source = source;

@@ -31,6 +31,8 @@ public class CreatureStats {
 	public int resistance;
 	public int speed;
 	
+	private CreatureStats() {}
+	
 	public CreatureStats(int vitae, int focus, 
 					     int magicAtk, int magicDef,
 					     int physAtk, int physDef, 

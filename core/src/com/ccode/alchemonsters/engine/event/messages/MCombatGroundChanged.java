@@ -15,6 +15,15 @@ public class MCombatGroundChanged extends Message {
 	public final GroundType oldGround;
 	public final GroundType newGround;
 	
+	public MCombatGroundChanged() {
+		super(ID);
+		context = null;
+		source = null;
+		cause = null;
+		oldGround = null;
+		newGround = null;
+	}
+	
 	public MCombatGroundChanged(BattleContext context, Creature source, String cause, GroundType oldGround, GroundType newGround) {
 		super(ID);
 		this.context = context;

@@ -15,6 +15,15 @@ public class MCombatTerrainChanged extends Message {
 	public final TerrainType oldTerrain;
 	public final TerrainType newTerrain;
 	
+	private MCombatTerrainChanged() {
+		super(ID);
+		context = null;
+		source = null;
+		cause = null;
+		oldTerrain = null;
+		newTerrain = null;
+	}
+	
 	public MCombatTerrainChanged(BattleContext context, Creature source, String cause, TerrainType oldTerrain, TerrainType newTerrain) {
 		super(ID);
 		this.context = context;

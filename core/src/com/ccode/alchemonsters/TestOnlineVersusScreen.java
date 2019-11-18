@@ -46,7 +46,6 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	private TeamCombatDisplayController myTeamDisplay;
 	private TeamCombatDisplay theirTeamDisplay;
 	private CombatLog combatTextDisplay;
-	private Dialog errorMessage;
 	
 	//Scene2d ui
 	private Stage ui;
@@ -90,24 +89,16 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		start1v1.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				//TODO: start 1v1 connection
-				try {
-					client = KryoCreator.createClient();
-					client.addListener(new VersusClientListener());
-					client.connect(5000, "localhost", 48372);
-					
-					BattleTeam team = new BattleTeam(myTeam, 1);
-					myControls = new ClientTeamController(client, 1).getControls();
-					
-					client.sendTCP(new NetJoinVersus("Team", team, 1));
-					isWaitingForJoin = true;
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				startConnection(1);
 			}
 		});
 		TextButton start2v2 = new TextButton("Start 2v2", UI.DEFAULT_SKIN);
+		start2v2.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				startConnection(2);
+			}
+		});
 		menuWindow.add(start1v1).expandX().fillX();
 		menuWindow.add(start2v2).expandX().fillX();
 		menuWindow.row();
@@ -145,18 +136,6 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		
 		table.add(combatWindow).expand().fill();
 		
-		//Setup the error message
-		errorMessage = new Dialog("Error", UI.DEFAULT_SKIN) {
-			protected void result(Object object) {
-				boolean close = (boolean) object;
-				if(close) {
-					hide();
-				}
-			}
-		};
-		errorMessage.text("Unable to start combat with empty team.\nPlease add at least one mon to your team.");
-		errorMessage.button("Close", true);
-		
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
 		
@@ -164,10 +143,56 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		
 	}
 	
+	private void startConnection(int numActives) {
+		//Check that there is at least one creature
+		if(myTeam.getNumCreatures() == 0) {
+			showErrorMessage("Team needs at least one creature to start battle.");
+			return;
+		}
+		
+		//Move as many creatures into active positions as possible
+		for(int i = 0; i < numActives; ++i) {
+			if(myTeam.creatures[i] == null) {
+				for(int k = numActives; k < CreatureTeam.TEAM_SIZE; ++k) {
+					if(myTeam.creatures[k] != null) {
+						myTeam.swap(k, i);
+						break;
+					}
+				}
+			}
+		}
+		
+		//Start connections
+		(new Thread(()->{
+			try {
+				client = KryoCreator.createClient();
+				client.addListener(new VersusClientListener());
+				client.start();
+				client.connect(5000, "localhost", 48372);
+				
+				BattleTeam team = new BattleTeam(myTeam, numActives);
+				myControls = new ClientTeamController(client, numActives).getControls();
+				
+				client.sendTCP(new NetJoinVersus("Team", team, numActives));
+				isWaitingForJoin = true;
+			} catch (IOException e) {
+				//Unable to connect
+				showErrorMessage("Unable to connect to server.");
+				System.out.println(e.getMessage());
+			}
+		})).start();
+	}
+	
+	private void showErrorMessage(String s) {
+		Dialog error = new Dialog("Error", UI.DEFAULT_SKIN);
+		error.text(s);
+		error.button("OK");
+		error.show(ui);
+	}
+	
 	@Override
 	public void renderGraphics(float delta) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -230,7 +255,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		public void received(Connection connection, Object object) {
 			if(object instanceof NetJoinSuccess) {
 				if(isWaitingForJoin) {
-					
+					System.out.println("we're in!");
 				}
 				else {
 					//TODO: wasn't waiting for join, so we probably need error handling here

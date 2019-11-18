@@ -10,6 +10,10 @@ public abstract class StatusAilmentEffect implements Publisher {
 
 	public final String id;
 	
+	private StatusAilmentEffect() {
+		id = null;
+	}
+	
 	public StatusAilmentEffect(String effectId) {
 		id = effectId;
 	}

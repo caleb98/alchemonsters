@@ -25,6 +25,18 @@ public class MCombatDamageDealt extends Message {
 	 */
 	public final boolean isTriggered;
 	
+	private MCombatDamageDealt() {
+		super(ID);
+		context = null;
+		source = null;
+		target = null;
+		cause = null;
+		elementType = null;
+		amount = -1;
+		isHit = null;
+		isCrit = null;
+	}
+	
 	public MCombatDamageDealt(BattleContext context, Creature source, Creature target, String cause,
 							  ElementType elementType, int amount, boolean isHit, boolean isCrit, boolean isTriggered) {
 		super(ID);

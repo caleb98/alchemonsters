@@ -17,6 +17,16 @@ public class MCombatStatBuffApplied extends Message {
 	public final StatType statBuffed;
 	public final int buffAmt;
 	
+	private MCombatStatBuffApplied() {
+		super(ID);
+		context = null;
+		source = null;
+		target = null;
+		move = null;
+		statBuffed = null;
+		buffAmt = -1;
+	}
+	
 	public MCombatStatBuffApplied(BattleContext context, Creature source, Creature target, Move move,
 								  StatType statBuffed, int buffAmt) {
 		super(ID);

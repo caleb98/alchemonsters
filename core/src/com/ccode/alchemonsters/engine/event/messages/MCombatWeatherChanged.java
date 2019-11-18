@@ -16,6 +16,15 @@ public class MCombatWeatherChanged extends Message {
 	public final WeatherType oldWeather;
 	public final WeatherType newWeather;
 	
+	private MCombatWeatherChanged() {
+		super(ID);
+		context = null;
+		source = null;
+		cause = null;
+		oldWeather = null;
+		newWeather = null;
+	}
+	
 	public MCombatWeatherChanged(BattleContext context, Creature source, String cause, WeatherType oldWeather, WeatherType newWeather) {
 		super(ID);
 		this.context = context;

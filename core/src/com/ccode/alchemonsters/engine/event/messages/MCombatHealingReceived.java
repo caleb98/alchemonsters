@@ -18,6 +18,16 @@ public class MCombatHealingReceived extends Message {
 	public final int amount;
 	public final boolean isTriggered;
 	
+	private MCombatHealingReceived() {
+		super(ID);
+		context = null;
+		source = null;
+		target = null;
+		cause = null;
+		amount = -1;
+		isTriggered = false;
+	}
+	
 	public MCombatHealingReceived(BattleContext context, Creature source, Creature target, String cause, int amount, boolean isTriggered) {
 		super(ID);
 		this.context = context;
