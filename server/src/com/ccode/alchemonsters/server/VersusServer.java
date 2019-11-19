@@ -9,7 +9,6 @@ import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
-import com.ccode.alchemonsters.combat.TeamController;
 import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.moves.Move;
@@ -19,13 +18,23 @@ import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
+import com.ccode.alchemonsters.engine.event.Subscriber;
+import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
+import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeStarted;
+import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
+import com.ccode.alchemonsters.engine.event.messages.MCombatGroundChanged;
+import com.ccode.alchemonsters.engine.event.messages.MCombatHealingReceived;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
+import com.ccode.alchemonsters.engine.event.messages.MCombatStatBuffApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
+import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
+import com.ccode.alchemonsters.engine.event.messages.MCombatWeatherChanged;
 import com.ccode.alchemonsters.net.NetActionSelected;
+import com.ccode.alchemonsters.net.NetActionSubmitted;
 import com.ccode.alchemonsters.net.NetErrorMessage;
 import com.ccode.alchemonsters.net.NetJoinSuccess;
 import com.ccode.alchemonsters.net.NetJoinVersus;
@@ -34,7 +43,7 @@ import com.ccode.alchemonsters.util.Triple;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
-public class VersusServer extends Listener implements Publisher {
+public class VersusServer extends Listener implements Publisher, Subscriber {
 	
 	//Team management
 	private BattleTeam teamA;
@@ -54,6 +63,24 @@ public class VersusServer extends Listener implements Publisher {
 	private boolean isTeamADoubleAttack = false;
 	private boolean isTeamBDoubleAttack = false;
 	private int doubleAttackPosition = -1;
+	
+	public VersusServer() {
+		//Subscribe to all combat events so we can forward them
+		subscribe(MCombatAilmentApplied.ID);		
+		subscribe(MCombatAilmentRemoved.ID);		
+		subscribe(MCombatChargeFinished.ID);		
+		subscribe(MCombatChargeStarted.ID);		
+		subscribe(MCombatDamageDealt.ID);		
+		subscribe(MCombatFinished.ID);		
+		subscribe(MCombatGroundChanged.ID);		
+		subscribe(MCombatHealingReceived.ID);		
+		subscribe(MCombatStarted.ID);		
+		subscribe(MCombatStatBuffApplied.ID);		
+		subscribe(MCombatStateChanged.ID);		
+		subscribe(MCombatTeamActiveChanged.ID);		
+		subscribe(MCombatTerrainChanged.ID);		
+		subscribe(MCombatWeatherChanged.ID);		
+	}
 	
 	//*******************************************
 	// Combat Start - Entry to battle.
@@ -424,6 +451,7 @@ public class VersusServer extends Listener implements Publisher {
 				teamBControls[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
 			}
 		}
+		isWaitingOnActionSelect = true;
 	}
 	
 	//*******************************************
@@ -599,7 +627,32 @@ public class VersusServer extends Listener implements Publisher {
 		publish(changed);
 		switch(next) {
 		
-		
+		case ACTIVE_DEATH_SWAP:
+			doActiveDeathSwap();
+			break;
+			
+		case BATTLE_PHASE_1:
+			doBattlePhaseOne();
+			break;
+			
+		case BATTLE_PHASE_2:
+			doBattlePhaseTwo();
+			break;
+			
+		case END_PHASE:
+			doEndPhase();
+			break;
+			
+		case MAIN_PHASE_1:
+			doMainPhaseOne();
+			break;
+			
+		case MAIN_PHASE_2:
+			doMainPhaseTwo();
+			break;
+			
+		default:
+			break;
 		
 		}
 	}
@@ -619,6 +672,48 @@ public class VersusServer extends Listener implements Publisher {
 		else if(object instanceof NetActionSelected) {
 			handleNetActionSelected(connection, (NetActionSelected) object);
 		}
+		else if(object instanceof NetActionSubmitted) {
+			if(isWaitingOnActionSelect) {
+				handleNetActionSubmitted(connection, (NetActionSubmitted) object);
+				for(UnitController c : teamAControls) {
+					if(!c.isActionSubmitted()) return;
+				}
+				for(UnitController c : teamBControls) {
+					if(!c.isActionSubmitted()) return;
+				}
+				
+				switch(context.currentState) {
+				
+				case ACTIVE_DEATH_SWAP:
+					if(isTeamADoubleAttack || isTeamBDoubleAttack) {
+						setCombatState(CombatState.BATTLE_PHASE_2);
+					}
+					break;
+					
+				case BATTLE_PHASE_1:
+					//Should never get here
+					break;
+					
+				case BATTLE_PHASE_2:
+					break;
+					
+				case END_PHASE:
+					break;
+					
+				case MAIN_PHASE_1:
+					setCombatState(CombatState.BATTLE_PHASE_1);
+					break;
+					
+				case MAIN_PHASE_2:
+					setCombatState(CombatState.BATTLE_PHASE_2);
+					break;
+					
+				default:
+					break;
+				
+				}
+			}
+		}
 	}
 	
 	private void handleNetActionSelected(Connection connection, NetActionSelected select) {
@@ -626,7 +721,16 @@ public class VersusServer extends Listener implements Publisher {
 			teamAControls[select.activePos].setSelectedAction(select.actionSelected);
 		}
 		else if(connection == teamBConnection) {
-			
+			teamBControls[select.activePos].setSelectedAction(select.actionSelected);
+		}
+	}
+	
+	private void handleNetActionSubmitted(Connection connection, NetActionSubmitted submit) {
+		if(connection == teamAConnection) {
+			teamAControls[submit.activePos].submitAction();
+		}
+		else if(connection == teamBConnection) {
+			teamBControls[submit.activePos].submitAction();
 		}
 	}
 	
@@ -690,15 +794,15 @@ public class VersusServer extends Listener implements Publisher {
 	}
 	
 	@Override
-	public void publish(Message message) {
-		Publisher.super.publish(message);
+	public void handleMessage(Message currentMessage) {
+		//Forward all combat messages
 		if(teamAConnection != null && teamAConnection.isConnected()) {
-			teamAConnection.sendTCP(message);
+			teamAConnection.sendTCP(currentMessage);
 		}
 		if(teamBConnection != null && teamBConnection.isConnected()) {
-			teamBConnection.sendTCP(message);
+			teamBConnection.sendTCP(currentMessage);
 		}
- 	}
+	}
 	
 	private class DelayedMoveInfo {
 		

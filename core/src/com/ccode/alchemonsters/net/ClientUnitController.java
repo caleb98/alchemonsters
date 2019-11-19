@@ -19,4 +19,10 @@ public class ClientUnitController extends GenericUnitController {
 		connection.sendTCP(new NetActionSelected(selectedIndex, activePos));
 	}
 	
+	@Override
+	public void submitAction() {
+		super.submitAction();
+		connection.sendTCP(new NetActionSubmitted(activePos));
+	}
+	
 }

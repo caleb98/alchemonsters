@@ -1,7 +1,5 @@
 package com.ccode.alchemonsters.ui;
 
-import java.util.LinkedList;
-
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -10,30 +8,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CreatureTeam;
-import com.ccode.alchemonsters.combat.TeamController;
-import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.UI;
-import com.ccode.alchemonsters.engine.event.Message;
-import com.ccode.alchemonsters.engine.event.Subscriber;
-import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
-import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
-import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
-import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 
-public class TeamCombatDisplay extends Table implements Subscriber {
+public class TeamCombatDisplay extends Table {
 	
-	private LinkedList<Message> messageQueue = new LinkedList<>();
-	
-	private String teamName;
-	private BattleTeam team;
-	private Cell<InactiveDisplay>[] allDisplays;
-	private Dialog sameActionError;
-	
-	private TeamController teamController;
-	private UnitController[] activeControllers;
-	
-	private boolean isSetup = false;
+	String teamName;
+	BattleTeam team;
+	Cell<CreatureDisplay>[] allDisplays;
+	Dialog sameActionError;
 	
 	public TeamCombatDisplay(String teamName) {
 		super(UI.DEFAULT_SKIN);
@@ -51,13 +34,9 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		sameActionError.text("Cannot select multiple mons to\n"
 				           + "swap to the same mon.");
 		sameActionError.button("Close", true);
-		
-		subscribe(MCombatStarted.ID);
-		subscribe(MCombatFinished.ID);
-		subscribe(MCombatDamageDealt.ID);
-		subscribe(MCombatTeamActiveChanged.ID);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setup(BattleTeam team, Stage ui) {
 		this.team = team;
 		
@@ -67,68 +46,38 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		add(new Label(teamName, UI.DEFAULT_SKIN)).padTop(20);
 		row();
 		
-		int numActives = team.getNumActives();
-		
-		//Set up controls
-		teamController = new TeamController(numActives);
-		activeControllers = teamController.getControls();
-		
 		//Create array of all the displays
 		allDisplays = new Cell[CreatureTeam.TEAM_SIZE];
 		
 		//Create the displays and add them to the array
 		for(int i = 0; i < team.getNumActives(); ++i) {
-			allDisplays[i] = add((InactiveDisplay) new ActiveDisplay(i)).pad(10);
+			allDisplays[i] = add(createActiveDisplay(i)).pad(10);
 			row();
 		}
 		
 		for(int i = team.getNumActives(); i < CreatureTeam.TEAM_SIZE; ++i) {
-			allDisplays[i] = add(new InactiveDisplay(i)).pad(10);
+			allDisplays[i] = add(createInactiveDisplay(i)).pad(10);
 			row();
-		}
-		
-		isSetup = true;
-	}
-
-	@Override
-	public void act(float delta) {		
-		super.act(delta);
-		
-		if(isSetup) {
-			Message m;
-			while((m = messageQueue.poll()) != null) {		
-				if(m instanceof MCombatStarted) {
-					updateStrings();
-				}
-				else if(m instanceof MCombatFinished) {
-					updateStrings();
-				}
-				else if(m instanceof MCombatDamageDealt) {
-					updateStrings();
-				}
-				else if(m instanceof MCombatTeamActiveChanged) {
-					updateStrings();
-				}
-			}
 		}
 	}
 	
 	public void updateStrings() {
-		for(Cell<InactiveDisplay> disp : allDisplays) {
+		for(Cell<CreatureDisplay> disp : allDisplays) {
 			disp.getActor().updateStrings();
 		}
 	}
 	
-	public UnitController[] getControllers() {
-		return activeControllers;
+	CreatureDisplay createActiveDisplay(int teamId) {
+		return new CreatureDisplay(teamId);
 	}
 	
-	@Override
-	public void handleMessage(Message currentMessage) {
-		messageQueue.add(currentMessage);
+	CreatureDisplay createInactiveDisplay(int teamId) {
+		CreatureDisplay disp = new CreatureDisplay(teamId);
+		disp.add(new Label("Active", UI.DEFAULT_SKIN));
+		return disp;
 	}
 	
-	private class InactiveDisplay extends Table {
+	class CreatureDisplay extends Table {
 		
 		int teamId;
 		Label name;
@@ -137,7 +86,7 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 		ProgressBar manaBar;
 		Label manaLabel;
 		
-		InactiveDisplay(int teamId) {
+		CreatureDisplay(int teamId) {
 			this.teamId = teamId;
 			name = new Label("Mon Name", UI.DEFAULT_SKIN);
 			add(name);
@@ -177,15 +126,6 @@ public class TeamCombatDisplay extends Table implements Subscriber {
 			manaBar.setRange(0, creature.maxMana);
 			manaBar.setValue(creature.currentMana);
 			manaLabel.setText(String.format("%s/%s", creature.currentMana, creature.maxMana));	
-		}
-		
-	}
-	
-	private class ActiveDisplay extends InactiveDisplay {
-
-		ActiveDisplay(int teamId) {
-			super(teamId);
-			add(new Label("Active", UI.DEFAULT_SKIN));
 		}
 		
 	}

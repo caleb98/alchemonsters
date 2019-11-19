@@ -29,8 +29,13 @@ import com.ccode.alchemonsters.net.ClientTeamController;
 import com.ccode.alchemonsters.net.ClientUnitController;
 import com.ccode.alchemonsters.net.KryoCreator;
 import com.ccode.alchemonsters.net.NetErrorMessage;
+import com.ccode.alchemonsters.net.NetFilterAllActions;
+import com.ccode.alchemonsters.net.NetFilterAvailableActions;
 import com.ccode.alchemonsters.net.NetJoinSuccess;
 import com.ccode.alchemonsters.net.NetJoinVersus;
+import com.ccode.alchemonsters.net.NetRefreshControl;
+import com.ccode.alchemonsters.net.NetResetAvailableActions;
+import com.ccode.alchemonsters.net.NetSetActions;
 import com.ccode.alchemonsters.ui.CombatLog;
 import com.ccode.alchemonsters.ui.TeamBuilderWindow;
 import com.ccode.alchemonsters.ui.TeamCombatDisplay;
@@ -44,9 +49,6 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	private static final String UUID_NAME = "_MULTIPLAYER_UUID";
 	
 	private UUID myID;
-	
-	//Message listener
-	private ListSubscriber sub;
 	
 	//Overall frame
 	private TeamBuilderWindow teamBuilder;
@@ -72,6 +74,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	//Network
 	private Client client;
 	private boolean isWaitingForJoin = false;
+	private boolean isCombatStarted = false;
 	
 	public TestOnlineVersusScreen(AlchemonstersGame game) {
 		super(game);
@@ -156,10 +159,6 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
-		
-		sub = new ListSubscriber();
-		sub.subscribe(MCombatStarted.ID);
-		sub.subscribe(MCombatStateChanged.ID);
 	}
 	
 	private void startConnection(int numActives) {
@@ -219,28 +218,6 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	
 	@Override
 	public void renderGraphics(float delta) {
-		while(sub.messageQueue.peek() != null) {
-			Message m = sub.messageQueue.poll();
-			if(m instanceof MCombatStarted) {
-				MCombatStarted full = (MCombatStarted) m;
-				if(full.teamA.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
-					myTeamDisplay.setup(full.teamA, ui);
-					theirTeamDisplay.setup(full.teamB, ui);
-				}
-				else if(full.teamB.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
-					myTeamDisplay.setup(full.teamB, ui);
-					theirTeamDisplay.setup(full.teamA, ui);
-				}
-				else {
-					//TODO: should never happen
-					showErrorMessage("No team with matching UUID!");
-					client.close();
-				}
-			}
-			else if(m instanceof MCombatStateChanged) {
-				
-			}
-		}
 		
 	}
 
@@ -303,6 +280,8 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		@Override
 		public void received(Connection connection, Object object) {
 			
+			System.out.println(object);
+			
 			if(object instanceof NetJoinSuccess) {
 				if(isWaitingForJoin) {
 					showInfoMessage("Connected!");
@@ -318,6 +297,37 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 			
 			else if(object instanceof Message) {
 				publish((Message) object); 
+				handleMessage((Message) object);
+			}
+			
+			else if(object instanceof NetSetActions) {
+				NetSetActions full = (NetSetActions) object;
+				myControls[full.activePos].setAllActions(full.actions);
+				myTeamDisplay.updateStrings();
+			}
+			
+			else if(object instanceof NetFilterAllActions) {
+				NetFilterAllActions full = (NetFilterAllActions) object;
+				myControls[full.activePos].filterAllActions(full.filter);
+				myTeamDisplay.updateStrings();
+			}
+			
+			else if(object instanceof NetFilterAvailableActions) {
+				NetFilterAvailableActions full = (NetFilterAvailableActions) object;
+				myControls[full.activePos].filterAvailableActions(full.filter);
+				myTeamDisplay.updateStrings();
+			}
+			
+			else if(object instanceof NetResetAvailableActions) {
+				NetResetAvailableActions full = (NetResetAvailableActions) object;
+				myControls[full.activePos].resetAvailableActions();
+				myTeamDisplay.updateStrings();
+			}
+			
+			else if(object instanceof NetRefreshControl) {
+				NetRefreshControl full = (NetRefreshControl) object;
+				myControls[full.activePos].refresh();
+				myTeamDisplay.updateStrings();
 			}
 			
 		}
@@ -325,6 +335,25 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		@Override
 		public void disconnected(Connection connection) {
 			
+		}
+		
+		private void handleMessage(Message m) {
+			if(m instanceof MCombatStarted) {
+				MCombatStarted full = (MCombatStarted) m;
+				if(full.teamA.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
+					myTeamDisplay.setup(full.teamA, myControls, ui);
+					theirTeamDisplay.setup(full.teamB, ui);
+				}
+				else if(full.teamB.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
+					myTeamDisplay.setup(full.teamB, myControls, ui);
+					theirTeamDisplay.setup(full.teamA, ui);
+				}
+				else {
+					//TODO: should never happen
+					showErrorMessage("No team with matching UUID!");
+					client.close();
+				}
+			}
 		}
 		
 		private void handleErrorMessage(NetErrorMessage err) {

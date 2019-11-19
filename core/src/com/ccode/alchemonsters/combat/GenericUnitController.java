@@ -76,6 +76,11 @@ public class GenericUnitController implements UnitController {
 	}
 	
 	@Override
+	public int getSelectedActionIndex() {
+		return selectedAction;
+	}
+	
+	@Override
 	public void setSelectedAction(int selectedIndex) {
 		selectedAction = selectedIndex;
 	}

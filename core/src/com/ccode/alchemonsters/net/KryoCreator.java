@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaClosure;
+
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleEvent;
@@ -82,6 +85,7 @@ public class KryoCreator {
 		
 		//com.ccode.alchemonsters.combat
 		kryo.register(BattleAction.class);
+		kryo.register(BattleAction.BattleActionType.class);
 		kryo.register(BattleContext.class);
 		kryo.register(BattleEvent.class);
 		kryo.register(Battleground.class);
@@ -102,6 +106,7 @@ public class KryoCreator {
 		//com.ccode.alchemonsters.combat.moves
 		kryo.register(Move.class);
 		kryo.register(MoveAction.class);
+		kryo.register(MoveAction[].class);
 		kryo.register(MoveActionAilmentApplicator.class);
 		kryo.register(MoveActionAilmentRemoval.class);
 		kryo.register(MoveActionChance.class);
@@ -117,6 +122,9 @@ public class KryoCreator {
 		kryo.register(MoveTarget.class);
 		kryo.register(MoveType.class);
 		kryo.register(TurnType.class);
+		
+		kryo.register(LuaClosure.class);
+		kryo.register(Globals.class);
 		
 		//com.ccode.alchemonsters.creature
 		kryo.register(Creature.class);
@@ -147,6 +155,7 @@ public class KryoCreator {
 		
 		//com.ccode.alchemonsters.net
 		kryo.register(NetActionSelected.class);
+		kryo.register(NetActionSubmitted.class);
 		kryo.register(NetErrorMessage.class);
 		kryo.register(NetFilterAllActions.class);
 		kryo.register(NetFilterAvailableActions.class);
@@ -171,8 +180,6 @@ public class KryoCreator {
 	
 	public static Client createClient() {
 		Client client = new Client();
-		//TODO: remove this! its only for debugging!!!!
-		client.setTimeout(0);
 		registerClasses(client);
 		return client;
 	}

@@ -63,6 +63,7 @@ public interface UnitController {
 	public boolean isActionSubmitted();
 	public void submitAction();
 	public BattleAction getSelectedAction();
+	public int getSelectedActionIndex();
 	public void setSelectedAction(int selectedIndex);
 	
 	// ************************************* 

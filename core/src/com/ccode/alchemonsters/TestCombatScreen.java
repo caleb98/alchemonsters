@@ -19,12 +19,13 @@ import com.badlogic.gdx.utils.Align;
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
 import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.GroundType;
+import com.ccode.alchemonsters.combat.TeamController;
 import com.ccode.alchemonsters.combat.TerrainType;
+import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
@@ -225,8 +226,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		}
 		
 		//Setup display windows
-		teamADisplay.setup(battleTeamA, ui);
-		teamBDisplay.setup(battleTeamB, ui);
+		teamADisplay.setup(battleTeamA, (new TeamController(positions)).getControls(), ui);
+		teamBDisplay.setup(battleTeamB, (new TeamController(positions)).getControls(), ui);
 		
 		//Combat setup
 		battleContext = new BattleContext(battleTeamA, battleTeamB);
@@ -255,6 +256,13 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		combatTextDisplay.clear();
 		publish(new MCombatStarted(battleContext));
 		setCombatState(CombatState.MAIN_PHASE_1);
+	}
+	
+	private void endCombat() {
+		publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
+		teamADisplay.updateStrings();
+		teamBDisplay.updateStrings();
+		isCombat = false;
 	}
 	
 	private void setCombatState(CombatState next) {
@@ -366,13 +374,11 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 						doBattleAction(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB, battleTeamA);
 					}
 					if(battleTeamA.isDefeated()) {
-						publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
-						isCombat = false;
+						endCombat();
 						return;
 					}
 					else if(battleTeamB.isDefeated()) {
-						publish(new MCombatFinished(battleContext, battleTeamA, battleTeamB));
-						isCombat = false;
+						endCombat();
 						return;
 					}
 					else {
@@ -415,13 +421,11 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 						//Check for sandstorm death
 						if(checkNeedsActiveSwap()) {
 							if(battleTeamA.isDefeated()) {
-								publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
-								isCombat = false;
+								endCombat();
 								break;
 							}
 							else if(battleTeamB.isDefeated()) {
-								publish(new MCombatFinished(battleContext, battleTeamA, battleTeamB));
-								isCombat = false;
+								endCombat();
 								break;
 							}
 							else {
@@ -779,13 +783,11 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		
 		//Check for defeat
 		if(battleTeamA.isDefeated()) {
-			publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
-			isCombat = false;
+			endCombat();
 			return;
 		}
 		else if(battleTeamB.isDefeated()) {
-			publish(new MCombatFinished(battleContext, battleTeamA, battleTeamB));
-			isCombat = false;
+			endCombat();
 			return;
 		}
 		
