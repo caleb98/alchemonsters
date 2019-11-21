@@ -50,6 +50,14 @@ public class MainMenuScreen extends GameScreen {
 			}
 		});
 		
+		TextButton multiplayer = new TextButton("Multiplayer Versus", UI.DEFAULT_SKIN);
+		multiplayer.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new TestOnlineVersusScreen(game));
+			}
+		});
+		
 		TextButton optionsButton = new TextButton("Test World", UI.DEFAULT_SKIN);
 		optionsButton.addListener(new ClickListener() {
 			@Override
@@ -70,6 +78,8 @@ public class MainMenuScreen extends GameScreen {
 		table.add(titleStack);
 		table.row();
 		table.add(startButton).pad(10);
+		table.row();
+		table.add(multiplayer).pad(10);
 		table.row();
 		table.add(optionsButton).pad(10);
 		table.row();
