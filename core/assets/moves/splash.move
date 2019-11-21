@@ -9,7 +9,7 @@
 	actions: [
 		{
 			class: "Script",
-			scriptFile: "splash.lua"
+			scriptName: "splash"
 		}
 	],
 	turnType: "INSTANT",

@@ -73,6 +73,9 @@ import com.esotericsoftware.kryonet.Server;
 
 public class KryoCreator {
 
+	private static final int WRITE_BUFFER_SIZE = 8192;
+	private static final int OBJECT_BUFFER_SIZE = 8192;
+	
 	private static void registerClasses(EndPoint endpoint) {
 		Kryo kryo = endpoint.getKryo();
 		
@@ -156,6 +159,7 @@ public class KryoCreator {
 		//com.ccode.alchemonsters.net
 		kryo.register(NetActionSelected.class);
 		kryo.register(NetActionSubmitted.class);
+		kryo.register(NetBattleContextUpdate.class);
 		kryo.register(NetErrorMessage.class);
 		kryo.register(NetFilterAllActions.class);
 		kryo.register(NetFilterAvailableActions.class);
@@ -173,13 +177,13 @@ public class KryoCreator {
 	}
 	
 	public static Server createServer() {
-		Server server = new Server();
+		Server server = new Server(WRITE_BUFFER_SIZE, OBJECT_BUFFER_SIZE);
 		registerClasses(server);
 		return server;
 	}
 	
 	public static Client createClient() {
-		Client client = new Client();
+		Client client = new Client(WRITE_BUFFER_SIZE, OBJECT_BUFFER_SIZE);
 		registerClasses(client);
 		return client;
 	}

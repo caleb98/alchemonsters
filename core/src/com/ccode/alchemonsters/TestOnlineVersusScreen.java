@@ -20,14 +20,13 @@ import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.engine.GameScreen;
 import com.ccode.alchemonsters.engine.UI;
-import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
-import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.net.ClientTeamController;
 import com.ccode.alchemonsters.net.ClientUnitController;
 import com.ccode.alchemonsters.net.KryoCreator;
+import com.ccode.alchemonsters.net.NetBattleContextUpdate;
 import com.ccode.alchemonsters.net.NetErrorMessage;
 import com.ccode.alchemonsters.net.NetFilterAllActions;
 import com.ccode.alchemonsters.net.NetFilterAvailableActions;
@@ -185,7 +184,6 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 			try {			
 				client = KryoCreator.createClient();
 				client.addListener(new VersusClientListener());
-				client.start();
 				client.connect(5000, ipInput.getText(), 48372);
 				
 				BattleTeam team = new BattleTeam(myTeam, numActives);
@@ -218,7 +216,11 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 	
 	@Override
 	public void renderGraphics(float delta) {
-		
+		if(client != null) {
+			try {
+				client.update(0);
+			} catch (IOException e) {}
+		}
 	}
 
 	@Override
@@ -280,7 +282,7 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 		@Override
 		public void received(Connection connection, Object object) {
 			
-			System.out.println(object);
+			//System.out.println(object);
 			
 			if(object instanceof NetJoinSuccess) {
 				if(isWaitingForJoin) {
@@ -330,11 +332,28 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 				myTeamDisplay.updateStrings();
 			}
 			
+			else if(object instanceof NetBattleContextUpdate) {
+				updateContext(((NetBattleContextUpdate) object).context);
+			}
+			
 		}
 		
 		@Override
 		public void disconnected(Connection connection) {
 			
+		}
+		
+		private void updateContext(BattleContext context) {
+			if(context.teamA.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
+				myTeamDisplay.setTeam(context.teamA);
+				theirTeamDisplay.setTeam(context.teamB);
+			}
+			else if(context.teamB.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
+				myTeamDisplay.setTeam(context.teamB);
+				theirTeamDisplay.setTeam(context.teamA);
+			}
+			myTeamDisplay.updateStrings();
+			theirTeamDisplay.updateStrings();
 		}
 		
 		private void handleMessage(Message m) {

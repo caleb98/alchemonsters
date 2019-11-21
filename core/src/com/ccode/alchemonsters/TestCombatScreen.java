@@ -34,9 +34,9 @@ import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.GameScreen;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
-import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
+import com.ccode.alchemonsters.engine.event.Subscriber;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
@@ -49,10 +49,7 @@ import com.ccode.alchemonsters.ui.TeamCombatDisplayController;
 import com.ccode.alchemonsters.util.GameRandom;
 import com.ccode.alchemonsters.util.Triple;
 
-public class TestCombatScreen extends GameScreen implements InputProcessor, Screen, Publisher {
-	
-	//Message listener
-	private ListSubscriber sub;
+public class TestCombatScreen extends GameScreen implements Subscriber, InputProcessor, Screen, Publisher {
 	
 	//Overall Frame
 	private TeamBuilderWindow teamABuilder;
@@ -183,9 +180,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
 		
-		sub = new ListSubscriber();
-		sub.subscribe(MCombatStateChanged.ID);
-		sub.subscribe(MCombatTeamActiveChanged.ID);
+		subscribe(MCombatStateChanged.ID);
+		subscribe(MCombatTeamActiveChanged.ID);
 	}	
 
 	private void startCombat(int positions) {
@@ -354,189 +350,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	}
 	
 	@Override
-	public void renderUI(float delta) {
-		
-		Message m;
-		while((m = sub.messageQueue.poll()) != null) {
-			if(m instanceof MCombatStateChanged) {
-				MCombatStateChanged full = (MCombatStateChanged) m;
-				switch(full.next) {
-				
-				case BATTLE_PHASE_1:
-					doBattlePhase();
-					break;
-					
-				case BATTLE_PHASE_2:
-					if(isTeamADoubleAttack) {
-						doBattleAction(teamADisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamA, battleTeamB);
-					}
-					else if(isTeamBDoubleAttack) {
-						doBattleAction(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB, battleTeamA);
-					}
-					if(battleTeamA.isDefeated()) {
-						endCombat();
-						return;
-					}
-					else if(battleTeamB.isDefeated()) {
-						endCombat();
-						return;
-					}
-					else {
-						setCombatState(CombatState.END_PHASE);	
-					}
-					break;
-					
-				case END_PHASE:
-					teamADisplay.updateStrings();
-					if(!checkNeedsActiveSwap()) {
-						setCombatState(CombatState.MAIN_PHASE_1);
-					}
-					else {
-						setCombatState(CombatState.ACTIVE_DEATH_SWAP);
-					}
-					break;
-					
-				case MAIN_PHASE_1:
-					//Apply damage from sandstorm
-					if(battleContext.battleground.weather == WeatherType.SANDSTORM) {
-						
-						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-							for(ElementType t : battleTeamA.get(i).base.types) {
-								if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-									battleTeamA.get(i).currentHealth -= battleTeamA.get(i).maxHealth / 16f;
-									break;
-								}
-							}
-						}
-						
-						for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-							for(ElementType t : battleTeamB.get(i).base.types) {
-								if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-									battleTeamB.get(i).currentHealth -= battleTeamB.get(i).maxHealth / 16f;
-									break;
-								}
-							}
-						}
-							
-						//Check for sandstorm death
-						if(checkNeedsActiveSwap()) {
-							if(battleTeamA.isDefeated()) {
-								endCombat();
-								break;
-							}
-							else if(battleTeamB.isDefeated()) {
-								endCombat();
-								break;
-							}
-							else {
-								setCombatState(CombatState.ACTIVE_DEATH_SWAP);
-								break;
-							}
-						}
-						
-					}
-					
-					//Apply healing from dreamscape if applicable
-					if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
-						
-						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-							battleTeamA.get(i).currentHealth += battleTeamA.get(i).maxHealth / 16f;
-							if(battleTeamA.get(i).currentHealth > battleTeamA.get(i).maxHealth) 
-								battleTeamA.get(i).currentHealth = battleTeamA.get(i).maxHealth;
-						}
-						
-						for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-							battleTeamB.get(i).currentHealth += battleTeamB.get(i).maxHealth / 16f;
-							if(battleTeamB.get(i).currentHealth > battleTeamB.get(i).maxHealth) 
-								battleTeamB.get(i).currentHealth = battleTeamB.get(i).maxHealth;
-						}
-						
-					}
-					
-					//Apply healing from tempest if applicable
-					if(battleContext.battleground.weather == WeatherType.TEMPEST) {
-						
-						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-							for(ElementType t : battleTeamA.get(i).base.types) {
-								if(t == ElementType.UNDEAD) {
-									battleTeamA.get(i).currentHealth += battleTeamA.get(i).maxHealth / 16f;
-									if(battleTeamA.get(i).currentHealth > battleTeamA.get(i).maxHealth) 
-										battleTeamA.get(i).currentHealth = battleTeamA.get(i).maxHealth;
-									break;
-								}
-							}
-						}
-						
-						for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-							for(ElementType t : battleTeamB.get(i).base.types) {
-								if(t == ElementType.UNDEAD) {
-									battleTeamB.get(i).currentHealth += battleTeamB.get(i).maxHealth / 16f;
-									if(battleTeamB.get(i).currentHealth > battleTeamB.get(i).maxHealth) 
-										battleTeamB.get(i).currentHealth = battleTeamB.get(i).maxHealth;
-									break;
-								}
-							}
-						}
-						
-					}
-					
-					isWaitingOnActionSelect = true;
-					setDefaultControllerActions(teamADisplay.getControllers(), battleTeamA);
-					setDefaultControllerActions(teamBDisplay.getControllers(), battleTeamB);
-					for(int i = 0; i < teamADisplay.getControllers().length; ++i) {
-						teamADisplay.getControllers()[i].refresh();
-					}
-					for(int i = 0; i < teamBDisplay.getControllers().length; ++i) {
-						teamBDisplay.getControllers()[i].refresh();
-					}
-					break;
-					
-				case MAIN_PHASE_2:
-					if(isTeamADoubleAttack) {
-						setDefaultControllerActions(teamADisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamA);
-						teamADisplay.getControllers()[doubleAttackPosition].refresh();
-					}
-					else if(isTeamBDoubleAttack) {
-						setDefaultControllerActions(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB);
-						teamBDisplay.getControllers()[doubleAttackPosition].refresh();
-					}
-					isWaitingOnActionSelect = true;
-					break;
-					
-				case ACTIVE_DEATH_SWAP:
-					//Trigger the following once only when we first enter this battle state
-					if(!isWaitingOnDeathSwitchSelect) {
-						
-						for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-							Creature creature = battleTeamA.get(i);
-							if(creature.isDead()) {
-								teamADisplay.getControllers()[i].refresh();
-								teamADisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
-								teamADisplay.updateStrings();
-							}
-						}
-						
-						for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-							Creature creature = battleTeamB.get(i);
-							if(creature.isDead()) {
-								teamBDisplay.getControllers()[i].refresh();
-								teamBDisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
-								teamBDisplay.updateStrings();
-							}
-						}
-
-						isWaitingOnDeathSwitchSelect = true;
-						
-					}
-					break;
-					
-				default:
-					break;
-				
-				}
-			}
-		}
-		
+	public void renderUI(float delta) {		
 		if(isWaitingOnActionSelect) {
 			if(areTeamActionsSelected()) {
 				isWaitingOnActionSelect = false;
@@ -567,10 +381,6 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 				teamBDisplay.updateStrings();
 				setCombatState(CombatState.MAIN_PHASE_1);
 			}
-		}
-		
-		if(isCombat) {
-			battleContext.update();
 		}
 		
 		ui.act(delta);
@@ -868,6 +678,187 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		}
 		
 		setCombatState(CombatState.END_PHASE);
+	}
+	
+	@Override
+	public void handleMessage(Message m) {
+		if(m instanceof MCombatStateChanged) {
+			MCombatStateChanged full = (MCombatStateChanged) m;
+			switch(full.next) {
+			
+			case BATTLE_PHASE_1:
+				doBattlePhase();
+				break;
+				
+			case BATTLE_PHASE_2:
+				if(isTeamADoubleAttack) {
+					doBattleAction(teamADisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamA, battleTeamB);
+				}
+				else if(isTeamBDoubleAttack) {
+					doBattleAction(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB, battleTeamA);
+				}
+				if(battleTeamA.isDefeated()) {
+					endCombat();
+					return;
+				}
+				else if(battleTeamB.isDefeated()) {
+					endCombat();
+					return;
+				}
+				else {
+					setCombatState(CombatState.END_PHASE);	
+				}
+				break;
+				
+			case END_PHASE:
+				teamADisplay.updateStrings();
+				if(!checkNeedsActiveSwap()) {
+					setCombatState(CombatState.MAIN_PHASE_1);
+				}
+				else {
+					setCombatState(CombatState.ACTIVE_DEATH_SWAP);
+				}
+				break;
+				
+			case MAIN_PHASE_1:
+				//Apply damage from sandstorm
+				if(battleContext.battleground.weather == WeatherType.SANDSTORM) {
+					
+					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
+						for(ElementType t : battleTeamA.get(i).base.types) {
+							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+								battleTeamA.get(i).currentHealth -= battleTeamA.get(i).maxHealth / 16f;
+								break;
+							}
+						}
+					}
+					
+					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
+						for(ElementType t : battleTeamB.get(i).base.types) {
+							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+								battleTeamB.get(i).currentHealth -= battleTeamB.get(i).maxHealth / 16f;
+								break;
+							}
+						}
+					}
+						
+					//Check for sandstorm death
+					if(checkNeedsActiveSwap()) {
+						if(battleTeamA.isDefeated()) {
+							endCombat();
+							break;
+						}
+						else if(battleTeamB.isDefeated()) {
+							endCombat();
+							break;
+						}
+						else {
+							setCombatState(CombatState.ACTIVE_DEATH_SWAP);
+							break;
+						}
+					}
+					
+				}
+				
+				//Apply healing from dreamscape if applicable
+				if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
+					
+					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
+						battleTeamA.get(i).currentHealth += battleTeamA.get(i).maxHealth / 16f;
+						if(battleTeamA.get(i).currentHealth > battleTeamA.get(i).maxHealth) 
+							battleTeamA.get(i).currentHealth = battleTeamA.get(i).maxHealth;
+					}
+					
+					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
+						battleTeamB.get(i).currentHealth += battleTeamB.get(i).maxHealth / 16f;
+						if(battleTeamB.get(i).currentHealth > battleTeamB.get(i).maxHealth) 
+							battleTeamB.get(i).currentHealth = battleTeamB.get(i).maxHealth;
+					}
+					
+				}
+				
+				//Apply healing from tempest if applicable
+				if(battleContext.battleground.weather == WeatherType.TEMPEST) {
+					
+					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
+						for(ElementType t : battleTeamA.get(i).base.types) {
+							if(t == ElementType.UNDEAD) {
+								battleTeamA.get(i).currentHealth += battleTeamA.get(i).maxHealth / 16f;
+								if(battleTeamA.get(i).currentHealth > battleTeamA.get(i).maxHealth) 
+									battleTeamA.get(i).currentHealth = battleTeamA.get(i).maxHealth;
+								break;
+							}
+						}
+					}
+					
+					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
+						for(ElementType t : battleTeamB.get(i).base.types) {
+							if(t == ElementType.UNDEAD) {
+								battleTeamB.get(i).currentHealth += battleTeamB.get(i).maxHealth / 16f;
+								if(battleTeamB.get(i).currentHealth > battleTeamB.get(i).maxHealth) 
+									battleTeamB.get(i).currentHealth = battleTeamB.get(i).maxHealth;
+								break;
+							}
+						}
+					}
+					
+				}
+				
+				isWaitingOnActionSelect = true;
+				setDefaultControllerActions(teamADisplay.getControllers(), battleTeamA);
+				setDefaultControllerActions(teamBDisplay.getControllers(), battleTeamB);
+				for(int i = 0; i < teamADisplay.getControllers().length; ++i) {
+					teamADisplay.getControllers()[i].refresh();
+				}
+				for(int i = 0; i < teamBDisplay.getControllers().length; ++i) {
+					teamBDisplay.getControllers()[i].refresh();
+				}
+				break;
+				
+			case MAIN_PHASE_2:
+				if(isTeamADoubleAttack) {
+					setDefaultControllerActions(teamADisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamA);
+					teamADisplay.getControllers()[doubleAttackPosition].refresh();
+				}
+				else if(isTeamBDoubleAttack) {
+					setDefaultControllerActions(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB);
+					teamBDisplay.getControllers()[doubleAttackPosition].refresh();
+				}
+				isWaitingOnActionSelect = true;
+				break;
+				
+			case ACTIVE_DEATH_SWAP:
+				//Trigger the following once only when we first enter this battle state
+				if(!isWaitingOnDeathSwitchSelect) {
+					
+					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
+						Creature creature = battleTeamA.get(i);
+						if(creature.isDead()) {
+							teamADisplay.getControllers()[i].refresh();
+							teamADisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
+							teamADisplay.updateStrings();
+						}
+					}
+					
+					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
+						Creature creature = battleTeamB.get(i);
+						if(creature.isDead()) {
+							teamBDisplay.getControllers()[i].refresh();
+							teamBDisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
+							teamBDisplay.updateStrings();
+						}
+					}
+
+					isWaitingOnDeathSwitchSelect = true;
+					
+				}
+				break;
+				
+			default:
+				break;
+			
+			}
+		}
 	}
 
 	@Override

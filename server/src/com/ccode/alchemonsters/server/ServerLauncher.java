@@ -8,6 +8,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
+import com.ccode.alchemonsters.engine.database.ScriptDatabase;
 import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
 import com.ccode.alchemonsters.engine.event.EventManager;
 import com.ccode.alchemonsters.net.KryoCreator;
@@ -30,6 +31,7 @@ public class ServerLauncher implements ApplicationListener {
 		
 		//Init systems
 		ScriptManager.init();
+		ScriptDatabase.initAndLoad();
 		CreatureDatabase.initAndLoad();
 		MoveDatabase.initAndLoad();
 		StatusAilmentDatabase.init();
@@ -47,6 +49,7 @@ public class ServerLauncher implements ApplicationListener {
 		//Start the server thread
 		Thread serverThread = new Thread(server, "ServerMainThread");
 		serverThread.start();
+		
 	}
 
 	public void render() {}

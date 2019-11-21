@@ -9,7 +9,7 @@
 	actions: [
 		{
 			class: "Script",
-			scriptFile: "drain.lua"
+			scriptName: "drain"
 		}
 	],
 	turnType: "INSTANT",

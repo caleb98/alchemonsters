@@ -12,7 +12,6 @@ public class ScriptManager {
 	
 	private static MoveActionDamage LUA_DAMAGE_INSTANCE;
 	
-	
 	public static void init() {
 		GLOBAL_CONTEXT = JsePlatform.standardGlobals();
 		GLOBAL_CONTEXT.load(

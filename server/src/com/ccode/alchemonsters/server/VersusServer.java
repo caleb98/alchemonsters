@@ -35,6 +35,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatWeatherChanged;
 import com.ccode.alchemonsters.net.NetActionSelected;
 import com.ccode.alchemonsters.net.NetActionSubmitted;
+import com.ccode.alchemonsters.net.NetBattleContextUpdate;
 import com.ccode.alchemonsters.net.NetErrorMessage;
 import com.ccode.alchemonsters.net.NetJoinSuccess;
 import com.ccode.alchemonsters.net.NetJoinVersus;
@@ -296,6 +297,8 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 		}
 		
 		setCombatState(CombatState.END_PHASE);
+		
+		sendContextUpdate();
 	}
 	
 	private void doBattlePhaseTwo() {
@@ -317,6 +320,7 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 			setCombatState(CombatState.END_PHASE);	
 		}
 
+		sendContextUpdate();
 	}
 	
 	private void doEndPhase() {
@@ -326,6 +330,8 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 		else {
 			setCombatState(CombatState.ACTIVE_DEATH_SWAP);
 		}
+		
+		sendContextUpdate();
 	}
 	
 	private void doMainPhaseOne() {
@@ -421,6 +427,8 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 		for(int i = 0; i < teamBControls.length; ++i) {
 			teamBControls[i].refresh();
 		}
+		
+		sendContextUpdate();
 	}
 	
 	private void doMainPhaseTwo() {
@@ -433,6 +441,8 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 			teamBControls[doubleAttackPosition].refresh();
 		}
 		isWaitingOnActionSelect = true;
+		
+		sendContextUpdate();
 	}
 	
 	private void doActiveDeathSwap() {			
@@ -452,6 +462,8 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 			}
 		}
 		isWaitingOnActionSelect = true;
+		
+		sendContextUpdate();
 	}
 	
 	//*******************************************
@@ -533,6 +545,8 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 			break;
 		
 		}
+		
+		sendContextUpdate();
 	}
 	
 	private boolean checkNeedsActiveSwap() {
@@ -658,7 +672,12 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 	}
 	
 	private void sendContextUpdate() {
-		
+		if(teamAConnection != null && teamAConnection.isConnected()) {
+			teamAConnection.sendTCP(new NetBattleContextUpdate(context));
+		}
+		if(teamBConnection != null && teamBConnection.isConnected()) {
+			teamBConnection.sendTCP(new NetBattleContextUpdate(context));
+		}
 	}
 	
 	//*******************************************

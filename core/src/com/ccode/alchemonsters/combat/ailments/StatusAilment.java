@@ -3,10 +3,10 @@ package com.ccode.alchemonsters.combat.ailments;
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
-import com.ccode.alchemonsters.engine.event.ListSubscriber;
 import com.ccode.alchemonsters.engine.event.Message;
+import com.ccode.alchemonsters.engine.event.Subscriber;
 
-public class StatusAilment extends ListSubscriber {
+public class StatusAilment implements Subscriber {
 
 	public BattleContext context;
 	public Creature source;
@@ -25,11 +25,9 @@ public class StatusAilment extends ListSubscriber {
 		effect = StatusAilmentDatabase.getAilment(ailmentName);
 	}
 	
-	public void update() {
-		Message m;
-		while((m = messageQueue.poll()) != null) {
-			effect.handleMessage(m, context, source, target, cause);
-		}
+	@Override
+	public void handleMessage(Message currentMessage) {
+		effect.handleMessage(currentMessage, context, source, target, cause);
 	}
 	
 	public void apply() {

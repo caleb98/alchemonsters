@@ -15,6 +15,7 @@ import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
+import com.ccode.alchemonsters.engine.database.ScriptDatabase;
 import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
 import com.ccode.alchemonsters.engine.event.EventManager;
 
@@ -52,6 +53,7 @@ public class AlchemonstersGame extends Game {
 		
 		//Init script manager
 		ScriptManager.init();
+		ScriptDatabase.initAndLoad();
 		
 		//Load dictionaries
 		CreatureDatabase.initAndLoad();

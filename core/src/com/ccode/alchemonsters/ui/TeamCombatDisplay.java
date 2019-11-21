@@ -59,6 +59,12 @@ public class TeamCombatDisplay extends Table {
 			allDisplays[i] = add(createInactiveDisplay(i)).pad(10);
 			row();
 		}
+		
+		updateStrings();
+	}
+	
+	public void setTeam(BattleTeam t) {
+		team = t;
 	}
 	
 	public void updateStrings() {

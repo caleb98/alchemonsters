@@ -22,19 +22,6 @@ public class BattleContext {
 		battleground = new Battleground();
 	}
 	
-	public void update() {
-		for(Creature c : teamA.team.creatures) {
-			if(c != null && c.currentAilment != null) {
-				c.currentAilment.update();
-			}
-		}
-		for(Creature c : teamB.team.creatures) {
-			if(c != null && c.currentAilment != null) {
-				c.currentAilment.update();
-			}
-		}
-	}
-	
 }
 
 
