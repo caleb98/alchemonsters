@@ -15,7 +15,7 @@ public class DesktopLauncher {
 		Settings settings = new Settings();
 		settings.maxHeight = 1024;
 		settings.maxWidth = 1024;
-		TexturePacker.process(settings, "../assets/sprites_unpacked", "../assets/sprites_packed", "packed");
+		TexturePacker.process(settings, "sprites_unpacked", "sprites_packed", "packed");
 		
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		
