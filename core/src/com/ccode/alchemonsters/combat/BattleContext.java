@@ -1,6 +1,5 @@
 package com.ccode.alchemonsters.combat;
 
-import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.util.DynamicVariables;
 
 public class BattleContext {

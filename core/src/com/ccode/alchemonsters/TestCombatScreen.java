@@ -328,7 +328,7 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 			break;
 			
 		case SWITCH:
-			MCombatTeamActiveChanged message = new MCombatTeamActiveChanged(battleContext, control, team, activePos, action.id);
+			MCombatTeamActiveChanged message = new MCombatTeamActiveChanged(battleContext, team, activePos, action.id);
 			team.swap(activePos, action.id);
 			publish(message);
 			break;
@@ -379,6 +379,8 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 				isWaitingOnDeathSwitchSelect = false;
 				teamADisplay.updateStrings();
 				teamBDisplay.updateStrings();
+				
+				//TODO: right now, swapping after death takes us back to the main phase, but we might want to pick up somewhere else
 				setCombatState(CombatState.MAIN_PHASE_1);
 			}
 		}

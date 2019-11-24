@@ -73,11 +73,11 @@ public class TeamCombatDisplay extends Table {
 		}
 	}
 	
-	CreatureDisplay createActiveDisplay(int teamId) {
+	CreatureDisplay createInactiveDisplay(int teamId) {
 		return new CreatureDisplay(teamId);
 	}
 	
-	CreatureDisplay createInactiveDisplay(int teamId) {
+	CreatureDisplay createActiveDisplay(int teamId) {
 		CreatureDisplay disp = new CreatureDisplay(teamId);
 		disp.add(new Label("Active", UI.DEFAULT_SKIN));
 		return disp;

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CreatureTeam;
@@ -310,13 +311,27 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 			
 			else if(object instanceof NetFilterAllActions) {
 				NetFilterAllActions full = (NetFilterAllActions) object;
-				myControls[full.activePos].filterAllActions(full.filter);
+				myControls[full.activePos].filterAllActions((a)->{
+					for(BattleAction b : full.newActions) {
+						if(a.equals(b)) {
+							return false;
+						}
+					}
+					return true;
+				});
 				myTeamDisplay.updateStrings();
 			}
 			
 			else if(object instanceof NetFilterAvailableActions) {
 				NetFilterAvailableActions full = (NetFilterAvailableActions) object;
-				myControls[full.activePos].filterAvailableActions(full.filter);
+				myControls[full.activePos].filterAvailableActions((a)->{
+					for(BattleAction b : full.newActions) {
+						if(a.equals(b)) {
+							return false;
+						}
+					}
+					return true;
+				});
 				myTeamDisplay.updateStrings();
 			}
 			

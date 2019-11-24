@@ -190,7 +190,10 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 		//Run the rest of the actions
 		//This will be all the moves
 		for(Triple<BattleTeam, Integer, BattleAction> info : monActions) {
-			doBattleAction(teamAControls[info.b], info.b, info.a, info.a == teamA ? teamB : teamA);
+			doBattleAction(info.a == teamA ? teamAControls[info.b] : teamBControls[info.b], 
+					       info.b, 
+					       info.a, 
+					       info.a == teamA ? teamB : teamA);
 		}
 		
 		//Do delayed moves
@@ -531,7 +534,7 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 			break;
 			
 		case SWITCH:
-			MCombatTeamActiveChanged message = new MCombatTeamActiveChanged(context, control, team, activePos, action.id);
+			MCombatTeamActiveChanged message = new MCombatTeamActiveChanged(context, team, activePos, action.id);
 			team.swap(activePos, action.id);
 			publish(message);
 			break;
@@ -694,6 +697,7 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 		else if(object instanceof NetActionSubmitted) {
 			if(isWaitingOnActionSelect) {
 				handleNetActionSubmitted(connection, (NetActionSubmitted) object);
+				
 				for(UnitController c : teamAControls) {
 					if(!c.isActionSubmitted()) return;
 				}
@@ -704,9 +708,22 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 				switch(context.currentState) {
 				
 				case ACTIVE_DEATH_SWAP:
-					if(isTeamADoubleAttack || isTeamBDoubleAttack) {
-						setCombatState(CombatState.BATTLE_PHASE_2);
+					//Run through all swap actions
+					for(int i = 0; i < teamA.getNumActives(); ++i) {
+						Creature creature = teamA.get(i);
+						if(creature.isDead()) {
+							doBattleAction(teamAControls[i], i, teamA, teamB);
+						}
 					}
+					
+					for(int i = 0; i < teamB.getNumActives(); ++i) {
+						Creature creature = teamB.get(i);
+						if(creature.isDead()) {
+							doBattleAction(teamBControls[i], i, teamB, teamA);
+						}
+					}
+					//TODO: right now, swapping after death takes us back to the main phase, but we might want to pick up somewhere else
+					setCombatState(CombatState.MAIN_PHASE_1);
 					break;
 					
 				case BATTLE_PHASE_1:

@@ -1,18 +1,18 @@
 package com.ccode.alchemonsters.net;
 
-import java.util.function.Predicate;
+import java.util.ArrayList;
 
 import com.ccode.alchemonsters.combat.BattleAction;
 
 public class NetFilterAvailableActions {
 
-	public Predicate<BattleAction> filter;
+	public ArrayList<BattleAction> newActions;
 	public int activePos;
 	
 	private NetFilterAvailableActions() {}
 	
-	public NetFilterAvailableActions(Predicate<BattleAction> filter, int activePos) {
-		this.filter = filter;
+	public NetFilterAvailableActions(ArrayList<BattleAction> newActions, int activePos) {
+		this.newActions = newActions;
 		this.activePos = activePos;
 	}
 	

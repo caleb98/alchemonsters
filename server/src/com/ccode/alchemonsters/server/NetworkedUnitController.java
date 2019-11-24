@@ -31,13 +31,13 @@ public class NetworkedUnitController extends GenericUnitController {
 	@Override
 	public void filterAllActions(Predicate<BattleAction> filter) {
 		super.filterAllActions(filter);
-		connection.sendTCP(new NetFilterAllActions(filter, activePos));
+		connection.sendTCP(new NetFilterAllActions(getAllActions(), activePos));
 	}
 
 	@Override
 	public void filterAvailableActions(Predicate<BattleAction> filter) {
 		super.filterAvailableActions(filter);
-		connection.sendTCP(new NetFilterAvailableActions(filter, activePos));
+		connection.sendTCP(new NetFilterAvailableActions(getAvailableActions(), activePos));
 	}
 
 	@Override

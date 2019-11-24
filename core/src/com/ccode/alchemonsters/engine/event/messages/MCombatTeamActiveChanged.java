@@ -10,7 +10,6 @@ public class MCombatTeamActiveChanged extends Message {
 	public static final String ID = "COMBAT_TEAM_ACTIVE_CHANGED";
 	
 	public final BattleContext context;
-	public final UnitController control;
 	public final BattleTeam team;
 	public final int prevActive;
 	public final int nextActive;
@@ -18,16 +17,14 @@ public class MCombatTeamActiveChanged extends Message {
 	private MCombatTeamActiveChanged() {
 		super(ID);
 		context = null;
-		control = null;
 		team = null;
 		prevActive = -1;
 		nextActive = -1;
 	}
 	
-	public MCombatTeamActiveChanged(BattleContext context, UnitController control, BattleTeam team, int oldActive, int newActive) {
+	public MCombatTeamActiveChanged(BattleContext context, BattleTeam team, int oldActive, int newActive) {
 		super(ID);
 		this.context = context;
-		this.control = control;
 		this.team = team;
 		this.prevActive = oldActive;
 		this.nextActive = newActive;

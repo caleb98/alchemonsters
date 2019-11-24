@@ -26,6 +26,16 @@ public class BattleAction implements Comparable<BattleAction> {
 	}
 	
 	@Override
+	public boolean equals(Object obj) {
+		if(obj == null || !(obj instanceof BattleAction)) {
+			return false;
+		}
+		
+		BattleAction other = (BattleAction) obj;
+		return type == other.type && targetPos == other.targetPos && id == other.id;
+	}
+	
+	@Override
 	public int compareTo(BattleAction o) {
 		if((o.type != BattleActionType.MOVE && type != BattleActionType.MOVE) ||
 		    o.type == BattleActionType.MOVE && type == BattleActionType.MOVE) {
