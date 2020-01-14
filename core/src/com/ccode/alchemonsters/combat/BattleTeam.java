@@ -35,14 +35,6 @@ public class BattleTeam {
 		team.swap(from, to);
 	}
 	
-	public void startCombat() {
-		for(Creature c : team.creatures) {
-			if(c != null) {
-				c.startCombat();
-			}
-		}
-	}
-	
 	public boolean isDefeated() {
 		for(Creature c : team.creatures) {
 			if(c != null && !c.isDead()) {

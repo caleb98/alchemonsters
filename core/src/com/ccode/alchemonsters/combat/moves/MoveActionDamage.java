@@ -11,6 +11,7 @@ import com.ccode.alchemonsters.util.GameRandom;
 public class MoveActionDamage implements MoveAction {
 	
 	public static final float STAB_MULTIPLIER = 1.5f;
+	public static final float CRIT_MULTIPLIER = 1.5f;
 	
 	/**
 	 * The target of the damage.
@@ -80,19 +81,21 @@ public class MoveActionDamage implements MoveAction {
 	
 	public  int getDamageAgainst(Move move, BattleContext context, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
 		float sourceAttack = move.moveType == MoveType.MAGIC ? source.calcTotalMagicAtk(context) : source.calcTotalPhysAtk(context);
+		float sourcePen = source.calcTotalPen(context);
 		float targetDefense = move.moveType == MoveType.MAGIC ? target.calcTotalMagicDef(context) : target.calcTotalPhysDef(context);	
+		float targetRes = target.calcTotalRes(context);
 		
-		float rawDamage = ((200 + (sourceAttack - 200)) * 2.9f * power) / 200f;
+		float atkDefRatio = sourceAttack / targetDefense;
+		float resReduction = (targetRes >= sourcePen) ? targetRes - sourcePen : (targetRes - sourcePen) / 4f;
 		
-		float defenseReduction = rawDamage * (targetDefense / (targetDefense + 0.5f * rawDamage)) + (targetDefense * power) / 1500f;
-		float penResRatio = source.calcTotalPen(context) / (float) target.calcTotalRes(context);
+		float rawDamage = (power * atkDefRatio - resReduction) * (( (source.currentLevel / 5f) + 1f ) / 21f );
 		
-		float actual = Math.max((rawDamage - defenseReduction) * penResRatio * (11 - source.currentLevel / 10f), 1);
+		float actual = Math.max(0, rawDamage);
 		
 		//TODO: apply these buffs before defenses?
 		//TODO: variable crit multiplier values3
 		if(isCrit) {
-			actual *= 1.5f;
+			actual *= CRIT_MULTIPLIER;
 		}
 		
 		//TODO: variable stab multiplier values?

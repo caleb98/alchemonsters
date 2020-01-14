@@ -1,7 +1,7 @@
 package com.ccode.alchemonsters.engine.event.messages;
 
 import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.TerrainType;
+import com.ccode.alchemonsters.combat.BiomeType;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.event.Message;
 
@@ -12,8 +12,8 @@ public class MCombatTerrainChanged extends Message {
 	public final BattleContext context;
 	public final Creature source;
 	public final String cause;
-	public final TerrainType oldTerrain;
-	public final TerrainType newTerrain;
+	public final BiomeType oldTerrain;
+	public final BiomeType newTerrain;
 	
 	private MCombatTerrainChanged() {
 		super(ID);
@@ -24,7 +24,7 @@ public class MCombatTerrainChanged extends Message {
 		newTerrain = null;
 	}
 	
-	public MCombatTerrainChanged(BattleContext context, Creature source, String cause, TerrainType oldTerrain, TerrainType newTerrain) {
+	public MCombatTerrainChanged(BattleContext context, Creature source, String cause, BiomeType oldTerrain, BiomeType newTerrain) {
 		super(ID);
 		this.context = context;
 		this.source = source;

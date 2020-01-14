@@ -18,12 +18,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.CreatureBase;
+import com.ccode.alchemonsters.creature.CreatureFactory;
 import com.ccode.alchemonsters.creature.CreatureNature;
-import com.ccode.alchemonsters.creature.CreatureStats;
 import com.ccode.alchemonsters.creature.StatType;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
+import com.ccode.alchemonsters.util.GameRandom;
 
 public class CreatureEditWindow extends Window {
 	
@@ -227,34 +228,31 @@ public class CreatureEditWindow extends Window {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				try {
-					CreatureBase base = CreatureDatabase.getBase(creatureSelectBox.getSelected());
-					CreatureStats stats = new CreatureStats(
-							Byte.parseByte(vitaeEdit.getText()), 
-							Byte.parseByte(focusEdit.getText()), 
-							Byte.parseByte(magicAtkEdit.getText()), 
-							Byte.parseByte(magicDefEdit.getText()),
-							Byte.parseByte(physAtkEdit.getText()), 
-							Byte.parseByte(physDefEdit.getText()),
-							Byte.parseByte(penetrationEdit.getText()),
-							Byte.parseByte(resistanceEdit.getText()), 
-							Byte.parseByte(speedEdit.getText())
-					);
-					CreatureNature nature = new CreatureNature(positiveNature.getSelected(), negativeNature.getSelected());
-					Creature c = new Creature(
-						base, 
-						nature, 
-						stats, 
-						(int) baseHealthSlider.getValue(), 
-						(int) baseManaSlider.getValue()
-					);
+					Creature edit = new Creature();
 					
-					c.currentLevel = (int) levelSlider.getValue();
-					c.moves = movesActiveList.getItems().toArray(String.class);
-					c.personalName = c.base.name + " (LVL " + c.currentLevel + ")";
+					edit.base = CreatureDatabase.getBase(creatureSelectBox.getSelected());
+					edit.nature = new CreatureNature(positiveNature.getSelected(), negativeNature.getSelected());
 					
-					c.calcDerivedStats();
+					edit.vitaeAttunement = Byte.parseByte(vitaeEdit.getText()); 
+					edit.focusAttunement = Byte.parseByte(focusEdit.getText());   
+					edit.magicAtkAttunement = Byte.parseByte(magicAtkEdit.getText());
+					edit.magicDefAttunement = Byte.parseByte(magicDefEdit.getText());
+					edit.physAtkAttunement = Byte.parseByte(physAtkEdit.getText());
+					edit.physDefAttunement = Byte.parseByte(physDefEdit.getText());
+					edit.penAttunement = Byte.parseByte(penetrationEdit.getText());
+					edit.resAttunement = Byte.parseByte(resistanceEdit.getText());
+					edit.speedAttunement = Byte.parseByte(speedEdit.getText());
 					
-					editedCreature = c;
+					edit.baseHealth = (int) baseHealthSlider.getValue();
+					edit.baseMana = (int) baseManaSlider.getValue();
+					
+					edit.currentLevel = (int) levelSlider.getValue();
+					edit.moves = movesActiveList.getItems().toArray(String.class);
+					edit.personalName = edit.base.name + " (LVL " + edit.currentLevel + ")";
+					
+					edit.recalculateAllStats(true);
+					
+					editedCreature = edit;
 					setVisible(false);
 					isEditComplete = true;
 				}
@@ -265,7 +263,18 @@ public class CreatureEditWindow extends Window {
 				}
 			}
 		});
-		add(editCancel, acceptButton);
+		
+		TextButton addRandom = new TextButton("Add Random LVL 1", UI.DEFAULT_SKIN);
+		addRandom.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				String[] ids = CreatureDatabase.getAvailableCreatureIDs().toArray(new String[]{});
+				editedCreature = CreatureFactory.generateRandomLevelOne(ids[GameRandom.nextInt(ids.length)]);
+				show(editedCreature);
+			}
+		});
+		
+		add(editCancel, acceptButton, addRandom);
 		
 		pack();
 		
@@ -334,15 +343,15 @@ public class CreatureEditWindow extends Window {
 			positiveNature.setSelected(c.nature.increased);
 			negativeNature.setSelected(c.nature.decreased);
 			
-			vitaeEdit.setText(String.valueOf(c.getAttunementValue(StatType.VITAE)));
-			focusEdit.setText(String.valueOf(c.getAttunementValue(StatType.FOCUS)));
-			magicAtkEdit.setText(String.valueOf(c.getAttunementValue(StatType.MAGIC_ATK)));
-			magicDefEdit.setText(String.valueOf(c.getAttunementValue(StatType.MAGIC_DEF)));
-			physAtkEdit.setText(String.valueOf(c.getAttunementValue(StatType.PHYS_ATK)));
-			physDefEdit.setText(String.valueOf(c.getAttunementValue(StatType.PHYS_DEF)));
-			penetrationEdit.setText(String.valueOf(c.getAttunementValue(StatType.PENETRATION)));
-			resistanceEdit.setText(String.valueOf(c.getAttunementValue(StatType.RESISTANCE)));
-			speedEdit.setText(String.valueOf(c.getAttunementValue(StatType.SPEED)));
+			vitaeEdit.setText(String.valueOf(c.vitaeAttunement));
+			focusEdit.setText(String.valueOf(c.focusAttunement));
+			magicAtkEdit.setText(String.valueOf(c.magicAtkAttunement));
+			magicDefEdit.setText(String.valueOf(c.magicDefAttunement));
+			physAtkEdit.setText(String.valueOf(c.physAtkAttunement));
+			physDefEdit.setText(String.valueOf(c.physDefAttunement));
+			penetrationEdit.setText(String.valueOf(c.penAttunement));
+			resistanceEdit.setText(String.valueOf(c.resAttunement));
+			speedEdit.setText(String.valueOf(c.speedAttunement));
 	
 			movesActiveList.setItems(c.moves);
 		}

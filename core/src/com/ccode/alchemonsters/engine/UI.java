@@ -24,17 +24,17 @@ public class UI {
 	public static void initAndLoad() {
 		
 		//Load fonts
-		FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("ui/default/bulkypix.ttf"));
-		FreeTypeFontParameter p = new FreeTypeFontParameter();
-		p.color = Color.BLACK;
-		
-		p.size = 20;
-		DEFAULT_FONT_SMALL = gen.generateFont(p);
-		p.size = 28;
-		DEFAULT_FONT_MED = gen.generateFont(p);
-		p.size = 36;
-		DEFAULT_FONT_LARGE = gen.generateFont(p);
-		gen.dispose();
+//		FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("ui/default/bulkypix.ttf"));
+//		FreeTypeFontParameter p = new FreeTypeFontParameter();
+//		p.color = Color.BLACK;
+//		
+//		p.size = 20;
+//		DEFAULT_FONT_SMALL = gen.generateFont(p);
+//		p.size = 28;
+//		DEFAULT_FONT_MED = gen.generateFont(p);
+//		p.size = 36;
+//		DEFAULT_FONT_LARGE = gen.generateFont(p);
+//		gen.dispose();
 		
 		//TODO: include fonts in the ui itself
 		//Load and setup default UI skin

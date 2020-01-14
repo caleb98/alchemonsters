@@ -20,8 +20,8 @@ public class ScriptManager {
 			  + "MCombatAilmentApplied = 'com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied'\n"
 			  + "MCombatStatBuffApplied = 'com.ccode.alchemonsters.engine.event.messages.MCombatStatBuffApplied'\n"
 			  + "WeatherType = luajava.bindClass('com.ccode.alchemonsters.combat.WeatherType')\n"
-			  + "GroundType = luajava.bindClass('com.ccode.alchemonsters.combat.GroundType')\n"
 			  + "TerrainType = luajava.bindClass('com.ccode.alchemonsters.combat.TerrainType')\n"
+			  + "BiomeType = luajava.bindClass('com.ccode.alchemonsters.combat.BiomeType')\n"
 		).call();
 		
 		//Expose a Damage action instance to allow scripts to calc damage and publish combat events

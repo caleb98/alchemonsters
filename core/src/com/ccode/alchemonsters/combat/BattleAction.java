@@ -37,13 +37,7 @@ public class BattleAction implements Comparable<BattleAction> {
 	
 	@Override
 	public int compareTo(BattleAction o) {
-		if((o.type != BattleActionType.MOVE && type != BattleActionType.MOVE) ||
-		    o.type == BattleActionType.MOVE && type == BattleActionType.MOVE) {
-			return 0;
-		}
-		else {
-			return type.compareTo(o.type);
-		}
+		return type.compareTo(o.type);
 	}
 	
 }

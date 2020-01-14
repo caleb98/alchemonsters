@@ -1,12 +1,9 @@
-package com.ccode.alchemonsters.combat;
+package com.ccode.alchemonsters.creature;
 
-import com.ccode.alchemonsters.creature.StatType;
-
-public class StatBuffs {
+public class CombatMods {
 
 	private static final int MAX_BUFF_AMOUNT = 6;
-	private static final float REDUCTION_STRENGTH = 1.5f;
-	private static final float INCREASE_STRENGTH = 0.35f;
+	private static final float BUFF_STRENGTH = 0.35f;
 	
 	private byte magicAtk = 0;
 	private byte magicDef = 0;
@@ -18,64 +15,64 @@ public class StatBuffs {
 	
 	public float getMagicAtkMultiplier() {
 		if(magicAtk < 0) {
-			return (float) Math.pow(REDUCTION_STRENGTH, magicAtk);
+			return (float) (1f / (1 + BUFF_STRENGTH * -magicAtk));
 		}
 		else {
-			return 1 + (magicAtk * INCREASE_STRENGTH);
+			return 1 + (magicAtk * BUFF_STRENGTH);
 		}
 	}
 	
 	public float getMagicDefMultiplier() {
 		if(magicDef < 0) {
-			return (float) Math.pow(REDUCTION_STRENGTH, magicDef);
+			return (float) (1f / (1 + BUFF_STRENGTH * -magicDef));
 		}
 		else {
-			return 1 + (magicDef * INCREASE_STRENGTH);
+			return 1 + (magicDef * BUFF_STRENGTH);
 		}
 	}
 	
 	public float getPhysAtkMultiplier() {
 		if(physAtk < 0) {
-			return (float) Math.pow(REDUCTION_STRENGTH, physAtk);
+			return (float) (1f / (1 + BUFF_STRENGTH * -physAtk));
 		}
 		else {
-			return 1 + (physAtk * INCREASE_STRENGTH);
+			return 1 + (physAtk * BUFF_STRENGTH);
 		}
 	}
 	
 	public float getPhysDefMultiplier() {
 		if(physDef < 0) {
-			return (float) Math.pow(REDUCTION_STRENGTH, physDef);
+			return (float) (1f / (1 + BUFF_STRENGTH * -physDef));
 		}
 		else {
-			return 1 + (physDef * INCREASE_STRENGTH);
+			return 1 + (physDef * BUFF_STRENGTH);
 		}
 	}
 	
 	public float getPenMultiplier() {
 		if(penetration < 0) {
-			return (float) Math.pow(REDUCTION_STRENGTH, penetration);
+			return (float) (1f / (1 + BUFF_STRENGTH * -penetration));
 		}
 		else {
-			return 1 + (penetration * INCREASE_STRENGTH);
+			return 1 + (penetration * BUFF_STRENGTH);
 		}
 	}
 	
 	public float getResMultiplier() {
 		if(resistance < 0) {
-			return (float) Math.pow(REDUCTION_STRENGTH, resistance);
+			return (float) (1f / (1 + BUFF_STRENGTH * -resistance));
 		}
 		else {
-			return 1 + (resistance * INCREASE_STRENGTH);
+			return 1 + (resistance * BUFF_STRENGTH);
 		}
 	}
 	
 	public float getSpeedMultiplier() {
 		if(speed < 0) {
-			return (float) Math.pow(REDUCTION_STRENGTH, speed);
+			return (float) (1f / (1 + 0.35 * -speed));
 		}
 		else {
-			return 1 + (speed * INCREASE_STRENGTH);
+			return 1 + (speed * BUFF_STRENGTH);
 		}
 	}
 	

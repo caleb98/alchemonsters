@@ -2,13 +2,13 @@ package com.ccode.alchemonsters.combat;
 
 public class Battleground {
 	
-	public GroundType ground;
 	public TerrainType terrain;
+	public BiomeType biome;
 	public WeatherType weather;
 	
 	public Battleground() {
-		ground = GroundType.NORMAL;
 		terrain = TerrainType.NORMAL;
+		biome = BiomeType.NORMAL;
 		weather = WeatherType.NORMAL;
 	}
 

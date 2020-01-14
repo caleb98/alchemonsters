@@ -1,7 +1,7 @@
 {
 	id: Base.Whalewhirl
 	name: Whalewhirl,
-	desc: "Described by scholars as a creature when a bottomless stomcah, WhaleWhirls are usually non-hostile. They prey upon small creatures that fill the oceans by opening their enormous mouths and engulfing large volumes of water.",
+	desc: "Described by scholars as a creature with a bottomless stomach, Whalewhirls are usually non-hostile. They prey upon small creatures that fill the oceans by opening their enormous mouths and engulfing large volumes of water.",
 	minBaseHealth: 43,
 	maxBaseHealth: 50,
 	minBaseMana: 9,

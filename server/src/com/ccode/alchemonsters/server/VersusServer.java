@@ -86,19 +86,15 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 	//*******************************************
 	// Combat Start - Entry to battle.
 	//*******************************************
-	private void startCombat() {
-		//Start combat for both teams
-		teamA.startCombat();
-		teamB.startCombat();
-		
+	private void startCombat() {		
 		//Reset health and mana values
 		for(Creature c : teamA.team.creatures) {
 			if(c != null)
-				c.rest();
+				c.resetHealthAndMana();
 		}
 		for(Creature c : teamB.team.creatures) {
 			if(c != null)
-				c.rest();
+				c.resetHealthAndMana();
 		}
 		
 		//Create the battle context

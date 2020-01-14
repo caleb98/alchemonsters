@@ -1,5 +1,6 @@
 package com.ccode.alchemonsters.net;
 
+import java.lang.invoke.SerializedLambda;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -12,12 +13,9 @@ import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleEvent;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.Battleground;
-import com.ccode.alchemonsters.combat.Catalyst;
+import com.ccode.alchemonsters.combat.BiomeType;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
-import com.ccode.alchemonsters.combat.GroundType;
-import com.ccode.alchemonsters.combat.PassiveAbility;
-import com.ccode.alchemonsters.combat.StatBuffs;
 import com.ccode.alchemonsters.combat.TerrainType;
 import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.ailments.StatusAilment;
@@ -39,12 +37,15 @@ import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
 import com.ccode.alchemonsters.combat.moves.MoveTarget;
 import com.ccode.alchemonsters.combat.moves.MoveType;
 import com.ccode.alchemonsters.combat.moves.TurnType;
+import com.ccode.alchemonsters.creature.CombatMods;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.CreatureBase;
 import com.ccode.alchemonsters.creature.CreatureNature;
-import com.ccode.alchemonsters.creature.CreatureStats;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.creature.StatType;
+import com.ccode.alchemonsters.creature.equip.Affix;
+import com.ccode.alchemonsters.creature.equip.Amplifier;
+import com.ccode.alchemonsters.creature.equip.StatIncreaseAffix;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentApplied;
 import com.ccode.alchemonsters.engine.event.messages.MCombatAilmentRemoved;
@@ -67,14 +68,15 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.ClosureSerializer;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.EndPoint;
 import com.esotericsoftware.kryonet.Server;
 
 public class KryoCreator {
 
-	private static final int WRITE_BUFFER_SIZE = 8192;
-	private static final int OBJECT_BUFFER_SIZE = 8192;
+	private static final int WRITE_BUFFER_SIZE = 65536;
+	private static final int OBJECT_BUFFER_SIZE = 65536;
 	
 	private static void registerClasses(EndPoint endpoint) {
 		Kryo kryo = endpoint.getKryo();
@@ -86,6 +88,11 @@ public class KryoCreator {
 		kryo.register(String[].class);
 		kryo.register(UUID.class, new UUIDSerializer());
 		
+		kryo.register(Object[].class);
+		kryo.register(Class.class);
+		kryo.register(SerializedLambda.class);
+		kryo.register(ClosureSerializer.Closure.class, new ClosureSerializer());
+		
 		//com.ccode.alchemonsters.combat
 		kryo.register(BattleAction.class);
 		kryo.register(BattleAction.BattleActionType.class);
@@ -93,13 +100,12 @@ public class KryoCreator {
 		kryo.register(BattleEvent.class);
 		kryo.register(Battleground.class);
 		kryo.register(BattleTeam.class);
-		kryo.register(Catalyst.class);
+		//kryo.register(Catalyst.class);
 		kryo.register(CombatState.class);
 		kryo.register(CreatureTeam.class);
-		kryo.register(GroundType.class);
-		kryo.register(PassiveAbility.class);
-		kryo.register(StatBuffs.class);
 		kryo.register(TerrainType.class);
+		//kryo.register(PassiveAbility.class);
+		kryo.register(BiomeType.class);
 		kryo.register(WeatherType.class);
 		
 		//com.ccode.alchemonsters.combat.ailments
@@ -130,14 +136,19 @@ public class KryoCreator {
 		kryo.register(Globals.class);
 		
 		//com.ccode.alchemonsters.creature
+		kryo.register(CombatMods.class);
 		kryo.register(Creature.class);
 		kryo.register(Creature[].class);
 		kryo.register(CreatureBase.class);
 		kryo.register(CreatureNature.class);
-		kryo.register(CreatureStats.class);
 		kryo.register(ElementType.class);
 		kryo.register(ElementType[].class);
 		kryo.register(StatType.class);
+		
+		//com.ccode.alchemonsters.creature.equip
+		kryo.register(Affix.class);
+		kryo.register(Amplifier.class);
+		kryo.register(StatIncreaseAffix.class);
 		
 		//com.ccode.alchemonsters.engine.event.message
 		kryo.register(Message.class);
@@ -201,7 +212,7 @@ public class KryoCreator {
 		}
 
 		@Override
-		public UUID read(Kryo kryo, Input input, Class<UUID> type) {
+		public UUID read(Kryo kryo, Input input, Class<? extends UUID> type) {
 			return new UUID(input.readLong(), input.readLong());
 		}
 		

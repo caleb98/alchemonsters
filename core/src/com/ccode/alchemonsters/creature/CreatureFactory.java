@@ -14,19 +14,38 @@ public class CreatureFactory {
 	private static double STAT_GEN_SD = 6;
 	
 	public static Creature generateRandomLevelOne(String baseID) {
+		Creature gen = new Creature();
+		
 		CreatureBase base = CreatureDatabase.getBase(baseID);
 		CreatureNature nature = generateRandomCreatureNature();
-		CreatureStats stats = generateRandomCreatureStats();
 		
 		int baseHealth = base.minBaseHealth + GameRandom.nextInt(base.maxBaseHealth - base.minBaseHealth);
 		int baseMana = base.minBaseMana + GameRandom.nextInt(base.maxBaseMana - base.minBaseMana);
 		
-		return new Creature(base, nature, stats, baseHealth, baseMana);
+		gen.base = base;
+		gen.nature = nature;
+		gen.baseHealth = baseHealth;
+		gen.baseMana = baseMana;
+		
+		gen.vitaeAttunement = generateRandomStatValue();
+		gen.focusAttunement = generateRandomStatValue();
+		gen.magicAtkAttunement = generateRandomStatValue();
+		gen.magicDefAttunement = generateRandomStatValue();
+		gen.physAtkAttunement = generateRandomStatValue();
+		gen.physDefAttunement = generateRandomStatValue();
+		gen.speedAttunement = generateRandomStatValue();
+		gen.penAttunement = generateRandomStatValue();
+		gen.resAttunement = generateRandomStatValue();
+		
+		gen.recalculateAllStats(true);
+		
+		return gen;
 	}
 	
 	public static CreatureNature generateRandomCreatureNature() {
-		StatType[] types = StatType.values();
-		return new CreatureNature(types[rand.nextInt(types.length)], types[rand.nextInt(types.length)]);
+		return new CreatureNature(
+				StatType.primaries[rand.nextInt(StatType.primaries.length)], 
+				StatType.primaries[rand.nextInt(StatType.primaries.length)]);
 	}
 	
 	/*
@@ -40,20 +59,6 @@ public class CreatureFactory {
 		if(value < 0) value = 0;
 		
 		return (byte) Math.round(value);
-	}
-	
-	public static CreatureStats generateRandomCreatureStats() {
-		return new CreatureStats(
-			generateRandomStatValue(),
-			generateRandomStatValue(),
-			generateRandomStatValue(),
-			generateRandomStatValue(),
-			generateRandomStatValue(),
-			generateRandomStatValue(),
-			generateRandomStatValue(),
-			generateRandomStatValue(),
-			generateRandomStatValue()
-		);
 	}
 	
 }

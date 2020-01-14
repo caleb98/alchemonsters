@@ -22,9 +22,9 @@ import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
-import com.ccode.alchemonsters.combat.GroundType;
-import com.ccode.alchemonsters.combat.TeamController;
 import com.ccode.alchemonsters.combat.TerrainType;
+import com.ccode.alchemonsters.combat.TeamController;
+import com.ccode.alchemonsters.combat.BiomeType;
 import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.moves.Move;
@@ -228,9 +228,6 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 		//Combat setup
 		battleContext = new BattleContext(battleTeamA, battleTeamB);
 		
-		battleTeamA.startCombat();
-		battleTeamB.startCombat();
-		
 		battleContext.teamA = battleTeamA;
 		battleContext.teamB = battleTeamB;
 		
@@ -238,15 +235,15 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 		
 		//Reset health and mana values
 		for(Creature c : battleTeamA.creatures()) {
-			if(c != null) c.rest();
+			if(c != null) c.resetHealthAndMana();
 		}
 		for(Creature c : battleTeamB.creatures()) {
-			if(c != null) c.rest();
+			if(c != null) c.resetHealthAndMana();
 		}
 		
 		//Reset to default battleground values
-		battleContext.battleground.ground = GroundType.NORMAL;
 		battleContext.battleground.terrain = TerrainType.NORMAL;
+		battleContext.battleground.biome = BiomeType.NORMAL;
 		battleContext.battleground.weather = WeatherType.NORMAL;
 		
 		combatTextDisplay.clear();
@@ -497,7 +494,7 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 	}
 	
 	private void doBattlePhase() {
-		//Triple contains <team of unit, active position id, the action fctiveId(activePos), action.id);or that unit>
+		//Triple contains <team of unit, active position id, the action for that unit>
 		ArrayList<Triple<BattleTeam, Integer, BattleAction>> monActions = new ArrayList<>();
 		for(int i = 0; i < teamADisplay.getControllers().length; ++i) {
 			//Ignore dead/absent mons
@@ -513,6 +510,7 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 			monActions.add(new Triple<>(battleTeamB, i, teamBDisplay.getControllers()[i].getSelectedAction()));
 		}
 		
+		//Sort by order in battle action enum
 		monActions.sort((a, b)->{
 			return a.c.compareTo(b.c);
 		});
@@ -558,22 +556,25 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 				int bSpeed = bMon.calcTotalSpeed(battleContext);
 				
 				if(aSpeed > bSpeed) {
-					return 1;
+					return -1;
 				}
 				else if(aSpeed < bSpeed) {
-					return -1;
+					return 1;
 				}
 				
 				//If speeds were equal, select randomly
 				return GameRandom.nextBoolean() ? -1 : 1;
 			}
 			
-		}).reversed());
+		}));
 		
 		//Run the rest of the actions
 		//This will be all the moves
 		for(Triple<BattleTeam, Integer, BattleAction> info : monActions) {
-			doBattleAction(teamADisplay.getControllers()[info.b], info.b, info.a, info.a == battleTeamA ? battleTeamB : battleTeamA);
+			doBattleAction(info.a == battleTeamA ? teamADisplay.getControllers()[info.b] : teamBDisplay.getControllers()[info.b], 
+				       info.b, 
+				       info.a, 
+				       info.a == battleTeamA ? battleTeamB : battleTeamA);
 		}
 		
 		//Do delayed moves
@@ -620,7 +621,7 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 				}
 			}
 			
-		}).reversed());
+		}).reversed()); //Reverse the list because default sorting will be by ascending
 		
 		if(monActions.size() == 1) {
 			//Only one mon did a move, but we still want the possibility for

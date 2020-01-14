@@ -12,10 +12,13 @@ public class CreatureBase implements Serializable {
 	public String id;
 	public String name;
 	public String desc;
+	
 	public int minBaseHealth;
 	public int maxBaseHealth;
+	
 	public int minBaseMana;
 	public int maxBaseMana;
+	
 	public int baseVitae;
 	public int baseFocus;
 	public int baseMagicAtk;
@@ -25,6 +28,7 @@ public class CreatureBase implements Serializable {
 	public int basePenetration;
 	public int baseResistance;
 	public int baseSpeed;
+	
 	public ElementType[] types;
 	public ArrayList<Pair<ElementType, Integer>> componentCost;
 	
