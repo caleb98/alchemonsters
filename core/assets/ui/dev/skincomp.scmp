@@ -359,6 +359,23 @@ atlasData: {
 			customized: false
 			tenPatchData: null
 		}
+		{
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/button.9.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: click
+			name: button_down
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+		}
 	]
 	fontDrawables: [
 		{
@@ -422,6 +439,16 @@ jsonData: {
 		{
 			class: com.ray3k.skincomposer.data.ColorData
 			color: {
+				r: 0.75
+				g: 0.75
+				b: 0.75
+				a: 1
+			}
+			name: click
+		}
+		{
+			class: com.ray3k.skincomposer.data.ColorData
+			color: {
 				r: 0
 				g: 0.84313726
 				b: 0
@@ -472,7 +499,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: down
 						optional: true
-						value: null
+						value: button_down
 					}
 					over: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -911,7 +938,7 @@ jsonData: {
 					}
 				}
 				deletable: false
-				parent: null
+				parent: default
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton: [
@@ -1782,7 +1809,7 @@ jsonData: {
 					}
 				}
 				deletable: false
-				parent: null
+				parent: default-horizontal
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.SplitPane: [
@@ -1816,7 +1843,7 @@ jsonData: {
 					}
 				}
 				deletable: false
-				parent: null
+				parent: default-horizontal
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.TextButton: [
@@ -1837,14 +1864,14 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.Color
 						name: fontColor
 						optional: true
-						value: null
+						value: white
 					}
 					downFontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.graphics.Color
 						name: downFontColor
 						optional: true
-						value: null
+						value: click
 					}
 					overFontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -1974,7 +2001,7 @@ jsonData: {
 					}
 				}
 				deletable: false
-				parent: null
+				parent: default
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.TextField: [
@@ -2231,11 +2258,15 @@ preferences: {
 	}
 	last-import-export-path: {
 		class: java.lang.String
-		value: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/ui.json
+		value: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/ui.json
 	}
 	id: {
 		class: java.lang.Integer
 		value: 936459188
+	}
+	simple-names: {
+		class: java.lang.Boolean
+		value: true
 	}
 	resources-relative: {
 		class: java.lang.Boolean

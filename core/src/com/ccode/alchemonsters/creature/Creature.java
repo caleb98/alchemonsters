@@ -1,6 +1,5 @@
 package com.ccode.alchemonsters.creature;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.ccode.alchemonsters.combat.BattleContext;
