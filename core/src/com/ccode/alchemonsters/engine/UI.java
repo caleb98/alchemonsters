@@ -17,14 +17,6 @@ public class UI {
 
 	public static Skin DEFAULT_SKIN;
 	
-	public static BitmapFont TITLE_FONT_SMALL;
-	public static BitmapFont TITLE_FONT_MEDIUM;
-	public static BitmapFont TITLE_FONT_LARGE;
-	
-	public static BitmapFont TEXT_FONT_SMALL;
-	public static BitmapFont TEXT_FONT_MEDIUM;
-	public static BitmapFont TEXT_FONT_LARGE;
-	
 	private static boolean isInitialized = false;
 	
 	public static void initAndLoad() {
