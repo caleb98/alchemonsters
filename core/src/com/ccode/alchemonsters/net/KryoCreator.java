@@ -104,7 +104,6 @@ public class KryoCreator {
 		kryo.register(CombatState.class);
 		kryo.register(CreatureTeam.class);
 		kryo.register(TerrainType.class);
-		//kryo.register(PassiveAbility.class);
 		kryo.register(BiomeType.class);
 		kryo.register(WeatherType.class);
 		

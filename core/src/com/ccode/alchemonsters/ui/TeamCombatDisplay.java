@@ -106,7 +106,7 @@ public class TeamCombatDisplay extends Table {
 			row();
 			
 			add(new Label("MP", UI.DEFAULT_SKIN));
-			manaBar = new ProgressBar(0, 10, 1, false, UI.DEFAULT_SKIN);
+			manaBar = new ProgressBar(0, 10, 1, false, UI.DEFAULT_SKIN.get("horizontal-blue", ProgressBar.ProgressBarStyle.class));
 			add(manaBar);
 			manaLabel = new Label("0/0", UI.DEFAULT_SKIN);
 			add(manaLabel);
