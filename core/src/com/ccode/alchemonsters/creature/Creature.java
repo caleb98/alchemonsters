@@ -8,6 +8,7 @@ import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.ailments.StatusAilment;
 import com.ccode.alchemonsters.creature.equip.Affix;
 import com.ccode.alchemonsters.creature.equip.Amplifier;
+import com.ccode.alchemonsters.engine.database.StatCalculators;
 import com.ccode.alchemonsters.util.DynamicVariables;
 
 public class Creature {
@@ -28,179 +29,6 @@ public class Creature {
 	public static final float SANDSTORM_MAGIC_DEF_MULTIPLIER = 1.2f;
 	public static final float LOCUST_SWARM_RES_MULTIPLIER = 1.2f;
 	public static final float JETSTREAM_SPEED_MULTIPLIER = 1.2f;
-	
-	public static final IntStatCalculator defaultTotalVitaeCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre = Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.baseVitae - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.vitaeAttunement * c.currentLevel / 100f)  + 
-						(c.vitaeLearned * c.currentLevel / 100f)) 
-				* c.vitaeIncreases * c.vitaeEffectiveness);
-		
-		if(c.nature.increased == StatType.VITAE) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.VITAE) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalFocusCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre = Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.baseFocus - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.focusAttunement * c.currentLevel / 100f) + 
-						(c.focusLearned * c.currentLevel / 100f)) 
-				* c.focusIncreases * c.focusEffectiveness);
-		
-		if(c.nature.increased == StatType.FOCUS) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.FOCUS) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalMagicAtkCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre = Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.baseMagicAtk - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						c.magicAtkAttunement + 
-						c.magicAtkLearned) 
-				* c.magicAtkIncreases * c.magicAtkEffectiveness * c.buffs.getMagicAtkMultiplier());
-		
-		if(c.nature.increased == StatType.MAGIC_ATK) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.MAGIC_ATK) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalMagicDefCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre =  Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.baseMagicDef - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.magicDefAttunement * c.currentLevel / 100f) + 
-						(c.magicDefLearned * c.currentLevel / 100f)) 
-				* c.magicDefIncreases * c.magicDefEffectiveness * c.buffs.getMagicDefMultiplier());
-		
-		if(c.nature.increased == StatType.MAGIC_DEF) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.MAGIC_DEF) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalPhysAtkCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre =  Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.basePhysAtk - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.physAtkAttunement * c.currentLevel / 100f) + 
-						(c.physAtkLearned * c.currentLevel / 100f)) 
-				* c.physAtkIncreases * c.physAtkEffectiveness * c.buffs.getPhysAtkMultiplier());
-		
-		if(c.nature.increased == StatType.PHYS_ATK) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.PHYS_ATK) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalPhysDefCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre = Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.basePhysDef - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.physDefAttunement * c.currentLevel / 100f) + 
-						(c.physDefLearned * c.currentLevel / 100f)) 
-				* c.physDefIncreases * c.physDefEffectiveness * c.buffs.getPhysDefMultiplier());
-		 
-		if(c.nature.increased == StatType.PHYS_DEF) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.PHYS_DEF) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalSpeedCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre = Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.baseSpeed - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.speedAttunement * c.currentLevel / 100f) + 
-						(c.speedLearned * c.currentLevel / 100f)) 
-				* c.speedIncreases * c.speedEffectiveness * c.buffs.getSpeedMultiplier());
-		
-		if(c.nature.increased == StatType.SPEED) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.SPEED) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalPenCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre = Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.basePenetration - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.penAttunement  * c.currentLevel / 100f) + 
-						(c.penLearned * c.currentLevel / 100f)) 
-				* c.penIncreases * c.penEffectiveness * c.buffs.getPenMultiplier());
-		
-		if(c.nature.increased == StatType.PENETRATION) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.PENETRATION) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final IntStatCalculator defaultTotalResCalculator = (IntStatCalculator & Serializable)(c)->{
-		int pre = Math.round(
-				(LEVEL_ONE_STAT_VALUE + ((c.base.baseResistance - LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-						(c.resAttunement * c.currentLevel / 100f) + 
-						(c.resLearned * c.currentLevel / 100f)) 
-				* c.resIncreases * c.resEffectiveness * c.buffs.getResMultiplier());
-		
-		if(c.nature.increased == StatType.RESISTANCE) {
-			pre *= POSITIVE_NATURE_MULTIPLIER;
-		}
-		else if(c.nature.decreased == StatType.RESISTANCE) {
-			pre *= NEGATIVE_NATURE_MULTIPLIER;
-		}
-		return pre;
-	};
-	
-	public static final FloatStatCalculator defaultCritChanceCalculator = 
-			(FloatStatCalculator & Serializable)(c)->{ return BASE_CRIT_CHANCE + c.critChanceIncrease; };
-			
-	public static final FloatStatCalculator defaultCritMultiplierCalculator = 
-			(FloatStatCalculator & Serializable)(c)->{ return BASE_CRIT_MULTIPLIER + c.critMultiplierIncrease; };
-			
-	public static final FloatStatCalculator defaultFlinchChanceCalculator = 
-			(FloatStatCalculator & Serializable)(c)->{ return BASE_FLINCH_CHANCE + c.flinchChanceIncrease; };
-			
-	public static final FloatStatCalculator defaultDodgeChanceCalculator = 
-			(FloatStatCalculator & Serializable)(c)->{ return BASE_DODGE_CHANCE + c.dodgeChanceIncrease; };
-			
-	public static final FloatStatCalculator defaultStabMultiplierCalculator = 
-			(FloatStatCalculator & Serializable)(c)->{ return BASE_STAB_MULTIPLIER + c.stabMultiplierIncrease; };
-	
-	public static final IntStatCalculator defaultHealthCalculator = (IntStatCalculator & Serializable)(c)->{
-		return Math.round((c.baseHealth + 
-				(c.currentLevel * (c.base.maxBaseHealth - c.base.minBaseHealth) / 10f) +
-				(c.currentLevel * c.totalVitae / 50f) +
-				c.healthIncreases) * c.healthMultiplier);
-	};
-	
-	public static final IntStatCalculator defaultManaCalculator = (IntStatCalculator & Serializable)(c)->{
-		return Math.round((c.baseMana + 
-				(c.currentLevel * (c.base.maxBaseMana - c.base.minBaseMana) / 10f) +
-				(c.currentLevel * c.totalFocus / 50f) +
-				c.manaIncreases) * c.manaMultiplier);
-	};
 	// === END STATIC FIELDS ===
 	
 	
@@ -255,15 +83,15 @@ public class Creature {
 	public float resEffectiveness = 1f;
 	public float speedEffectiveness = 1f;
 	
-	public IntStatCalculator totalVitaeCalculator = defaultTotalVitaeCalculator;
-	public IntStatCalculator totalFocusCalculator = defaultTotalFocusCalculator;
-	public IntStatCalculator totalMagicAtkCalculator = defaultTotalMagicAtkCalculator;
-	public IntStatCalculator totalMagicDefCalculator = defaultTotalMagicDefCalculator;
-	public IntStatCalculator totalPhysAtkCalculator = defaultTotalPhysAtkCalculator;
-	public IntStatCalculator totalPhysDefCalculator = defaultTotalPhysDefCalculator;
-	public IntStatCalculator totalSpeedCalculator = defaultTotalSpeedCalculator;
-	public IntStatCalculator totalPenCalculator = defaultTotalPenCalculator;
-	public IntStatCalculator totalResCalculator = defaultTotalResCalculator;
+	public String totalVitaeCalculator = StatCalculators.defaultTotalVitaeCalculator;
+	public String totalFocusCalculator = StatCalculators.defaultTotalFocusCalculator;
+	public String totalMagicAtkCalculator = StatCalculators.defaultTotalMagicAtkCalculator;
+	public String totalMagicDefCalculator = StatCalculators.defaultTotalMagicDefCalculator;
+	public String totalPhysAtkCalculator = StatCalculators.defaultTotalPhysAtkCalculator;
+	public String totalPhysDefCalculator = StatCalculators.defaultTotalPhysDefCalculator;
+	public String totalSpeedCalculator = StatCalculators.defaultTotalSpeedCalculator;
+	public String totalPenCalculator = StatCalculators.defaultTotalPenCalculator;
+	public String totalResCalculator = StatCalculators.defaultTotalResCalculator;
 	
 	//totaled stats
 	public int totalVitae;
@@ -289,11 +117,11 @@ public class Creature {
 	public float dodgeChanceIncrease = 0f;
 	public float stabMultiplierIncrease = 0f;
 	
-	public FloatStatCalculator critChanceCalculator = defaultCritChanceCalculator;
-	public FloatStatCalculator critMultiplieCalculator = defaultCritMultiplierCalculator;
-	public FloatStatCalculator flinchChanceCalculator = defaultFlinchChanceCalculator;
-	public FloatStatCalculator dodgeChanceCalculator = defaultDodgeChanceCalculator;
-	public FloatStatCalculator stabMultiplierCalculator = defaultStabMultiplierCalculator;
+	public String critChanceCalculator = StatCalculators.defaultCritChanceCalculator;
+	public String critMultiplieCalculator = StatCalculators.defaultCritMultiplierCalculator;
+	public String flinchChanceCalculator = StatCalculators.defaultFlinchChanceCalculator;
+	public String dodgeChanceCalculator = StatCalculators.defaultDodgeChanceCalculator;
+	public String stabMultiplierCalculator = StatCalculators.defaultStabMultiplierCalculator;
 
 	//derived stats
 	public int baseHealth;
@@ -307,6 +135,9 @@ public class Creature {
 	
 	public int maxHealth;
 	public int maxMana;
+	
+	public String defaultHealthCalculator = StatCalculators.defaultHealthCalculator;
+	public String defaultManaCalculator = StatCalculators.defaultManaCalculator;
 	
 	//Active values
 	public int currentHealth;
@@ -465,25 +296,25 @@ public class Creature {
 	}
 	
 	private void calculateTotalStats(boolean resetCurrentHealthAndMana) {
-		totalVitae = totalVitaeCalculator.calculateStat(this);
-		totalFocus = totalFocusCalculator.calculateStat(this);
-		totalMagicAtk = totalMagicAtkCalculator.calculateStat(this);
-		totalMagicDef = totalMagicDefCalculator.calculateStat(this);
-		totalPhysAtk = totalPhysAtkCalculator.calculateStat(this);
-		totalPhysDef = totalPhysDefCalculator.calculateStat(this);
-		totalSpeed = totalSpeedCalculator.calculateStat(this);
-		totalPenetration = totalPenCalculator.calculateStat(this);
-		totalResistance = totalResCalculator.calculateStat(this);
+		totalVitae = StatCalculators.doIntCalc(totalVitaeCalculator, this);
+		totalFocus = StatCalculators.doIntCalc(totalFocusCalculator, this);
+		totalMagicAtk = StatCalculators.doIntCalc(totalMagicAtkCalculator, this);
+		totalMagicDef = StatCalculators.doIntCalc(totalMagicDefCalculator, this);
+		totalPhysAtk = StatCalculators.doIntCalc(totalPhysAtkCalculator, this);
+		totalPhysDef = StatCalculators.doIntCalc(totalPhysDefCalculator, this);
+		totalSpeed = StatCalculators.doIntCalc(totalSpeedCalculator, this);
+		totalPenetration = StatCalculators.doIntCalc(totalPenCalculator, this);
+		totalResistance = StatCalculators.doIntCalc(totalResCalculator, this);
 		
-		critChance = defaultCritChanceCalculator.calculateStat(this);
-		critMultiplier = defaultCritMultiplierCalculator.calculateStat(this);
-		flinchChance = defaultFlinchChanceCalculator.calculateStat(this);
-		dodgeChance = defaultDodgeChanceCalculator.calculateStat(this);
-		stabMultiplier = defaultStabMultiplierCalculator.calculateStat(this);
+		critChance = StatCalculators.doFloatCalc(critChanceCalculator, this);
+		critMultiplier = StatCalculators.doFloatCalc(critMultiplieCalculator, this);
+		flinchChance = StatCalculators.doFloatCalc(flinchChanceCalculator, this);
+		dodgeChance = StatCalculators.doFloatCalc(dodgeChanceCalculator, this);
+		stabMultiplier = StatCalculators.doFloatCalc(stabMultiplierCalculator, this);
 		
 		if(resetCurrentHealthAndMana) {
-			maxHealth = defaultHealthCalculator.calculateStat(this);
-			maxMana = defaultManaCalculator.calculateStat(this);
+			maxHealth = StatCalculators.doIntCalc(defaultHealthCalculator, this);
+			maxMana = StatCalculators.doIntCalc(defaultManaCalculator, this);
 			
 			currentHealth = maxHealth;
 			currentMana = maxMana;
@@ -492,8 +323,8 @@ public class Creature {
 			float currentHealthPercent = currentHealth / (float) maxHealth;
 			float currentManaPercent = currentMana / (float) maxMana;
 			
-			maxHealth = defaultHealthCalculator.calculateStat(this);
-			maxMana = defaultManaCalculator.calculateStat(this);
+			maxHealth = StatCalculators.doIntCalc(defaultHealthCalculator, this);
+			maxMana = StatCalculators.doIntCalc(defaultManaCalculator, this);
 			
 			currentHealth = Math.round(maxHealth * currentHealthPercent);
 			currentMana = Math.round(maxMana * currentManaPercent);
