@@ -3,7 +3,7 @@ atlasData: {
 	atlasCurrent: true
 	drawables: [
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/window.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/window.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -20,7 +20,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/button.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/button.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -37,7 +37,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/checkbox.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/checkbox.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -54,7 +54,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/checkbox_checked.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/checkbox_checked.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -71,7 +71,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/squareframe.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/squareframe.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -88,7 +88,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/highlight.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/highlight.9.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -105,7 +105,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/pgbarfill.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/pgbarfill.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -122,7 +122,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/pgbarfill.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/pgbarfill.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -139,7 +139,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/pgbarfill_vert.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/pgbarfill_vert.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -156,7 +156,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/pgbarfill_vert.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/pgbarfill_vert.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -173,7 +173,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/pgbar.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/pgbar.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -190,7 +190,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/pgbarfill.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/pgbarfill.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -207,7 +207,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/pgbarfill_vert.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/pgbarfill_vert.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -224,7 +224,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/scrollbar.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/scrollbar.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -241,7 +241,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/selectbox.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/selectbox.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -258,7 +258,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/sliderbar_knob.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/sliderbar_knob.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -275,7 +275,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/sliderbar.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/sliderbar.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -292,7 +292,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/plus.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/plus.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -309,7 +309,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/minus.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/minus.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -326,7 +326,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/textarea_bg.9.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/textarea_bg.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -343,7 +343,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/editcursor.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/editcursor.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -362,7 +362,7 @@ atlasData: {
 	]
 	fontDrawables: [
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/notoserif_16_white.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/notoserif_16_white.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -379,7 +379,7 @@ atlasData: {
 			tenPatchData: null
 		}
 		{
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/notosans_16_white.png
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/notosans_16_white.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -444,12 +444,12 @@ jsonData: {
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: notosans
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/notosans_16_white.fnt
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/notosans_16_white.fnt
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: notoserif
-			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/notoserif_16_white.fnt
+			file: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/notoserif_16_white.fnt
 		}
 	]
 	freeTypeFonts: []
@@ -2242,6 +2242,6 @@ preferences: {
 		value: false
 	}
 }
-saveFile: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/test/dev/skincomp.scmp
+saveFile: G:/Workspaces/Alchemonsters/Alchemonsters/core/assets/ui/dev/skincomp.scmp
 version: 34
 }

@@ -208,6 +208,8 @@ public class StatCalculators {
 					(c.currentLevel * c.totalFocus / 50f) +
 					c.manaIncreases) * c.manaMultiplier);
 		});
+		
+		isInitialized = true;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -232,7 +234,7 @@ public class StatCalculators {
 	}
 	
 	public static float doFloatCalc(String calcName, Creature c) {
-		return getCalculator(calcName, Integer.class).calculateStat(c);
+		return getCalculator(calcName, Float.class).calculateStat(c);
 	}
 	
 }

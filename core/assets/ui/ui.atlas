@@ -149,7 +149,7 @@ window
   xy: 1, 234
   size: 30, 50
   split: 6, 6, 25, 4
-  pad: 8, 8, 29, 6
+  pad: 9, 9, 29, 8
   orig: 30, 50
   offset: 0, 0
   index: -1
