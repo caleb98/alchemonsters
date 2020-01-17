@@ -1,0 +1,16 @@
+com.ccode.alchemonsters
+com.ccode.alchemonsters.combat
+com.ccode.alchemonsters.combat.ailments
+com.ccode.alchemonsters.combat.moves
+com.ccode.alchemonsters.creature
+com.ccode.alchemonsters.creature.equip
+com.ccode.alchemonsters.desktop
+com.ccode.alchemonsters.engine
+com.ccode.alchemonsters.engine.database
+com.ccode.alchemonsters.engine.event
+com.ccode.alchemonsters.engine.event.messages
+com.ccode.alchemonsters.entity
+com.ccode.alchemonsters.net
+com.ccode.alchemonsters.ui
+com.ccode.alchemonsters.util
+com.ccode.alchemonsters.world

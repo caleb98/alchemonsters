@@ -87,8 +87,6 @@ public class MainMenuScreen extends GameScreen {
 		table.row();
 		
 		Gdx.input.setInputProcessor(ui);
-		
-		ui.getBatch().enableBlending();
 	}
 
 	@Override

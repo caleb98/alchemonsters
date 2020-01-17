@@ -49,7 +49,7 @@ import com.ccode.alchemonsters.ui.TeamCombatDisplayController;
 import com.ccode.alchemonsters.util.GameRandom;
 import com.ccode.alchemonsters.util.Triple;
 
-public class TestCombatScreen extends GameScreen implements Subscriber, InputProcessor, Screen, Publisher {
+public class TestCombatScreen extends GameScreen implements InputProcessor, Screen, Subscriber {
 	
 	//Overall Frame
 	private TeamBuilderWindow teamABuilder;
@@ -68,22 +68,9 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 	
 	//Combat event and state variables
 	private BattleContext battleContext;
-	private boolean isCombat = false;
 	
 	private CreatureTeam teamA;
-	private BattleTeam battleTeamA;
-	
 	private CreatureTeam teamB;
-	private BattleTeam battleTeamB;
-	
-	private ArrayList<DelayedMoveInfo> delayedMoves = new ArrayList<>();
-	
-	private boolean isWaitingOnActionSelect = false;
-	private boolean isWaitingOnDeathSwitchSelect = false;
-	
-	private boolean isTeamADoubleAttack = false;
-	private boolean isTeamBDoubleAttack = false;
-	private int doubleAttackPosition = -1;
 	
 	public TestCombatScreen(AlchemonstersGame game) {
 		super(game);
@@ -181,12 +168,13 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 		Gdx.input.setInputProcessor(multi);
 		
 		subscribe(MCombatStateChanged.ID);
-		subscribe(MCombatTeamActiveChanged.ID);
+		subscribe(MCombatFinished.ID);
+		subscribe(MCombatStarted.ID);
 	}	
 
 	private void startCombat(int positions) {
-		battleTeamA = new BattleTeam(teamA, positions);
-		battleTeamB = new BattleTeam(teamB, positions);
+		BattleTeam battleTeamA = new BattleTeam(teamA, positions);
+		BattleTeam battleTeamB = new BattleTeam(teamB, positions);
 		
 		//Make sure that there is at least one mon to be active for each team.
 		if(teamA.getNumCreatures() == 0 || teamB.getNumCreatures() == 0) {
@@ -226,12 +214,9 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 		teamBDisplay.setup(battleTeamB, (new TeamController(positions)).getControls(), ui);
 		
 		//Combat setup
-		battleContext = new BattleContext(battleTeamA, battleTeamB);
-		
-		battleContext.teamA = battleTeamA;
-		battleContext.teamB = battleTeamB;
-		
-		isCombat = true;
+		battleContext = new BattleContext(
+				battleTeamA, teamADisplay.getControllers(), 
+				battleTeamB, teamBDisplay.getControllers());
 		
 		//Reset health and mana values
 		for(Creature c : battleTeamA.creatures()) {
@@ -247,98 +232,16 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 		battleContext.battleground.weather = WeatherType.NORMAL;
 		
 		combatTextDisplay.clear();
-		publish(new MCombatStarted(battleContext));
-		setCombatState(CombatState.MAIN_PHASE_1);
-	}
-	
-	private void endCombat() {
-		publish(new MCombatFinished(battleContext, battleTeamB, battleTeamA));
+		battleContext.startCombat();
+		
 		teamADisplay.updateStrings();
 		teamBDisplay.updateStrings();
-		isCombat = false;
 	}
 	
-	private void setCombatState(CombatState next) {
-		MCombatStateChanged message = new MCombatStateChanged(battleContext, battleContext.currentState, next);
-		battleContext.currentState = next;
-		publish(message);
-	}
-	
-	private void doBattleAction(UnitController control, int activePos, BattleTeam team, BattleTeam other) {
-		if(team.get(activePos).isDead() && control.getSelectedAction().type != BattleActionType.SWITCH) {
-			return;
-		}
-		
-		BattleAction action = control.getSelectedAction();
-		switch(action.type) {
-		
-		case MOVE:
-			String moveName = team.get(activePos).moves[action.id];
-			Move move = MoveDatabase.getMove(moveName);
-			team.get(activePos).currentMana -= move.manaCost;
-			switch(move.turnType) {
-			
-			case CHARGE:
-				//First check for dreamscape, which makes charge moves occur instantly
-				if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
-					publish(new MCombatChargeStarted(battleContext, team.get(activePos), other.get(action.targetPos), move));
-					for(MoveAction a : move.actions) {
-						a.activate(move, battleContext, team.get(activePos), team, other.get(action.targetPos), other);
-					}
-					team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
-					publish(new MCombatChargeFinished(battleContext, team.get(activePos), other.get(action.targetPos), move));
-				}
-				//If they aren't  charging already, then start the charge
-				else if(!control.isCharging()) {
-					control.setCharging(action.id, action.targetPos);
-					publish(new MCombatChargeStarted(battleContext, team.get(activePos), other.get(action.targetPos), move));
-				}
-				//Otherwise they were already charging, so execute the move
-				else {
-					control.stopCharging();
-					for(MoveAction a : move.actions) {
-						a.activate(move, battleContext, team.get(activePos), team, other.get(action.targetPos), other);
-					}
-					team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
-					publish(new MCombatChargeFinished(battleContext, team.get(activePos), other.get(action.targetPos), move));
-				}
-				break;
-				
-			case DELAYED:
-				delayedMoves.add(new DelayedMoveInfo(team, team.get(activePos), move, other, action.targetPos, move.delayAmount));
-				break;
-				
-			case RECHARGE:
-				//Deluge makes it so that recharge abilities dont require a recharge time,
-				//so only apply the recharge if the current weather is NOT deluge
-				if(battleContext.battleground.weather != WeatherType.DELUGE) {
-					control.setRecharging(true);
-				}
-			case INSTANT:
-				for(MoveAction a : move.actions) {
-					a.activate(move, battleContext, team.get(activePos), team, other.get(action.targetPos), other);
-				}
-				team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
-				break;
-			
-			}
-			break;
-			
-		case SWITCH:
-			MCombatTeamActiveChanged message = new MCombatTeamActiveChanged(battleContext, team, activePos, action.id);
-			team.swap(activePos, action.id);
-			publish(message);
-			break;
-			
-		case USE:
-			//TODO: implement inventory and item use
-			break;
-			
-		case WAIT:
-			control.setRecharging(false);
-			break;
-		
-		}
+	@Override
+	public void handleMessage(Message currentMessage) {
+		teamADisplay.updateStrings();
+		teamBDisplay.updateStrings();
 	}
 	
 	@Override
@@ -348,520 +251,16 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 	
 	@Override
 	public void renderUI(float delta) {		
-		if(isWaitingOnActionSelect) {
-			if(areTeamActionsSelected()) {
-				isWaitingOnActionSelect = false;
-				if(battleContext.currentState == CombatState.MAIN_PHASE_1)
-					setCombatState(CombatState.BATTLE_PHASE_1);
-				else if(battleContext.currentState == CombatState.MAIN_PHASE_2)
-					setCombatState(CombatState.BATTLE_PHASE_2);
-			}
-		}
-		else if(isWaitingOnDeathSwitchSelect) {
-			if(areTeamActionsSelected()) {				
-				for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-					Creature creature = battleTeamA.get(i);
-					if(creature.isDead()) {
-						doBattleAction(teamADisplay.getControllers()[i], i, battleTeamA, battleTeamB);
-					}
-				}
-				
-				for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-					Creature creature = battleTeamB.get(i);
-					if(creature.isDead()) {
-						doBattleAction(teamBDisplay.getControllers()[i], i, battleTeamB, battleTeamA);
-					}
-				}
-				
-				isWaitingOnDeathSwitchSelect = false;
-				teamADisplay.updateStrings();
-				teamBDisplay.updateStrings();
-				
-				//TODO: right now, swapping after death takes us back to the main phase, but we might want to pick up somewhere else
-				setCombatState(CombatState.MAIN_PHASE_1);
-			}
+
+		if(battleContext != null) {
+			battleContext.updateBattle();
+			teamADisplay.updateStrings();
+			teamBDisplay.updateStrings();
 		}
 		
 		ui.act(delta);
 		ui.draw();
 		
-	}
-	
-	private boolean areTeamActionsSelected() {
-		for(UnitController c : teamADisplay.getControllers()) {
-			if(!c.isActionSubmitted()) {
-				return false;
-			}
-		}
-		for(UnitController c : teamBDisplay.getControllers()) {
-			if(!c.isActionSubmitted()) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	private boolean checkNeedsActiveSwap() {
-		for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-			if(battleTeamA.get(i) != null && battleTeamA.get(i).isDead()) {
-				//One of the actives is dead, make sure that
-				//we have a replacement possibility.
-				for(int k = battleTeamA.getNumActives(); k < CreatureTeam.TEAM_SIZE; ++k) {
-					if(battleTeamA.get(k) != null && !battleTeamA.get(k).isDead()) {
-						return true;
-					}
-				}
-			}
-		}
-		for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-			if(battleTeamB.get(i) != null && battleTeamB.get(i).isDead()) {
-				//One of the actives is dead, make sure that
-				//we have a replacement possibility.
-				for(int k = battleTeamB.getNumActives(); k < CreatureTeam.TEAM_SIZE; ++k) {
-					if(battleTeamB.get(k) != null && !battleTeamB.get(k).isDead()) {
-						return true;
-					}
-				}
-			}
-		}
-		
-		return false;
-	}
-	
-	private void setDefaultControllerActions(UnitController[] controls, BattleTeam team) {
-		for(int position = 0; position < controls.length; ++position) {
-			UnitController control = controls[position];
-			setDefaultControllerActions(control, position, team);
-		}
-		if(team == battleTeamA) {
-			teamADisplay.updateStrings();
-		}
-		else if(team == battleTeamB) {
-			teamBDisplay.updateStrings();
-		}
-	}
-	
-	private void setDefaultControllerActions(UnitController control, int position,  BattleTeam team) {
-		Creature creature = team.get(position);
-		if(creature == null) {
-			return;
-		}
-		
-		ArrayList<BattleAction> actions = new ArrayList<>();
-		
-		if(control == null) {
-			System.out.println("null!");
-		}
-		//Check for special charging case - we'll need different actions
-		if(control.isCharging()) {
-			actions.add(new BattleAction(BattleActionType.MOVE, control.getChargingTargetPos(), control.getCharging()));
-			control.setAllActions(actions);
-			return;
-		}
-		
-		if(control.isRecharging()) {
-			//TODO: this uses -1 for target index because the "wait" action doesn't have a logical target, maybe a problem?
-			actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
-			control.setAllActions(actions);
-			return;
-		}
-		
-		for(int i = team.getNumActives(); i < CreatureTeam.TEAM_SIZE; ++i) {
-			if(team.get(i) != null && !team.get(i).isDead()) {
-				actions.add(new BattleAction(BattleActionType.SWITCH, -1, i));
-			}
-		}
-		
-		//Add moves targeting each of the enemies
-		BattleTeam enemyTeam = (team == battleTeamA) ? battleTeamB : battleTeamA;
-		for(int tar = 0; tar < enemyTeam.getNumActives(); ++tar) {
-			//This target is dead, so dont allow targeting it
-			if(enemyTeam.get(tar) == null || enemyTeam.get(tar).isDead()) {
-				continue;
-			}
-			for(int i = 0; i < creature.moves.length; ++i) {
-				Move move = MoveDatabase.getMove(creature.moves[i]);
-				if(creature.currentMana >= move.manaCost) {
-					actions.add(new BattleAction(BattleActionType.MOVE, tar, i));
-				}
-			}
-		}
-		
-
-		actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
-		
-		control.setAllActions(actions);
-	}
-	
-	private void doBattlePhase() {
-		//Triple contains <team of unit, active position id, the action for that unit>
-		ArrayList<Triple<BattleTeam, Integer, BattleAction>> monActions = new ArrayList<>();
-		for(int i = 0; i < teamADisplay.getControllers().length; ++i) {
-			//Ignore dead/absent mons
-			if(battleTeamA.get(i) == null || battleTeamA.get(i).isDead()) {
-				continue;
-			}
-			monActions.add(new Triple<>(battleTeamA, i, teamADisplay.getControllers()[i].getSelectedAction()));
-		}
-		for(int i = 0; i < teamBDisplay.getControllers().length; ++i) {
-			if(battleTeamB.get(i) == null || battleTeamB.get(i).isDead()) {
-				continue;
-			}
-			monActions.add(new Triple<>(battleTeamB, i, teamBDisplay.getControllers()[i].getSelectedAction()));
-		}
-		
-		//Sort by order in battle action enum
-		monActions.sort((a, b)->{
-			return a.c.compareTo(b.c);
-		});
-		
-		//Process all switch, use, and wait actions 
-		Iterator<Triple<BattleTeam, Integer, BattleAction>> iter = monActions.iterator();
-		while(iter.hasNext()) {
-			Triple<BattleTeam, Integer, BattleAction> info = iter.next();
-			//Run all actions until we reach the move actions.
-			if(info.c.type == BattleActionType.MOVE) {
-				break;
-			}
-			else {
-				doBattleAction(info.a == battleTeamA ? teamADisplay.getControllers()[info.b] : teamBDisplay.getControllers()[info.b], 
-						       info.b, 
-						       info.a, 
-						       info.a == battleTeamA ? battleTeamB : battleTeamA);
-				iter.remove();
-			}
-		}
-		
-		//Remaining actions are move
-		monActions.sort((new Comparator<Triple<BattleTeam, Integer, BattleAction>>() {
-
-			@Override
-			public int compare(Triple<BattleTeam, Integer, BattleAction> a, Triple<BattleTeam, Integer, BattleAction> b) {
-				//Get the moves
-				Move aMove = MoveDatabase.getMove(a.a.get(a.b).moves[a.c.id]);
-				Move bMove = MoveDatabase.getMove(b.a.get(b.b).moves[b.c.id]);
-				
-				//Compare by priority first
-				if(aMove.priority > bMove.priority) {
-					return 1;
-				}
-				else if(aMove.priority < bMove.priority) {
-					return -1;
-				}
-				
-				//If priorities were equal, compare by speed
-				Creature aMon = a.a.get(a.b);
-				Creature bMon = b.a.get(b.b);
-				int aSpeed = aMon.calcTotalSpeed(battleContext);
-				int bSpeed = bMon.calcTotalSpeed(battleContext);
-				
-				if(aSpeed > bSpeed) {
-					return -1;
-				}
-				else if(aSpeed < bSpeed) {
-					return 1;
-				}
-				
-				//If speeds were equal, select randomly
-				return GameRandom.nextBoolean() ? -1 : 1;
-			}
-			
-		}));
-		
-		//Run the rest of the actions
-		//This will be all the moves
-		for(Triple<BattleTeam, Integer, BattleAction> info : monActions) {
-			doBattleAction(info.a == battleTeamA ? teamADisplay.getControllers()[info.b] : teamBDisplay.getControllers()[info.b], 
-				       info.b, 
-				       info.a, 
-				       info.a == battleTeamA ? battleTeamB : battleTeamA);
-		}
-		
-		//Do delayed moves
-		Iterator<DelayedMoveInfo> delays = delayedMoves.iterator();
-		while(delays.hasNext()) {
-			DelayedMoveInfo inf = delays.next();
-			if(inf.delayTurns == 0) {
-				Move move = inf.move;
-				for(MoveAction a : move.actions) {
-					a.activate(move, battleContext, inf.sourceCreature, inf.sourceTeam, inf.targetTeam.get(inf.targetPos), inf.targetTeam);
-				}
-				inf.sourceCreature.variables.setVariable("_PREVIOUS_MOVE", move);
-				delays.remove();
-			}
-			else {
-				inf.delayTurns--;
-			}
-		}
-		
-		//Check for defeat
-		if(battleTeamA.isDefeated()) {
-			endCombat();
-			return;
-		}
-		else if(battleTeamB.isDefeated()) {
-			endCombat();
-			return;
-		}
-		
-		//Check for double attack
-		//First sort by speed
-		monActions.sort((new Comparator<Triple<BattleTeam, Integer, BattleAction>>() {
-
-			@Override
-			public int compare(Triple<BattleTeam, Integer, BattleAction> a, Triple<BattleTeam, Integer, BattleAction> b) {
-				int aSpeed = a.a.get(a.b).calcTotalSpeed(battleContext);
-				int bSpeed = b.a.get(b.b).calcTotalSpeed(battleContext);
-				
-				if(aSpeed != bSpeed) {
-					return aSpeed - bSpeed;
-				}
-				else {
-					return GameRandom.nextBoolean() ? -1 : 1;
-				}
-			}
-			
-		}).reversed()); //Reverse the list because default sorting will be by ascending
-		
-		if(monActions.size() == 1) {
-			//Only one mon did a move, but we still want the possibility for
-			//a double attack. Check this mon's speed against the highest 
-			//speed of the enemy team.
-			Triple<BattleTeam, Integer, BattleAction> firstInfo = monActions.get(0);
-			BattleTeam otherTeam = (firstInfo.a == battleTeamA) ? battleTeamB : battleTeamA;
-			
-			int maxSpeed = 0;
-			for(int activeIndex = 0; activeIndex < otherTeam.getNumActives(); ++activeIndex) {
-				//Ignore empty slots or dead mons
-				if(otherTeam.get(activeIndex) == null || otherTeam.get(activeIndex).isDead()) {
-					continue;
-				}
-				int thisSpeed = otherTeam.get(activeIndex).calcTotalSpeed(battleContext);
-				if(thisSpeed > maxSpeed) {
-					maxSpeed = thisSpeed;
-				}
-			}
-			
-			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed(battleContext) >= 1.5 * maxSpeed) {
-				//There should be a double attack
-				if(firstInfo.a == battleTeamA) {
-					isTeamADoubleAttack = true;
-				}
-				else {
-					isTeamBDoubleAttack = false;
-				}
-				doubleAttackPosition = firstInfo.b;
-				setCombatState(CombatState.MAIN_PHASE_2);
-			}
-		}
-		else if(monActions.size() > 1) {
-			//If there's a double attack, the fastest mon should have at least 1.5 the 
-			//speed of the second mon
-			Triple<BattleTeam, Integer, BattleAction> firstInfo = monActions.get(0);
-			Triple<BattleTeam, Integer, BattleAction> secondInfo = monActions.get(1);
-			int firstSpeed = firstInfo.a.get(firstInfo.b).calcTotalSpeed(battleContext);
-			int secondSpeed = secondInfo.a.get(secondInfo.b).calcTotalSpeed(battleContext);
-			
-			if(firstSpeed >= 1.5 * secondSpeed) {
-				Creature doubleAttackMon;
-				//There should be a double attack
-				if(firstInfo.a == battleTeamA) {
-					isTeamADoubleAttack = true;
-					doubleAttackMon = battleTeamA.get(firstInfo.b);
-				}
-				else {
-					isTeamBDoubleAttack = true;
-					doubleAttackMon = battleTeamB.get(firstInfo.b);
-				}
-				doubleAttackPosition = firstInfo.b;
-				battleContext.variables.setVariable("_PREV_DOUBLE_ATTACK_MON", doubleAttackMon);
-				setCombatState(CombatState.MAIN_PHASE_2);
-				return;
-			}
-		}
-		
-		setCombatState(CombatState.END_PHASE);
-	}
-	
-	@Override
-	public void handleMessage(Message m) {
-		if(m instanceof MCombatStateChanged) {
-			MCombatStateChanged full = (MCombatStateChanged) m;
-			switch(full.next) {
-			
-			case BATTLE_PHASE_1:
-				doBattlePhase();
-				break;
-				
-			case BATTLE_PHASE_2:
-				if(isTeamADoubleAttack) {
-					doBattleAction(teamADisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamA, battleTeamB);
-				}
-				else if(isTeamBDoubleAttack) {
-					doBattleAction(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB, battleTeamA);
-				}
-				if(battleTeamA.isDefeated()) {
-					endCombat();
-					return;
-				}
-				else if(battleTeamB.isDefeated()) {
-					endCombat();
-					return;
-				}
-				else {
-					setCombatState(CombatState.END_PHASE);	
-				}
-				break;
-				
-			case END_PHASE:
-				teamADisplay.updateStrings();
-				if(!checkNeedsActiveSwap()) {
-					setCombatState(CombatState.MAIN_PHASE_1);
-				}
-				else {
-					setCombatState(CombatState.ACTIVE_DEATH_SWAP);
-				}
-				break;
-				
-			case MAIN_PHASE_1:
-				//Apply damage from sandstorm
-				if(battleContext.battleground.weather == WeatherType.SANDSTORM) {
-					
-					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-						for(ElementType t : battleTeamA.get(i).base.types) {
-							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-								battleTeamA.get(i).currentHealth -= battleTeamA.get(i).maxHealth / 16f;
-								break;
-							}
-						}
-					}
-					
-					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-						for(ElementType t : battleTeamB.get(i).base.types) {
-							if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-								battleTeamB.get(i).currentHealth -= battleTeamB.get(i).maxHealth / 16f;
-								break;
-							}
-						}
-					}
-						
-					//Check for sandstorm death
-					if(checkNeedsActiveSwap()) {
-						if(battleTeamA.isDefeated()) {
-							endCombat();
-							break;
-						}
-						else if(battleTeamB.isDefeated()) {
-							endCombat();
-							break;
-						}
-						else {
-							setCombatState(CombatState.ACTIVE_DEATH_SWAP);
-							break;
-						}
-					}
-					
-				}
-				
-				//Apply healing from dreamscape if applicable
-				if(battleContext.battleground.weather == WeatherType.DREAMSCAPE) {
-					
-					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-						battleTeamA.get(i).currentHealth += battleTeamA.get(i).maxHealth / 16f;
-						if(battleTeamA.get(i).currentHealth > battleTeamA.get(i).maxHealth) 
-							battleTeamA.get(i).currentHealth = battleTeamA.get(i).maxHealth;
-					}
-					
-					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-						battleTeamB.get(i).currentHealth += battleTeamB.get(i).maxHealth / 16f;
-						if(battleTeamB.get(i).currentHealth > battleTeamB.get(i).maxHealth) 
-							battleTeamB.get(i).currentHealth = battleTeamB.get(i).maxHealth;
-					}
-					
-				}
-				
-				//Apply healing from tempest if applicable
-				if(battleContext.battleground.weather == WeatherType.TEMPEST) {
-					
-					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-						for(ElementType t : battleTeamA.get(i).base.types) {
-							if(t == ElementType.UNDEAD) {
-								battleTeamA.get(i).currentHealth += battleTeamA.get(i).maxHealth / 16f;
-								if(battleTeamA.get(i).currentHealth > battleTeamA.get(i).maxHealth) 
-									battleTeamA.get(i).currentHealth = battleTeamA.get(i).maxHealth;
-								break;
-							}
-						}
-					}
-					
-					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-						for(ElementType t : battleTeamB.get(i).base.types) {
-							if(t == ElementType.UNDEAD) {
-								battleTeamB.get(i).currentHealth += battleTeamB.get(i).maxHealth / 16f;
-								if(battleTeamB.get(i).currentHealth > battleTeamB.get(i).maxHealth) 
-									battleTeamB.get(i).currentHealth = battleTeamB.get(i).maxHealth;
-								break;
-							}
-						}
-					}
-					
-				}
-				
-				isWaitingOnActionSelect = true;
-				setDefaultControllerActions(teamADisplay.getControllers(), battleTeamA);
-				setDefaultControllerActions(teamBDisplay.getControllers(), battleTeamB);
-				for(int i = 0; i < teamADisplay.getControllers().length; ++i) {
-					teamADisplay.getControllers()[i].refresh();
-				}
-				for(int i = 0; i < teamBDisplay.getControllers().length; ++i) {
-					teamBDisplay.getControllers()[i].refresh();
-				}
-				break;
-				
-			case MAIN_PHASE_2:
-				if(isTeamADoubleAttack) {
-					setDefaultControllerActions(teamADisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamA);
-					teamADisplay.getControllers()[doubleAttackPosition].refresh();
-				}
-				else if(isTeamBDoubleAttack) {
-					setDefaultControllerActions(teamBDisplay.getControllers()[doubleAttackPosition], doubleAttackPosition, battleTeamB);
-					teamBDisplay.getControllers()[doubleAttackPosition].refresh();
-				}
-				isWaitingOnActionSelect = true;
-				break;
-				
-			case ACTIVE_DEATH_SWAP:
-				//Trigger the following once only when we first enter this battle state
-				if(!isWaitingOnDeathSwitchSelect) {
-					
-					for(int i = 0; i < battleTeamA.getNumActives(); ++i) {
-						Creature creature = battleTeamA.get(i);
-						if(creature.isDead()) {
-							teamADisplay.getControllers()[i].refresh();
-							teamADisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
-							teamADisplay.updateStrings();
-						}
-					}
-					
-					for(int i = 0; i < battleTeamB.getNumActives(); ++i) {
-						Creature creature = battleTeamB.get(i);
-						if(creature.isDead()) {
-							teamBDisplay.getControllers()[i].refresh();
-							teamBDisplay.getControllers()[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
-							teamBDisplay.updateStrings();
-						}
-					}
-
-					isWaitingOnDeathSwitchSelect = true;
-					
-				}
-				break;
-				
-			default:
-				break;
-			
-			}
-		}
 	}
 
 	@Override
@@ -936,25 +335,4 @@ public class TestCombatScreen extends GameScreen implements Subscriber, InputPro
 		return false;
 	}
 	
-	private class DelayedMoveInfo {
-		
-		BattleTeam sourceTeam;
-		Creature sourceCreature;
-		Move move;
-		BattleTeam targetTeam;
-		int targetPos;
-		int delayTurns;
-		
-		public DelayedMoveInfo(BattleTeam team, Creature creature, Move move, BattleTeam target, int targetPos, int turns) {
-			sourceTeam = team;
-			sourceCreature = creature;
-			this.move = move;
-			targetTeam = target;
-			this.targetPos = targetPos;
-			delayTurns = turns;
-		}
-		
-	}
-
-
 }

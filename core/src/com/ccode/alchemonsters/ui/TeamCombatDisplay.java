@@ -50,12 +50,12 @@ public class TeamCombatDisplay extends Table {
 		allDisplays = new Cell[CreatureTeam.TEAM_SIZE];
 		
 		//Create the displays and add them to the array
-		for(int i = 0; i < team.getNumActives(); ++i) {
+		for(int i = 0; i < team.numActives; ++i) {
 			allDisplays[i] = add(createActiveDisplay(i)).pad(10);
 			row();
 		}
 		
-		for(int i = team.getNumActives(); i < CreatureTeam.TEAM_SIZE; ++i) {
+		for(int i = team.numActives; i < CreatureTeam.TEAM_SIZE; ++i) {
 			allDisplays[i] = add(createInactiveDisplay(i)).pad(10);
 			row();
 		}

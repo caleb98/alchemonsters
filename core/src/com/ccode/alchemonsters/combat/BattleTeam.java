@@ -6,11 +6,12 @@ import com.ccode.alchemonsters.util.DynamicVariables;
 public class BattleTeam {
 
 	public final CreatureTeam team;
-	public int numActives;
+	public final int numActives;
 	public DynamicVariables variables = new DynamicVariables();
 	
 	private BattleTeam() {
 		team = null;
+		numActives = -1;
 	}
 	
 	public BattleTeam(CreatureTeam team, int activePositions) {
@@ -24,11 +25,6 @@ public class BattleTeam {
 	
 	public Creature[] creatures() {
 		return team.creatures;
-	}
-	
-	
-	public int getNumActives() {
-		return numActives;
 	}
 	
 	public void swap(int from, int to) {

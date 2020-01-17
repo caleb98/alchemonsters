@@ -32,7 +32,6 @@ public class TeamController {
 			//this team.
 			BattleAction selected = getSelectedAction();
 			for(UnitController other : activeControllers) {
-				other.resetAvailableActions();
 				if(selected.type == BattleActionType.SWITCH) {
 					if(other != this) {
 						other.filterAvailableActions((a)->{

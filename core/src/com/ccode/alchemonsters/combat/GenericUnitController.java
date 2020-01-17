@@ -7,7 +7,7 @@ public class GenericUnitController implements UnitController {
 	
 	private ArrayList<BattleAction> allActions = new ArrayList<>();
 	private ArrayList<BattleAction> availableActions = new ArrayList<>();
-	private int selectedAction = -1; //Index of selected action in the actions list
+	private BattleAction selectedAction = null; //Index of selected action in the actions list
 	private boolean isActionSubmitted = false; 
 	
 	private int chargingMove = -1;
@@ -67,22 +67,12 @@ public class GenericUnitController implements UnitController {
 
 	@Override
 	public BattleAction getSelectedAction() {
-		if(selectedAction == -1) {
-			return null;
-		}
-		else {
-			return availableActions.get(selectedAction);
-		}
-	}
-	
-	@Override
-	public int getSelectedActionIndex() {
 		return selectedAction;
 	}
 	
 	@Override
 	public void setSelectedAction(int selectedIndex) {
-		selectedAction = selectedIndex;
+		selectedAction = availableActions.get(selectedIndex);
 	}
 
 	@Override
@@ -123,7 +113,7 @@ public class GenericUnitController implements UnitController {
 
 	@Override
 	public void refresh() {
-		selectedAction = -1;
+		selectedAction = null;
 		isActionSubmitted = false;
 	}
 	

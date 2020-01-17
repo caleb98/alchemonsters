@@ -84,7 +84,7 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 			if(team.get(teamId) != null && team.get(teamId).isDead()) {
 				boolean isSwapAvailable = false;
 				
-				for(int i = team.getNumActives(); i < CreatureTeam.TEAM_SIZE; ++i) {
+				for(int i = team.numActives; i < CreatureTeam.TEAM_SIZE; ++i) {
 					if(team.get(i) != null && !team.get(i).isDead()) {
 						isSwapAvailable = true;
 						break;

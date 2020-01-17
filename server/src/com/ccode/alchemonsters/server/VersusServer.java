@@ -98,7 +98,7 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 		}
 		
 		//Create the battle context
-		context = new BattleContext(teamA, teamB);
+		//context = new BattleContext(teamA, teamB);
 		
 		publish(new MCombatStarted(context));
 		setCombatState(CombatState.MAIN_PHASE_1);
@@ -705,17 +705,26 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 				
 				case ACTIVE_DEATH_SWAP:
 					//Run through all swap actions
-					for(int i = 0; i < teamA.getNumActives(); ++i) {
+					for(int i = 0; i < teamA.numActives; ++i) {
 						Creature creature = teamA.get(i);
 						if(creature.isDead()) {
-							doBattleAction(teamAControls[i], i, teamA, teamB);
+							//Look for an inactive, non-dead creature to swap to
+							for(int k = teamA.numActives; k < CreatureTeam.TEAM_SIZE; ++k) {
+								if(!teamA.get(k).isDead()) {
+									doBattleAction(teamAControls[i], i, teamA, teamB);
+								}
+							}
 						}
 					}
 					
-					for(int i = 0; i < teamB.getNumActives(); ++i) {
+					for(int i = 0; i < teamB.numActives; ++i) {
 						Creature creature = teamB.get(i);
 						if(creature.isDead()) {
-							doBattleAction(teamBControls[i], i, teamB, teamA);
+							for(int k = teamB.numActives; k < CreatureTeam.TEAM_SIZE; ++k) {
+								if(!teamB.get(k).isDead()) {
+									doBattleAction(teamBControls[i], i, teamB, teamA);
+								}
+							}
 						}
 					}
 					//TODO: right now, swapping after death takes us back to the main phase, but we might want to pick up somewhere else

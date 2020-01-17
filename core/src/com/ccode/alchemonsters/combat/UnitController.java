@@ -63,7 +63,6 @@ public interface UnitController {
 	public boolean isActionSubmitted();
 	public void submitAction();
 	public BattleAction getSelectedAction();
-	public int getSelectedActionIndex();
 	public void setSelectedAction(int selectedIndex);
 	
 	// ************************************* 
@@ -72,7 +71,8 @@ public interface UnitController {
 	
 	/**
 	 * Sets the move that this controller is charging
-	 * @param charging 
+	 * @param move the index of the charging move in the mon's move list
+	 * @param tar the index of the target on the opposing team
 	 */
 	public void setCharging(int move, int tar);
 	public void stopCharging();
