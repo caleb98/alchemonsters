@@ -1,7 +1,7 @@
 {
 	id: Base.Volthare
 	name: Volthare,
-	desc: "A rabbit that lives life in the fastlane, Volthare is as speedy as they come, often found racing other of its kind until it passes out due to exhaustion.",
+	desc: "A rabbit that lives life in the fastlane, Volthare is as speedy as they come, often found racing others of its kind until it passes out due to exhaustion.",
 	minBaseHealth: 10,
 	maxBaseHealth: 16,
 	minBaseMana: 22,
