@@ -1,49 +1,88 @@
 package com.ccode.alchemonsters.engine.database;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Set;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.SerializationException;
 import com.ccode.alchemonsters.creature.CreatureBase;
+import com.ccode.alchemonsters.creature.ElementType;
 
 public class CreatureDatabase {
-
-	private static final String CREATURE_DIRECTORY = "creatures";
 	
 	private static HashMap<String, CreatureBase> CREATURE_DICTIONARY;
 	private static boolean isInitialized = false;
 	
-	public static void initAndLoad() {
+	public static void initAndLoad() {		
 		CREATURE_DICTIONARY = new HashMap<String, CreatureBase>();
-		Json json = new Json();
 		
-		FileHandle loadDir = Gdx.files.internal(CREATURE_DIRECTORY);
-		for(FileHandle creatureFile : loadDir.list("creature")) {
+		try {
+			ResultSet creaturesTable = GameData.executeQuery("SELECT * FROM BaseCollection");
+			ResultSet elementTypes;
+			ResultSetMetaData meta;
 			
-			try {
-				CreatureBase base = json.fromJson(CreatureBase.class, creatureFile);
+			while(creaturesTable.next()) {
+				CreatureBase base = new CreatureBase();
 				
-				if(CREATURE_DICTIONARY.containsKey(base.id)) {
-					System.err.printf("[Error] Creature ID clash for %s! Creature %s already exists with that ID (%s)\n", 
-							base.name, 
-							CREATURE_DICTIONARY.get(base.id),
-							base.id
-					);
-					continue;
+				base.name = creaturesTable.getNString("CreatureName");
+				base.desc = creaturesTable.getNString("Description");
+				
+				base.minBaseHealth = creaturesTable.getInt("MinBaseHealth");
+				base.maxBaseHealth = creaturesTable.getInt("MaxBaseHealth");
+				
+				base.minBaseMana = creaturesTable.getInt("MinBaseMana");
+				base.maxBaseMana = creaturesTable.getInt("MaxBaseMana");
+				
+				base.baseVitae = creaturesTable.getInt("BaseVitae");
+				base.baseFocus = creaturesTable.getInt("BaseFocus");
+				base.baseMagicAtk = creaturesTable.getInt("BaseMagicAttack");
+				base.baseMagicDef = creaturesTable.getInt("BaseMagicDefense");
+				base.basePhysAtk = creaturesTable.getInt("BasePhysicalAttack");
+				base.basePhysDef = creaturesTable.getInt("BasePhysicalDefense");
+				base.basePenetration = creaturesTable.getInt("BasePenetration");
+				base.baseResistance = creaturesTable.getInt("BaseResistance");
+				base.baseSpeed = creaturesTable.getInt("BaseSpeed");
+				
+				elementTypes = GameData.executeQuery(
+						"SELECT CreatureType.CreatureID, TypeChartOne.Type AS TypeOne, TypeChartTwo.Type AS TypeTwo "
+						+ "FROM CreatureType "
+						+ "INNER JOIN TypeChart AS TypeChartOne "
+						+ "ON CreatureType.TypeOneID=TypeChartOne.ID "
+						+ "INNER JOIN TypeChart AS TypeChartTwo "
+						+ "ON CreatureType.TypeTwoID=TypeChartTwo.ID "
+						+ "WHERE CreatureID=" + creaturesTable.getInt("ID"));
+
+				int total = 0;
+				while(elementTypes.next()) {
+					if(total > 0) {
+						System.err.printf(
+								"Warning: CreatureID %s has two registered type sets.\n", 
+								creaturesTable.getInt("ID"));
+						break;
+					}
+					
+					base.types = new ElementType[]{
+							ElementType.valueOf(elementTypes.getString("TypeOne")),
+							ElementType.valueOf(elementTypes.getString("TypeTwo"))
+					};
 				}
 				
-				CREATURE_DICTIONARY.put(base.id, base);
-				System.out.printf("Creature '%s' loaded with ID %s\n", base.name, base.id);
-			} catch (SerializationException se) {
-				System.err.printf("[Error] Unable to load creature file %s! Caused by %s\n", creatureFile.name(), se.getCause());
+				if(CREATURE_DICTIONARY.containsKey(base.name)) {
+					System.err.printf("Error: Creature with name %s already present!", base.name);
+				}
+				else {
+					System.out.printf("Loaded creature base %s.\n", base.name);
+					CREATURE_DICTIONARY.put(base.name, base);
+				}
 			}
 			
+			isInitialized = true;
+		} catch (SQLException e) {
+			System.err.println("Unable to fetch creature database table.");
+			e.printStackTrace();
+			System.exit(-1);
 		}
-		
-		isInitialized = true;
 	}
 	
 	/**

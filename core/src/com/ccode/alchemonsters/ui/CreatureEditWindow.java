@@ -69,6 +69,7 @@ public class CreatureEditWindow extends Window {
 		for(String id : CreatureDatabase.getAvailableCreatureIDs()) {
 			items.add(id);
 		}
+		items.sort();
 		creatureSelectBox.setItems(items);
 		creatureSelectBox.addListener(new ChangeListener() {
 			@Override
@@ -331,7 +332,7 @@ public class CreatureEditWindow extends Window {
 		if(c != null) {
 			CreatureBase b = c.base;
 			
-			creatureSelectBox.setSelected(b.id);
+			creatureSelectBox.setSelected(b.name);
 			
 			levelSlider.setValue(c.currentLevel);
 			baseHealthSlider.setRange(b.minBaseHealth, b.maxBaseHealth);

@@ -1,5 +1,7 @@
 package com.ccode.alchemonsters.engine.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.luaj.vm2.LuaValue;
@@ -10,8 +12,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.ccode.alchemonsters.engine.ScriptManager;
 
 public class ScriptDatabase {
-
-	private static final String SCRIPT_DIRECTORY = "moves";
 	
 	private static HashMap<String, LuaValue> SCRIPT_DICTIONARY;
 	private static boolean isInitialized = false;
@@ -19,24 +19,31 @@ public class ScriptDatabase {
 	public static void initAndLoad() {
 		SCRIPT_DICTIONARY = new HashMap<String, LuaValue>();
 		
-		FileHandle loadDir = Gdx.files.internal(SCRIPT_DIRECTORY);
-		for(FileHandle luaFile : loadDir.list("lua")) {
-			try {
-				if(SCRIPT_DICTIONARY.containsKey(luaFile.nameWithoutExtension())) {
-					System.err.printf("[Error] Script ID clas for \'%s\'! Script with that name already exists.", luaFile.nameWithoutExtension());
+		try {
+			ResultSet scripts = GameData.executeQuery("SELECT * FROM MoveScripts");
+			
+			while(scripts.next()) {
+				
+				String scriptName = scripts.getString("ScriptName");
+				String scriptData = scripts.getString("ScriptData");
+				
+				if(SCRIPT_DICTIONARY.containsKey(scriptName)) {
+					System.err.printf("[Error] Script ID clas for \'%s\'! Script with that name already exists.", scriptName);
 					continue;
 				}
 				
-				String fullScript = String.format("function activate(move, context, source, sourceTeam, target, targetTeam)\n%s\nend", luaFile.readString());
+				String fullScript = String.format("function activate(move, context, source, sourceTeam, target, targetTeam)\n%s\nend", scriptData);
 				ScriptManager.GLOBAL_CONTEXT.load(fullScript).call();
 				LuaValue scriptFunction = ScriptManager.GLOBAL_CONTEXT.get("activate");
 				
-				SCRIPT_DICTIONARY.put(luaFile.nameWithoutExtension(), scriptFunction);
-				System.out.printf("Script \'%s\' loaded.\n", luaFile.nameWithoutExtension());
-			} catch (GdxRuntimeException e) {
-				System.out.printf("Error loading script file: %s", luaFile.file().getName());
-				System.out.println(e.getMessage());
+				SCRIPT_DICTIONARY.put(scriptName, scriptFunction);
+				System.out.printf("Script \'%s\' loaded.\n", scriptName);
+				
 			}
+		} catch (SQLException e) {
+			System.err.println("Error loading scripts!");
+			e.printStackTrace();
+			System.exit(-1);
 		}
 		
 		isInitialized = true;

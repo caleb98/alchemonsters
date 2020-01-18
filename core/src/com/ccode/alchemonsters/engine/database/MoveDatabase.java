@@ -1,5 +1,7 @@
 package com.ccode.alchemonsters.engine.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -8,6 +10,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.SerializationException;
 import com.ccode.alchemonsters.combat.moves.Move;
+import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveActionAilmentApplicator;
 import com.ccode.alchemonsters.combat.moves.MoveActionChance;
 import com.ccode.alchemonsters.combat.moves.MoveActionChooseRandom;
@@ -19,49 +22,66 @@ import com.ccode.alchemonsters.combat.moves.MoveActionSetGround;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetWeather;
 import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
+import com.ccode.alchemonsters.combat.moves.MoveType;
+import com.ccode.alchemonsters.combat.moves.TurnType;
+import com.ccode.alchemonsters.creature.ElementType;
 
 public class MoveDatabase {
-
-	private static final String MOVE_DIRECTORY = "moves";
 	
 	private static HashMap<String, Move> MOVE_DICTIONARY;
 	private static boolean isInitialized = false;
 	
-	public static void initAndLoad() {		
-		MOVE_DICTIONARY = new HashMap<String, Move>();
-		Json json = new Json();
-		
-		//Set up class aliases
-		json.addClassTag("Damage", MoveActionDamage.class);
-		json.addClassTag("StatModifier", MoveActionStatModifier.class);
-		json.addClassTag("AilmentApplicator", MoveActionAilmentApplicator.class);
-		json.addClassTag("Script", MoveActionScript.class);
-		json.addClassTag("Chance", MoveActionChance.class);
-		json.addClassTag("Repeat", MoveActionRepeat.class);
-		json.addClassTag("ChooseRandom", MoveActionChooseRandom.class);
-		json.addClassTag("Combine", MoveActionCombine.class);
-		json.addClassTag("SetWeather", MoveActionSetWeather.class);
-		json.addClassTag("SetTerrain", MoveActionSetTerrain.class);
-		json.addClassTag("SetGround", MoveActionSetGround.class);
-		
-		FileHandle loadDir = Gdx.files.internal(MOVE_DIRECTORY);
-		for(FileHandle moveFile : loadDir.list("move")) {
+	public static void initAndLoad() {
+		try {
+			MOVE_DICTIONARY = new HashMap<String, Move>();
+			Json json = new Json();
 			
-			try {
-				Move move = json.fromJson(Move.class, moveFile);
+			//Set up class aliases
+			json.addClassTag("Damage", MoveActionDamage.class);
+			json.addClassTag("StatModifier", MoveActionStatModifier.class);
+			json.addClassTag("AilmentApplicator", MoveActionAilmentApplicator.class);
+			json.addClassTag("Script", MoveActionScript.class);
+			json.addClassTag("Chance", MoveActionChance.class);
+			json.addClassTag("Repeat", MoveActionRepeat.class);
+			json.addClassTag("ChooseRandom", MoveActionChooseRandom.class);
+			json.addClassTag("Combine", MoveActionCombine.class);
+			json.addClassTag("SetWeather", MoveActionSetWeather.class);
+			json.addClassTag("SetTerrain", MoveActionSetTerrain.class);
+			json.addClassTag("SetGround", MoveActionSetGround.class);
+			
+			ResultSet moves = GameData.executeQuery("SELECT * FROM Moves");
+			String actionJSON;
+			
+			while(moves.next()) {
 				
-				if(MOVE_DICTIONARY.containsKey(move.name)) {
-					System.err.printf("[Error] Move ID clash for \'%s\'! Move with that name already exists.", move.name);
+				Move m = new Move();
+				
+				m.name = moves.getString("MoveName");
+				m.desc = moves.getString("Description");
+				m.accuracy = moves.getFloat("Accuracy");
+				m.manaCost = moves.getInt("ManaCost");
+				m.critStage = moves.getInt("CritStage");
+				m.elementType = ElementType.valueOf(moves.getString("ElementType"));
+				m.moveType = MoveType.valueOf(moves.getString("MoveType"));
+				
+				m.priority = moves.getInt("Priority");
+				m.turnType = TurnType.valueOf(moves.getString("TurnType"));
+				m.delayAmount = moves.getInt("DelayAmount");
+				
+				actionJSON = moves.getString("ActionData");
+				m.actions = json.fromJson(MoveAction[].class, actionJSON);
+				
+				if(MOVE_DICTIONARY.containsKey(m.name)) {
+					System.err.printf("[Error] Move ID clash for \'%s\'! Move with that name already exists.", m.name);
 					continue;
 				}
 				
-				MOVE_DICTIONARY.put(move.name, move);
-				System.out.printf("Move \'%s\' loaded.\n", move.name);
-			} catch (SerializationException se) {
-				System.err.printf("[Error] Unable to load move file %s! Caused by %s\n", moveFile.name(), se.getCause());
-				se.printStackTrace(System.err);
+				MOVE_DICTIONARY.put(m.name, m);
+				System.out.printf("Move \'%s\' loaded.\n", m.name);
+				
 			}
-			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		
 		isInitialized = true;

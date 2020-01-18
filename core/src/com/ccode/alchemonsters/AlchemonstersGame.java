@@ -9,16 +9,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ccode.alchemonsters.engine.ProcessManager;
 import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.CreatureDatabase;
+import com.ccode.alchemonsters.engine.database.GameData;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.database.ScriptDatabase;
 import com.ccode.alchemonsters.engine.database.StatCalculators;
 import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
-import com.ccode.alchemonsters.engine.event.EventManager;
 
 public class AlchemonstersGame extends Game {
 	
@@ -52,7 +51,10 @@ public class AlchemonstersGame extends Game {
 		//Init the Process Manager
 		processManager = new ProcessManager();
 		
-		//Init script manager
+		//Connect to game database
+		GameData.initAndLoad();
+		
+		//Init script systems
 		ScriptManager.init();
 		ScriptDatabase.initAndLoad();
 		
