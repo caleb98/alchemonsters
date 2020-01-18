@@ -17,6 +17,8 @@ public class GameData {
 	
 	public static void initAndLoad() {		
 		try {
+			Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+			
 			String dbURL = "jdbc:ucanaccess://" + GAME_DATA_DIR;
 			
 			connection = DriverManager.getConnection(dbURL);
@@ -25,6 +27,9 @@ public class GameData {
 			System.err.println("Unable to load game data database.");
 			e.printStackTrace();
 			System.exit(-1);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		isInitialized = true;
