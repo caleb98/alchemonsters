@@ -195,6 +195,8 @@ public class CreatureEditWindow extends Window {
 					Array<String> items = movesActiveList.getItems();
 					items.removeIndex(movesActiveList.getSelectedIndex());
 					movesActiveList.setItems(items);
+					movesPane.invalidate();
+					movesActiveList.invalidate();
 				}
 			}
 		});
@@ -204,15 +206,47 @@ public class CreatureEditWindow extends Window {
 			public void clicked(InputEvent event, float x, float y) {
 				moveSelectWindow.setVisible(true);
 				moveSelectWindow.toFront();
+				movesPane.invalidate();
+				movesActiveList.invalidate();
 			}
 		});
+		TextButton clearButton = new TextButton("Clear", UI.DEFAULT_SKIN);
+		clearButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				movesActiveList.clearItems();
+				movesPane.invalidate();
+				movesActiveList.invalidate();
+			}
+		});
+		TextButton randomButton = new TextButton("Random", UI.DEFAULT_SKIN);
+		randomButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				String[] allMoves = MoveDatabase.getLoadedMoveNames().toArray(new String[]{});
+				if(movesActiveList.getItems().size >= allMoves.length) {
+					return;
+				}
+				String added = "";
+				do {
+					added = allMoves[GameRandom.nextInt(allMoves.length)];
+				} while(movesActiveList.getItems().contains(added, false));
+				movesActiveList.getItems().add(added);
+				movesPane.invalidate();
+				movesActiveList.invalidate();
+			}
+		});
+		moveButtons.add(clearButton);
+		moveButtons.row();
 		moveButtons.add(removeButton);
 		moveButtons.row();
 		moveButtons.add(addButton);
+		moveButtons.row();
+		moveButtons.add(randomButton);
 		
 		add(movesLabel);
 		row();
-		add(movesPane).prefHeight(100).prefWidth(Value.percentWidth(1f));
+		add(movesPane).fill().expand();
 		add(moveButtons);
 		row();
 		
@@ -265,8 +299,8 @@ public class CreatureEditWindow extends Window {
 			}
 		});
 		
-		TextButton addRandom = new TextButton("Add Random LVL 1", UI.DEFAULT_SKIN);
-		addRandom.addListener(new ClickListener() {
+		TextButton addRandomOne = new TextButton("Add Random LVL 1", UI.DEFAULT_SKIN);
+		addRandomOne.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				String[] ids = CreatureDatabase.getAvailableCreatureIDs().toArray(new String[]{});
@@ -275,7 +309,20 @@ public class CreatureEditWindow extends Window {
 			}
 		});
 		
-		add(editCancel, acceptButton, addRandom);
+		TextButton addRandomHundred = new TextButton("Add Random LVL 100", UI.DEFAULT_SKIN);
+		addRandomHundred.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				String[] ids = CreatureDatabase.getAvailableCreatureIDs().toArray(new String[]{});
+				editedCreature = CreatureFactory.generateRandomLevelOne(ids[GameRandom.nextInt(ids.length)]);
+				editedCreature.currentLevel = 100;
+				levelSlider.setValue(100);
+				levelDisplay.setText(100);
+				show(editedCreature);
+			}
+		});
+		
+		add(editCancel, acceptButton, addRandomOne, addRandomHundred);
 		
 		pack();
 		

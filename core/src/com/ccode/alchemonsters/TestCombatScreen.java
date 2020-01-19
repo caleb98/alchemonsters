@@ -1,9 +1,5 @@
 package com.ccode.alchemonsters;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -16,38 +12,24 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.ccode.alchemonsters.combat.BattleAction;
-import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
-import com.ccode.alchemonsters.combat.CombatState;
-import com.ccode.alchemonsters.combat.CreatureTeam;
-import com.ccode.alchemonsters.combat.TerrainType;
-import com.ccode.alchemonsters.combat.TeamController;
 import com.ccode.alchemonsters.combat.BiomeType;
-import com.ccode.alchemonsters.combat.UnitController;
+import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.TeamController;
+import com.ccode.alchemonsters.combat.TerrainType;
 import com.ccode.alchemonsters.combat.WeatherType;
-import com.ccode.alchemonsters.combat.moves.Move;
-import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.creature.Creature;
-import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.GameScreen;
 import com.ccode.alchemonsters.engine.UI;
-import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.event.Message;
-import com.ccode.alchemonsters.engine.event.Publisher;
 import com.ccode.alchemonsters.engine.event.Subscriber;
-import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
-import com.ccode.alchemonsters.engine.event.messages.MCombatChargeStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
-import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 import com.ccode.alchemonsters.ui.CombatLog;
 import com.ccode.alchemonsters.ui.TeamBuilderWindow;
 import com.ccode.alchemonsters.ui.TeamCombatDisplayController;
-import com.ccode.alchemonsters.util.GameRandom;
-import com.ccode.alchemonsters.util.Triple;
 
 public class TestCombatScreen extends GameScreen implements InputProcessor, Screen, Subscriber {
 	
