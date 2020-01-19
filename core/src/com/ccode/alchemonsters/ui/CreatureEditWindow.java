@@ -1,5 +1,6 @@
 package com.ccode.alchemonsters.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -15,7 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.CreatureBase;
 import com.ccode.alchemonsters.creature.CreatureFactory;
@@ -333,6 +336,25 @@ public class CreatureEditWindow extends Window {
 		Label loadedMoves = new Label("Loaded Moves", UI.DEFAULT_SKIN);
 		movesAvailableList = new List<>(UI.DEFAULT_SKIN);
 		movesAvailableList.setItems(MoveDatabase.getLoadedMoveNames().toArray(new String[]{}));
+		movesAvailableList.addListener(new ClickListener() {
+			
+			long prevClickTime = TimeUtils.millis();
+			
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				long current = TimeUtils.millis();
+				if(current - prevClickTime < 300 && movesAvailableList.getSelected() != null) {
+					String toAdd = movesAvailableList.getSelected();
+					if(!movesActiveList.getItems().contains(toAdd, true)) {
+						Array<String> items = movesActiveList.getItems();
+						items.add(toAdd);
+						movesActiveList.setItems(items);
+						moveSelectWindow.setVisible(false);
+					}
+				}
+				prevClickTime = current;
+			}
+		});
 		ScrollPane movesSelect = new ScrollPane(movesAvailableList, UI.DEFAULT_SKIN);
 		movesSelect.setScrollbarsVisible(true);
 		movesSelect.setFadeScrollBars(false);
@@ -369,6 +391,12 @@ public class CreatureEditWindow extends Window {
 		
 		moveSelectWindow.pack();
 		ui.addActor(moveSelectWindow);
+		
+		moveSelectWindow.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center);
+		moveSelectWindow.setPosition(Math.round(moveSelectWindow.getX()), Math.round(moveSelectWindow.getY()));
+	
+		setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center);
+		setPosition(Math.round(getX()), Math.round(getY()));
 		
 		//Quick fix to update the default baseMana and baseHealth slider ranges
 		creatureSelectBox.setSelectedIndex(1);
