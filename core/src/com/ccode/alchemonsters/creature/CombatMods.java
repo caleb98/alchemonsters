@@ -76,84 +76,80 @@ public class CombatMods {
 		}
 	}
 	
-	public void addMagicAtkBuff(byte amt) {
+	public void addMagicAtkMod(byte amt) {
 		magicAtk += amt;
 		if(magicAtk > MAX_BUFF_AMOUNT) magicAtk = MAX_BUFF_AMOUNT;
 		if(magicAtk < -MAX_BUFF_AMOUNT) magicAtk = -MAX_BUFF_AMOUNT;
 	}
 	
-	public void addMagicDefBuff(byte amt) {
+	public void addMagicDefMod(byte amt) {
 		magicDef += amt;
 		if(magicDef > MAX_BUFF_AMOUNT) magicDef = MAX_BUFF_AMOUNT;
 		if(magicDef < -MAX_BUFF_AMOUNT) magicDef = -MAX_BUFF_AMOUNT;
 	}
 	
-	public void addPhysAtkBuff(byte amt) {
+	public void addPhysAtkMod(byte amt) {
 		physAtk += amt;
 		if(physAtk > MAX_BUFF_AMOUNT) physAtk = MAX_BUFF_AMOUNT;
 		if(physAtk < -MAX_BUFF_AMOUNT) physAtk = -MAX_BUFF_AMOUNT;
 	}
 	
-	public void addPhysDefBuff(byte amt) {
+	public void addPhysDefMod(byte amt) {
 		physDef += amt;
 		if(physDef > MAX_BUFF_AMOUNT) physDef = MAX_BUFF_AMOUNT;
 		if(physDef < -MAX_BUFF_AMOUNT) physDef= -MAX_BUFF_AMOUNT;
 	}
 	
-	public void addPenBuff(byte amt) {
+	public void addPenMod(byte amt) {
 		penetration += amt;
 		if(penetration > MAX_BUFF_AMOUNT) penetration = MAX_BUFF_AMOUNT;
 		if(penetration < -MAX_BUFF_AMOUNT) penetration = -MAX_BUFF_AMOUNT;
 	}
 	
-	public void addResBuff(byte amt) {
+	public void addResMod(byte amt) {
 		resistance += amt;
 		if(resistance > MAX_BUFF_AMOUNT) resistance = MAX_BUFF_AMOUNT;
 		if(resistance < -MAX_BUFF_AMOUNT) resistance= -MAX_BUFF_AMOUNT;
 	}
 	
-	public void addSpeedBuff(byte amt) {
+	public void addSpeedMod(byte amt) {
 		speed += amt;
 		if(speed > MAX_BUFF_AMOUNT) speed = MAX_BUFF_AMOUNT;
 		if(speed < -MAX_BUFF_AMOUNT) speed = -MAX_BUFF_AMOUNT;
 	}
 	
-	public void addBuff(byte amt, StatType stat) {
+	public void addMod(byte amt, StatType stat) {
 		switch(stat) {
-		
-		case FOCUS:
-			//TODO: log error
-			break;
 			
 		case MAGIC_ATK:
-			addMagicAtkBuff(amt);
+			addMagicAtkMod(amt);
 			break;
 			
 		case MAGIC_DEF:
-			addMagicDefBuff(amt);
+			addMagicDefMod(amt);
 			break;
 			
 		case PHYS_ATK:
-			addPhysAtkBuff(amt);
+			addPhysAtkMod(amt);
 			break;
 			
 		case PHYS_DEF:
-			addPhysDefBuff(amt);
+			addPhysDefMod(amt);
 			break;
 			
 		case PENETRATION:
-			addPenBuff(amt);
+			addPenMod(amt);
 			break;
 			
 		case RESISTANCE:
-			addResBuff(amt);
+			addResMod(amt);
 			break;
 			
 		case SPEED:
-			addSpeedBuff(amt);
+			addSpeedMod(amt);
 			break;
 			
-		case VITAE:
+		default:
 			//TODO: log error
 			break;
 		

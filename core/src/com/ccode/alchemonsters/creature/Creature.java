@@ -145,7 +145,7 @@ public class Creature {
 	//effects
 	public ArrayList<Effect> activeEffects = new ArrayList<>();
 
-	public CombatMods buffs = new CombatMods();
+	public CombatMods mods = new CombatMods();
 	public StatusAilment currentAilment;
 	
 	public DynamicVariables variables = new DynamicVariables(); 

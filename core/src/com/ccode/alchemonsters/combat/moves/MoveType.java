@@ -4,5 +4,6 @@ public enum MoveType {
 
 	MAGIC,
 	PHYSICAL,
+	NEUTRAL, 
 	
 }

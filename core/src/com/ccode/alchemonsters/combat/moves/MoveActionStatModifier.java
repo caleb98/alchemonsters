@@ -26,7 +26,7 @@ public class MoveActionStatModifier implements MoveAction {
 		switch(this.target) {
 		
 		case OPPONENT:
-			target.buffs.addBuff(amount, stat);
+			target.mods.addMod(amount, stat);
 			publish(new MCombatStatBuffApplied(context, source, target, move, stat, amount));
 			break;
 			
@@ -34,7 +34,7 @@ public class MoveActionStatModifier implements MoveAction {
 			break;
 			
 		case SELF:
-			source.buffs.addBuff(amount, stat);
+			source.mods.addMod(amount, stat);
 			publish(new MCombatStatBuffApplied(context, source, source, move, stat, amount));
 			break;
 			

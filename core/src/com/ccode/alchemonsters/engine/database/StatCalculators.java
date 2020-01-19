@@ -73,7 +73,7 @@ public class StatCalculators {
 					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseMagicAtk - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							c.magicAtkAttunement + 
 							c.magicAtkLearned) 
-					* c.magicAtkIncreases * c.magicAtkEffectiveness * c.buffs.getMagicAtkMultiplier());
+					* c.magicAtkIncreases * c.magicAtkEffectiveness * c.mods.getMagicAtkMultiplier());
 			
 			if(c.nature.increased == StatType.MAGIC_ATK) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -89,7 +89,7 @@ public class StatCalculators {
 					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseMagicDef - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.magicDefAttunement * c.currentLevel / 100f) + 
 							(c.magicDefLearned * c.currentLevel / 100f)) 
-					* c.magicDefIncreases * c.magicDefEffectiveness * c.buffs.getMagicDefMultiplier());
+					* c.magicDefIncreases * c.magicDefEffectiveness * c.mods.getMagicDefMultiplier());
 			
 			if(c.nature.increased == StatType.MAGIC_DEF) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -105,7 +105,7 @@ public class StatCalculators {
 					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.basePhysAtk - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.physAtkAttunement * c.currentLevel / 100f) + 
 							(c.physAtkLearned * c.currentLevel / 100f)) 
-					* c.physAtkIncreases * c.physAtkEffectiveness * c.buffs.getPhysAtkMultiplier());
+					* c.physAtkIncreases * c.physAtkEffectiveness * c.mods.getPhysAtkMultiplier());
 			
 			if(c.nature.increased == StatType.PHYS_ATK) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -121,7 +121,7 @@ public class StatCalculators {
 					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.basePhysDef - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.physDefAttunement * c.currentLevel / 100f) + 
 							(c.physDefLearned * c.currentLevel / 100f)) 
-					* c.physDefIncreases * c.physDefEffectiveness * c.buffs.getPhysDefMultiplier());
+					* c.physDefIncreases * c.physDefEffectiveness * c.mods.getPhysDefMultiplier());
 			 
 			if(c.nature.increased == StatType.PHYS_DEF) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -137,7 +137,7 @@ public class StatCalculators {
 					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseSpeed - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.speedAttunement * c.currentLevel / 100f) + 
 							(c.speedLearned * c.currentLevel / 100f)) 
-					* c.speedIncreases * c.speedEffectiveness * c.buffs.getSpeedMultiplier());
+					* c.speedIncreases * c.speedEffectiveness * c.mods.getSpeedMultiplier());
 			
 			if(c.nature.increased == StatType.SPEED) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -153,7 +153,7 @@ public class StatCalculators {
 					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.basePenetration - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.penAttunement  * c.currentLevel / 100f) + 
 							(c.penLearned * c.currentLevel / 100f)) 
-					* c.penIncreases * c.penEffectiveness * c.buffs.getPenMultiplier());
+					* c.penIncreases * c.penEffectiveness * c.mods.getPenMultiplier());
 			
 			if(c.nature.increased == StatType.PENETRATION) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -169,7 +169,7 @@ public class StatCalculators {
 					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseResistance - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.resAttunement * c.currentLevel / 100f) + 
 							(c.resLearned * c.currentLevel / 100f)) 
-					* c.resIncreases * c.resEffectiveness * c.buffs.getResMultiplier());
+					* c.resIncreases * c.resEffectiveness * c.mods.getResMultiplier());
 			
 			if(c.nature.increased == StatType.RESISTANCE) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;

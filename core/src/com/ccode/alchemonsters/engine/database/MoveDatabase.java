@@ -18,8 +18,8 @@ import com.ccode.alchemonsters.combat.moves.MoveActionCombine;
 import com.ccode.alchemonsters.combat.moves.MoveActionDamage;
 import com.ccode.alchemonsters.combat.moves.MoveActionRepeat;
 import com.ccode.alchemonsters.combat.moves.MoveActionScript;
-import com.ccode.alchemonsters.combat.moves.MoveActionSetGround;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
+import com.ccode.alchemonsters.combat.moves.MoveActionSetBiome;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetWeather;
 import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
 import com.ccode.alchemonsters.combat.moves.MoveType;
@@ -46,8 +46,8 @@ public class MoveDatabase {
 			json.addClassTag("ChooseRandom", MoveActionChooseRandom.class);
 			json.addClassTag("Combine", MoveActionCombine.class);
 			json.addClassTag("SetWeather", MoveActionSetWeather.class);
+			json.addClassTag("SetBiome", MoveActionSetBiome.class);
 			json.addClassTag("SetTerrain", MoveActionSetTerrain.class);
-			json.addClassTag("SetGround", MoveActionSetGround.class);
 			
 			ResultSet moves = GameData.executeQuery("SELECT * FROM Moves");
 			String actionJSON;
