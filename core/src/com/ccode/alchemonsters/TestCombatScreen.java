@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -21,7 +22,13 @@ import com.ccode.alchemonsters.combat.TerrainType;
 import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.GameScreen;
+import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.UI;
+import com.ccode.alchemonsters.engine.database.CreatureDatabase;
+import com.ccode.alchemonsters.engine.database.GameData;
+import com.ccode.alchemonsters.engine.database.MoveDatabase;
+import com.ccode.alchemonsters.engine.database.ScriptDatabase;
+import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Subscriber;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
@@ -277,7 +284,19 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	
 	@Override
 	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
+		switch(keycode) {
+		
+		case Keys.F5:
+			GameData.initAndLoad();
+			ScriptManager.init();
+			ScriptDatabase.initAndLoad();
+			CreatureDatabase.initAndLoad();
+			MoveDatabase.initAndLoad();
+			
+			game.setScreen(new MainMenuScreen(game));
+			return true;
+				
+		}
 		return false;
 	}
 
