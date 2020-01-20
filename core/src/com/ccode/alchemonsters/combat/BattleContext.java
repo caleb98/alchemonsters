@@ -320,6 +320,8 @@ public class BattleContext implements Publisher {
 		for(int moveIndex = 0; moveIndex < creature.moves.length; ++moveIndex) {
 			Move move = MoveDatabase.getMove(creature.moves[moveIndex]);
 			
+			BattleTeam enemyTeam;
+			
 			switch(move.targetSelectType) {
 				
 			case NONE:
@@ -341,7 +343,7 @@ public class BattleContext implements Publisher {
 				break;
 				
 			case SINGLE_OPPONENT:
-				BattleTeam enemyTeam = (team == teamA) ? teamB : teamA;
+				enemyTeam = (team == teamA) ? teamB : teamA;
 				for(int teamIndex = 0; teamIndex < enemyTeam.numActives; ++teamIndex) {
 					if(!(team.get(teamIndex) == null) && !enemyTeam.get(teamIndex).isDead()) {
 						actions.add(new BattleAction(BattleActionType.MOVE, teamIndex, moveIndex));

@@ -7,6 +7,6 @@ import com.ccode.alchemonsters.engine.event.Publisher;
 
 public interface MoveAction extends Publisher {
 	
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam);
+	public void activate(Move move, BattleContext context, Creature caster, BattleTeam casterTeam, Creature target, BattleTeam opponentTeam);
 	
 }

@@ -11,7 +11,7 @@ public class MoveActionAilmentApplicator implements MoveAction {
 	/**
 	 * The target of this move action.
 	 */
-	public MoveTarget target;
+	public MoveActionTarget target;
 	/**
 	 * The name of the ailment to apply.
 	 */
@@ -22,9 +22,27 @@ public class MoveActionAilmentApplicator implements MoveAction {
 	public float chance = 1f;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		if(!(GameRandom.nextFloat() <= chance)) {
 			return;
+		}
+		
+		//TODO: proper ailment application
+		switch(this.target) {
+		
+		case TARGET:
+			
+			break;
+			
+		case OPPONENT_TEAM:
+			break;
+			
+		case SELF:
+			break;
+			
+		case SELF_TEAM:
+			break;
+		
 		}
 		
 		if(target.currentAilment != null) {

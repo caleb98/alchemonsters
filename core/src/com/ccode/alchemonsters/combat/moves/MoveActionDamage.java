@@ -1,5 +1,6 @@
 package com.ccode.alchemonsters.combat.moves;
 
+import com.badlogic.gdx.utils.reflect.Field;
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.WeatherType;
@@ -16,14 +17,14 @@ public class MoveActionDamage implements MoveAction {
 	/**
 	 * The target of the damage.
 	 */
-	public MoveTarget target;
+	public MoveActionTarget target;
 	/**
 	 * The strength of the damage. (Not equal to actual damage amount!)
 	 */
 	public int power;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		
 		//Check accuracy/hit chance
 		boolean isHit = move.rollHit(context, source, target);
@@ -37,14 +38,20 @@ public class MoveActionDamage implements MoveAction {
 		if(isHit) {
 			switch(this.target) {
 			
-			case OPPONENT:
+			case TARGET:
 				damage = getDamageAgainst(move, context, source, target, power, isCrit, isStab);
 				target.modifyHealth(-damage);
 				publish(new MCombatDamageDealt(context, source, target, move.name, move.elementType, damage, isHit, isCrit, false));
 				break;
 				
 			case OPPONENT_TEAM:
-				//TODO: team damage
+				Creature opp;
+				for(int i = 0; i < opponentTeam.numActives; ++i) {
+					opp = opponentTeam.get(i);
+					damage = getDamageAgainst(move, context, source, opp, power, isCrit, isStab);
+					opp.modifyHealth(-damage);
+					publish(new MCombatDamageDealt(context, source, opp, move.name, move.elementType, damage, isHit, isCrit, false));
+				}
 				break;
 				
 			case SELF:
@@ -54,7 +61,13 @@ public class MoveActionDamage implements MoveAction {
 				break;
 				
 			case SELF_TEAM:
-				//TODO: self team damage
+				Creature friendly;
+				for(int i = 0; i < sourceTeam.numActives; ++i) {
+					friendly = sourceTeam.get(i);
+					damage = getDamageAgainst(move, context, source, friendly, power, isCrit, isStab);
+					friendly.modifyHealth(-damage);
+					publish(new MCombatDamageDealt(context, source, friendly, move.name, move.elementType, damage, isHit, isCrit, false));
+				}
 				break;
 			
 			}

@@ -8,6 +8,7 @@ public enum MoveTargetSelectType {
 	SINGLE_OPPONENT,
 	/**
 	 * For moves that select the entire enemy team as a target.
+	 * These moves may not have a move action that requires a MoveTarget.
 	 */
 	OPPONENT_TEAM,
 	/**
@@ -16,6 +17,7 @@ public enum MoveTargetSelectType {
 	SINGLE_FRIENDLY,
 	/**
 	 * For moves that select the entire friendly team as a target.
+	 * These moves may not have a move action that requires a MoveTarget.
 	 */
 	FRIENDLY_TEAM,
 	/**
@@ -23,7 +25,8 @@ public enum MoveTargetSelectType {
 	 */
 	SELF,
 	/**
-	 * For moves that have no target (they only affect the battlefield)
+	 * For moves that have no target (they only affect the battlefield).
+	 * These moves may not have a move action that requires a MoveTarget.
 	 */
 	NONE,
 	

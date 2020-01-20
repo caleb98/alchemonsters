@@ -6,10 +6,10 @@ import com.ccode.alchemonsters.creature.Creature;
 
 public class MoveActionAilmentRemoval implements MoveAction {
 
-	private MoveTarget target;
+	public MoveActionTarget target;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		//TODO: ailment removal!
 	}
 

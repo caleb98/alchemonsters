@@ -12,9 +12,9 @@ public class MoveActionCombine implements MoveAction {
 	public MoveAction[] actions;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		for(MoveAction a : actions) {
-			a.activate(move, context, source, sourceTeam, target, targetTeam);
+			a.activate(move, context, source, sourceTeam, target, opponentTeam);
 		}
 	}
 	

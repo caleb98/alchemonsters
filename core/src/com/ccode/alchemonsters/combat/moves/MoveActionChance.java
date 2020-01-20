@@ -17,9 +17,9 @@ public class MoveActionChance implements MoveAction {
 	public float chance;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		if(GameRandom.nextFloat() < chance) {
-			action.activate(move, context, source, sourceTeam, target, targetTeam);
+			action.activate(move, context, source, sourceTeam, target, opponentTeam);
 		}
 	}
 	

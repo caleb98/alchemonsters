@@ -5,23 +5,22 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Set;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.SerializationException;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveActionAilmentApplicator;
+import com.ccode.alchemonsters.combat.moves.MoveActionAilmentRemoval;
 import com.ccode.alchemonsters.combat.moves.MoveActionChance;
 import com.ccode.alchemonsters.combat.moves.MoveActionChooseRandom;
 import com.ccode.alchemonsters.combat.moves.MoveActionCombine;
 import com.ccode.alchemonsters.combat.moves.MoveActionDamage;
 import com.ccode.alchemonsters.combat.moves.MoveActionRepeat;
 import com.ccode.alchemonsters.combat.moves.MoveActionScript;
-import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetBiome;
+import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetWeather;
 import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
+import com.ccode.alchemonsters.combat.moves.MoveActionTarget;
 import com.ccode.alchemonsters.combat.moves.MoveTargetSelectType;
 import com.ccode.alchemonsters.combat.moves.MoveType;
 import com.ccode.alchemonsters.combat.moves.TurnType;
@@ -78,8 +77,115 @@ public class MoveDatabase {
 					continue;
 				}
 				
-				MOVE_DICTIONARY.put(m.name, m);
-				System.out.printf("Move \'%s\' loaded.\n", m.name);
+				boolean isInvalid = false;
+				
+				switch(m.targetSelectType) {
+				
+				case FRIENDLY_TEAM:
+					for(MoveAction a : m.actions) {
+						if(a instanceof MoveActionAilmentApplicator) {
+							if(((MoveActionAilmentApplicator) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionAilmentRemoval) {
+							if(((MoveActionAilmentRemoval) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionDamage) {
+							if(((MoveActionDamage) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionStatModifier) {
+							if(((MoveActionStatModifier) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						
+						if(isInvalid) {
+							System.err.printf(
+									"Unable to add move %s: "
+									+ "Invalid combination of FRIENDLY_TEAM TargetSelectType and "
+									+ "MoveAction containing TARGET MoveActionTarget.\n", m.name);
+						}
+					}
+					break;
+					
+				case NONE:
+					for(MoveAction a : m.actions) {						
+						if(a instanceof MoveActionAilmentApplicator) {
+							if(((MoveActionAilmentApplicator) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionAilmentRemoval) {
+							if(((MoveActionAilmentRemoval) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionDamage) {
+							if(((MoveActionDamage) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionStatModifier) {
+							if(((MoveActionStatModifier) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						
+						if(isInvalid) {
+							System.err.printf(
+									"Unable to add move %s: "
+									+ "Invalid combination of NONE TargetSelectType and "
+									+ "MoveAction containing TARGET MoveActionTarget\n", m.name);
+						}
+					}
+					break;
+					
+				case OPPONENT_TEAM:
+					for(MoveAction a : m.actions) {						
+						if(a instanceof MoveActionAilmentApplicator) {
+							if(((MoveActionAilmentApplicator) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionAilmentRemoval) {
+							if(((MoveActionAilmentRemoval) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionDamage) {
+							if(((MoveActionDamage) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						else if(a instanceof MoveActionStatModifier) {
+							if(((MoveActionStatModifier) a).target == MoveActionTarget.TARGET) {
+								isInvalid = true;
+							}
+						}
+						
+						if(isInvalid) {
+							System.err.printf(
+									"Unable to add move %s: "
+									+ "Invalid combination of OPPONENT_TEAM TargetSelectType and "
+									+ "MoveAction containing TARGET MoveActionTarget\n", m.name);
+						}
+					}
+					break;
+					
+				default:
+					break;
+				
+				}
+				
+				if(!isInvalid) {
+					MOVE_DICTIONARY.put(m.name, m);
+					System.out.printf("Move \'%s\' loaded.\n", m.name);
+				}
 				
 			}
 		} catch (SQLException e) {

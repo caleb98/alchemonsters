@@ -151,10 +151,18 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 						break;
 						
 					case SINGLE_FRIENDLY:
+						stringVer.add(
+								String.format(
+										"Use move %s [%s mana] (friendly: %s)", 
+										team.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost, 
+										a.targetPos));
+						break;
+						
 					case SINGLE_OPPONENT:
 						stringVer.add(
 								String.format(
-										"Use move %s [%s mana] (target: %s)", 
+										"Use move %s [%s mana] (enemy: %s)", 
 										team.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
 										a.targetPos));
