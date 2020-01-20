@@ -11,6 +11,13 @@ public class BattleAction implements Comparable<BattleAction> {
 	
 	public final BattleActionType type;
 	public final int targetPos;
+	/**
+	 * Represents various values depending on the BattleActionType of this action.
+	 * For switch: the index of the creature to switch to in the team.
+	 * For use: the index of the item to be used in the inventory.
+	 * For wait: always -1
+	 * For move: the index of the move to use in the attacker's move array
+	 */
 	public final int id;
 
 	private BattleAction() {

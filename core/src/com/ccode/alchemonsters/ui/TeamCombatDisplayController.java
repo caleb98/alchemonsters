@@ -60,9 +60,11 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 			submitButton.addListener(new ClickListener() {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
-					activeControllers[teamId].setSelectedAction(actionStrings.getSelectedIndex());
-					activeControllers[teamId].submitAction();
-					TeamCombatDisplayController.this.updateStrings();
+					if(actionStrings.getSelectedIndex() >= 0) {
+						activeControllers[teamId].setSelectedAction(actionStrings.getSelectedIndex());
+						activeControllers[teamId].submitAction();
+						TeamCombatDisplayController.this.updateStrings();
+					}
 				}
 			});
 			
@@ -110,7 +112,55 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 						stringVer.add("Continue charging " + moveName);
 						break;
 					}
-					stringVer.add(String.format("Use move %s [%s mana] (target: %s)", team.get(teamId).moves[a.id], MoveDatabase.getMove(moveName).manaCost, a.targetPos));
+					switch(MoveDatabase.getMove(team.get(teamId).moves[a.id]).targetSelectType) {
+					
+					case NONE:
+						stringVer.add(
+								String.format(
+										"Use move %s [%s mana] (no target)", 
+										team.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost, 
+										a.targetPos));
+						break;
+						
+					case FRIENDLY_TEAM:
+						stringVer.add(
+								String.format(
+										"Use move %s [%s mana] (friendly team)", 
+										team.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost, 
+										a.targetPos));
+						break;
+						
+					case OPPONENT_TEAM:
+						stringVer.add(
+								String.format(
+										"Use move %s [%s mana] (opponent team)", 
+										team.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost, 
+										a.targetPos));
+						break;
+						
+					case SELF:
+						stringVer.add(
+								String.format(
+										"Use move %s [%s mana] (self)", 
+										team.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost, 
+										a.targetPos));
+						break;
+						
+					case SINGLE_FRIENDLY:
+					case SINGLE_OPPONENT:
+						stringVer.add(
+								String.format(
+										"Use move %s [%s mana] (target: %s)", 
+										team.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost, 
+										a.targetPos));
+						break;				
+					
+					}
 					break;
 					
 				case SWITCH:

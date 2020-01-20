@@ -30,6 +30,7 @@ public class Move {
 	public ElementType elementType;
 	public MoveType moveType;
 	public MoveAction[] actions;
+	public MoveTargetSelectType targetSelectType;
 
 	public int priority;
 	public TurnType turnType;
@@ -37,6 +38,7 @@ public class Move {
 	
 	public boolean rollHit(BattleContext context, Creature source, Creature target) {
 		float accuracy = this.accuracy;
+		
 		//TODO: globalize variables related to deluge accuracy increase 
 		if(context.battleground.weather == WeatherType.DELUGE && elementType == ElementType.LIGHTNING) {
 			accuracy += 0.2f;

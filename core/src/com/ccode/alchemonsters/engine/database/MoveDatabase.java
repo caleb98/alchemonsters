@@ -22,6 +22,7 @@ import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetBiome;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetWeather;
 import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
+import com.ccode.alchemonsters.combat.moves.MoveTargetSelectType;
 import com.ccode.alchemonsters.combat.moves.MoveType;
 import com.ccode.alchemonsters.combat.moves.TurnType;
 import com.ccode.alchemonsters.creature.ElementType;
@@ -63,6 +64,7 @@ public class MoveDatabase {
 				m.critStage = moves.getInt("CritStage");
 				m.elementType = ElementType.valueOf(moves.getString("ElementType"));
 				m.moveType = MoveType.valueOf(moves.getString("MoveType"));
+				m.targetSelectType = MoveTargetSelectType.valueOf(moves.getString("TargetSelectType"));
 				
 				m.priority = moves.getInt("Priority");
 				m.turnType = TurnType.valueOf(moves.getString("TurnType"));
