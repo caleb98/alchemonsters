@@ -25,11 +25,11 @@ public class MoveActionRepeat implements MoveAction {
 	public float repeatChance = 1f;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
-		action.activate(move, context, source, sourceTeam, target, targetTeam);
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
+		action.activate(move, context, source, sourceTeam, target, opponentTeam);
 		for(int i = 1; i < repeatTimes; ++i) {
 			if(GameRandom.nextFloat() < repeatChance) {
-				action.activate(move, context, source, sourceTeam, target, targetTeam);
+				action.activate(move, context, source, sourceTeam, target, opponentTeam);
 			}
 			else {
 				return;

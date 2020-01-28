@@ -152,7 +152,24 @@ public class BattleContext implements Publisher {
 				}
 			case INSTANT:
 				for(MoveAction a : move.actions) {
-					a.activate(move, this, team.get(activePos), team, other.get(action.targetPos), other);
+					switch(move.targetSelectType) {
+					
+					case NONE:
+					case FRIENDLY_TEAM:
+					case OPPONENT_TEAM:
+						a.activate(move, this, team.get(activePos), team, null, other);
+						break;
+						
+					case SELF:
+					case SINGLE_FRIENDLY:
+						a.activate(move, this, team.get(activePos), team, team.get(action.targetPos), other);
+						break;
+						
+					case SINGLE_OPPONENT:
+						a.activate(move, this, team.get(activePos), team, other.get(action.targetPos), other);
+						break;
+					
+					}
 				}
 				team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
 				break;
@@ -299,21 +316,43 @@ public class BattleContext implements Publisher {
 			}
 		}
 		
-		//Add moves targeting each of the enemies
-		BattleTeam enemyTeam = (team == teamA) ? teamB : teamA;
-		for(int tar = 0; tar < enemyTeam.numActives; ++tar) {
-			//This target is dead, so dont allow targeting it
-			if(enemyTeam.get(tar) == null || enemyTeam.get(tar).isDead()) {
-				continue;
-			}
-			for(int i = 0; i < creature.moves.length; ++i) {
-				Move move = MoveDatabase.getMove(creature.moves[i]);
-				if(creature.currentMana >= move.manaCost) {
-					actions.add(new BattleAction(BattleActionType.MOVE, tar, i));
+		//Loop through all the moves and add their actions
+		for(int moveIndex = 0; moveIndex < creature.moves.length; ++moveIndex) {
+			Move move = MoveDatabase.getMove(creature.moves[moveIndex]);
+			
+			BattleTeam enemyTeam;
+			
+			switch(move.targetSelectType) {
+				
+			case NONE:
+			case FRIENDLY_TEAM:
+			case OPPONENT_TEAM:
+				actions.add(new BattleAction(BattleActionType.MOVE, -1, moveIndex));
+				break;
+				
+			case SELF:
+				actions.add(new BattleAction(BattleActionType.MOVE, position, moveIndex));
+				break;
+				
+			case SINGLE_FRIENDLY:
+				for(int teamIndex = 0; teamIndex < team.numActives; ++teamIndex) {
+					if(!(team.get(teamIndex) == null) && !team.get(teamIndex).isDead()) {
+						actions.add(new BattleAction(BattleActionType.MOVE, teamIndex, moveIndex));
+					}
 				}
+				break;
+				
+			case SINGLE_OPPONENT:
+				enemyTeam = (team == teamA) ? teamB : teamA;
+				for(int teamIndex = 0; teamIndex < enemyTeam.numActives; ++teamIndex) {
+					if(!(team.get(teamIndex) == null) && !enemyTeam.get(teamIndex).isDead()) {
+						actions.add(new BattleAction(BattleActionType.MOVE, teamIndex, moveIndex));
+					}
+				}
+				break;
+				
 			}
-		}
-		
+		}		
 
 		actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
 		

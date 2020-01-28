@@ -34,7 +34,7 @@ import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetBiome;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetWeather;
 import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
-import com.ccode.alchemonsters.combat.moves.MoveTarget;
+import com.ccode.alchemonsters.combat.moves.MoveActionTarget;
 import com.ccode.alchemonsters.combat.moves.MoveType;
 import com.ccode.alchemonsters.combat.moves.TurnType;
 import com.ccode.alchemonsters.creature.CombatMods;
@@ -127,7 +127,7 @@ public class KryoCreator {
 		kryo.register(MoveActionSetBiome.class);
 		kryo.register(MoveActionSetWeather.class);
 		kryo.register(MoveActionStatModifier.class);
-		kryo.register(MoveTarget.class);
+		kryo.register(MoveActionTarget.class);
 		kryo.register(MoveType.class);
 		kryo.register(TurnType.class);
 		

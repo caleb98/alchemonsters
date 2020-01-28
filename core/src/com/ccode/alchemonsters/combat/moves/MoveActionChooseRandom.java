@@ -14,9 +14,9 @@ public class MoveActionChooseRandom implements MoveAction {
 	public MoveAction[] choices;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		int choice = GameRandom.nextInt(choices.length);
-		choices[choice].activate(move, context, source, sourceTeam, target, targetTeam);
+		choices[choice].activate(move, context, source, sourceTeam, target, opponentTeam);
 	}
 	
 }

@@ -14,8 +14,7 @@ public class MoveActionSetBiome implements MoveAction {
 	public BiomeType biome;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target,
-			BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target,	BattleTeam opponentTeam) {
 		BiomeType old = context.battleground.biome;
 		context.battleground.biome = biome;
 		publish(new MCombatTerrainChanged(context, source, move.name, old, biome));

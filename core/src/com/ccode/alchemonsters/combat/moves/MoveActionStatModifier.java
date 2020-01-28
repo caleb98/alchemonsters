@@ -11,7 +11,7 @@ public class MoveActionStatModifier implements MoveAction {
 	/**
 	 * The target of the stat modifier.
 	 */
-	public MoveTarget target;
+	public MoveActionTarget target;
 	/**
 	 * Which stat is to be modified.
 	 */
@@ -22,15 +22,21 @@ public class MoveActionStatModifier implements MoveAction {
 	public byte amount;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		switch(this.target) {
 		
-		case OPPONENT:
+		case TARGET:
 			target.mods.addMod(amount, stat);
 			publish(new MCombatStatBuffApplied(context, source, target, move, stat, amount));
 			break;
 			
 		case OPPONENT_TEAM:
+			Creature opp;
+			for(int i = 0; i < opponentTeam.numActives; ++i) {
+				opp = opponentTeam.get(i);
+				opp.mods.addMod(amount, stat);
+				publish(new MCombatStatBuffApplied(context, source, opp, move, stat, amount));
+			}
 			break;
 			
 		case SELF:
@@ -39,6 +45,12 @@ public class MoveActionStatModifier implements MoveAction {
 			break;
 			
 		case SELF_TEAM:
+			Creature friendly;
+			for(int i = 0; i < sourceTeam.numActives; ++i) {
+				friendly = sourceTeam.get(i);
+				friendly.mods.addMod(amount, stat);
+				publish(new MCombatStatBuffApplied(context, source, source, move, stat, amount));
+			}
 			break;
 
 		}

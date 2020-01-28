@@ -14,7 +14,7 @@ public class MoveActionScript implements MoveAction {
 	public String scriptName;
 
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam targetTeam) {
+	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
 		try {
 			ScriptDatabase.getScript(scriptName).invoke(new LuaValue[] {
 				CoerceJavaToLua.coerce(move), 
@@ -22,7 +22,7 @@ public class MoveActionScript implements MoveAction {
 				CoerceJavaToLua.coerce(source), 
 				CoerceJavaToLua.coerce(sourceTeam), 
 				CoerceJavaToLua.coerce(target), 
-				CoerceJavaToLua.coerce(targetTeam)
+				CoerceJavaToLua.coerce(opponentTeam)
 			});
 		} catch (LuaError le) {
 			System.err.println("Scripted move action encountered a Lua Error! Details:");
