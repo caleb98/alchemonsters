@@ -2,7 +2,6 @@ package com.ccode.alchemonsters.combat.moves;
 
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
-import com.ccode.alchemonsters.combat.ailments.StatusAilment;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.util.GameRandom;
 
@@ -44,13 +43,6 @@ public class MoveActionAilmentApplicator implements MoveAction {
 			break;
 		
 		}
-		
-		if(target.currentAilment != null) {
-			target.currentAilment.remove();
-		}
-		
-		target.currentAilment = new StatusAilment(context, source, target, move.name, ailmentName);
-		target.currentAilment.apply();
 	}
 
 }

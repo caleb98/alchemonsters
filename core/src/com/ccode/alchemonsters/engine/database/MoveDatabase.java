@@ -39,7 +39,6 @@ public class MoveDatabase {
 			//Set up class aliases
 			json.addClassTag("Damage", MoveActionDamage.class);
 			json.addClassTag("StatModifier", MoveActionStatModifier.class);
-			json.addClassTag("AilmentApplicator", MoveActionAilmentApplicator.class);
 			json.addClassTag("Script", MoveActionScript.class);
 			json.addClassTag("Chance", MoveActionChance.class);
 			json.addClassTag("Repeat", MoveActionRepeat.class);

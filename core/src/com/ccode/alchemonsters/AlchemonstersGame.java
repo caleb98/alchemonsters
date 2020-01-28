@@ -17,7 +17,6 @@ import com.ccode.alchemonsters.engine.database.GameData;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.database.ScriptDatabase;
 import com.ccode.alchemonsters.engine.database.StatCalculators;
-import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
 
 public class AlchemonstersGame extends Game {
 	
@@ -42,8 +41,6 @@ public class AlchemonstersGame extends Game {
 	@Override
 	public void create () {
 		
-		//TEST
-		
 		//Initialize and load the asset manager
 		assetManager.load("sprites_packed/packed.atlas", TextureAtlas.class);
 		assetManager.finishLoading();
@@ -61,7 +58,6 @@ public class AlchemonstersGame extends Game {
 		//Load databases
 		CreatureDatabase.initAndLoad();
 		MoveDatabase.initAndLoad();
-		StatusAilmentDatabase.init();
 		StatCalculators.init();
 		
 		//Setup Box2d

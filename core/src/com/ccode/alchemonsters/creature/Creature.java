@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.WeatherType;
-import com.ccode.alchemonsters.combat.ailments.StatusAilment;
 import com.ccode.alchemonsters.creature.equip.Affix;
 import com.ccode.alchemonsters.creature.equip.Amplifier;
 import com.ccode.alchemonsters.engine.database.StatCalculators;
@@ -146,7 +145,6 @@ public class Creature {
 	public ArrayList<Effect> activeEffects = new ArrayList<>();
 
 	public CombatMods mods = new CombatMods();
-	public StatusAilment currentAilment;
 	
 	public DynamicVariables variables = new DynamicVariables(); 
 	

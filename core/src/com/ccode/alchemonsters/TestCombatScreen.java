@@ -28,7 +28,6 @@ import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.GameData;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.database.ScriptDatabase;
-import com.ccode.alchemonsters.engine.database.StatusAilmentDatabase;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Subscriber;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
