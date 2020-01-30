@@ -6,9 +6,6 @@ import java.util.HashMap;
 
 import org.luaj.vm2.LuaValue;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.ccode.alchemonsters.engine.ScriptManager;
 
 public class ScriptDatabase {
@@ -32,7 +29,7 @@ public class ScriptDatabase {
 					continue;
 				}
 				
-				String fullScript = String.format("function activate(move, context, source, sourceTeam, target, targetTeam)\n%s\nend", scriptData);
+				String fullScript = String.format("function activate(moveInstance, sourceTeam, opponentTeam)\n%s\nend", scriptData);
 				ScriptManager.GLOBAL_CONTEXT.load(fullScript).call();
 				LuaValue scriptFunction = ScriptManager.GLOBAL_CONTEXT.get("activate");
 				

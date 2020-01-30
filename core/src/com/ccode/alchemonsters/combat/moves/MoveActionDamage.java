@@ -75,7 +75,7 @@ public class MoveActionDamage implements MoveAction {
 		}
 	}
 	
-	public  int getDamageAgainst(MoveInstance moveInstance, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
+	public int getDamageAgainst(MoveInstance moveInstance, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
 		BattleContext context = moveInstance.context;
 		ElementType elementType = moveInstance.getElementType();
 		
