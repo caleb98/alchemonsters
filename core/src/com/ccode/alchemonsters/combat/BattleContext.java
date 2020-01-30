@@ -7,6 +7,7 @@ import java.util.Iterator;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
+import com.ccode.alchemonsters.combat.moves.MoveInstance;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
@@ -41,6 +42,7 @@ public class BattleContext implements Publisher {
 	private boolean isTeamBDoubleAttack = false;
 	private int doubleAttackPosition = -1;
 	
+	@SuppressWarnings("unused")
 	private BattleContext() {}
 	
 	public BattleContext(BattleTeam teamA, UnitController[] teamAControls, BattleTeam teamB, UnitController[] teamBControls) {
@@ -97,11 +99,11 @@ public class BattleContext implements Publisher {
 	 * Carries out a single battle action
 	 * @param control the controller of the unit using the action
 	 * @param activePos the position of the unit using the action on the team
-	 * @param team the team the unit using the action is on
-	 * @param other the opposite (opponent) team
+	 * @param sourceTeam the team the unit using the action is on
+	 * @param opponentTeam the opposite (opponent) team
 	 */
-	private void doBattleAction(UnitController control, int activePos, BattleTeam team, BattleTeam other) {
-		if(team.get(activePos).isDead() && control.getSelectedAction().type != BattleActionType.SWITCH) {
+	private void doBattleAction(UnitController control, int activePos, BattleTeam sourceTeam, BattleTeam opponentTeam) {
+		if(sourceTeam.get(activePos).isDead() && control.getSelectedAction().type != BattleActionType.SWITCH) {
 			return;
 		}
 		
@@ -109,39 +111,51 @@ public class BattleContext implements Publisher {
 		switch(action.type) {
 		
 		case MOVE:
-			String moveName = team.get(activePos).moves[action.id];
+			//Grab move
+			String moveName = sourceTeam.get(activePos).moves[action.id];
 			Move move = MoveDatabase.getMove(moveName);
-			team.get(activePos).currentMana -= move.manaCost;
+			
+			//Create move instance
+			Creature[] targets = new Creature[action.targets.length];
+			for(int i = 0; i < targets.length; ++i) {
+				targets[i] = opponentTeam.get(action.targets[i]);
+			}
+			MoveInstance moveInstance = new MoveInstance(move, sourceTeam.get(activePos), targets, this);
+		
+			//Go ahead and subtract the mana cost
+			sourceTeam.get(activePos).currentMana -= move.manaCost;
+			
+			//Carry out the move depending on its turn type
 			switch(move.turnType) {
 			
 			case CHARGE:
 				//First check for dreamscape, which makes charge moves occur instantly
-				if(this.battleground.weather == WeatherType.DREAMSCAPE) {
-					publish(new MCombatChargeStarted(this, team.get(activePos), other.get(action.targetPos), move));
-					for(MoveAction a : move.actions) {
-						a.activate(move, this, team.get(activePos), team, other.get(action.targetPos), other);
-					}
-					team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
-					publish(new MCombatChargeFinished(this, team.get(activePos), other.get(action.targetPos), move));
+				if(this.battleground.weather == WeatherType.DREAMSCAPE && !control.isCharging()) {
+					
+					publish(new MCombatChargeStarted(moveInstance));
+					executeMove(moveInstance, sourceTeam, opponentTeam);
+					publish(new MCombatChargeFinished(moveInstance));
+					
 				}
+				
 				//If they aren't  charging already, then start the charge
 				else if(!control.isCharging()) {
-					control.setCharging(action.id, action.targetPos);
-					publish(new MCombatChargeStarted(this, team.get(activePos), other.get(action.targetPos), move));
+					control.setCharging(action.id, action.targets);
+					publish(new MCombatChargeStarted(moveInstance));
 				}
+				
 				//Otherwise they were already charging, so execute the move
 				else {
+					
 					control.stopCharging();
-					for(MoveAction a : move.actions) {
-						a.activate(move, this, team.get(activePos), team, other.get(action.targetPos), other);
-					}
-					team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
-					publish(new MCombatChargeFinished(this, team.get(activePos), other.get(action.targetPos), move));
+					executeMove(moveInstance, sourceTeam, opponentTeam);
+					publish(new MCombatChargeFinished(moveInstance));
+					
 				}
 				break;
 				
 			case DELAYED:
-				delayedMoves.add(new DelayedMoveInfo(team, team.get(activePos), move, other, action.targetPos, move.delayAmount));
+				delayedMoves.add(new DelayedMoveInfo(sourceTeam, sourceTeam.get(activePos), move, opponentTeam, action.targets, move.delayAmount));
 				break;
 				
 			case RECHARGE:
@@ -151,35 +165,15 @@ public class BattleContext implements Publisher {
 					control.setRecharging(true);
 				}
 			case INSTANT:
-				for(MoveAction a : move.actions) {
-					switch(move.targetSelectType) {
-					
-					case NONE:
-					case FRIENDLY_TEAM:
-					case OPPONENT_TEAM:
-						a.activate(move, this, team.get(activePos), team, null, other);
-						break;
-						
-					case SELF:
-					case SINGLE_FRIENDLY:
-						a.activate(move, this, team.get(activePos), team, team.get(action.targetPos), other);
-						break;
-						
-					case SINGLE_OPPONENT:
-						a.activate(move, this, team.get(activePos), team, other.get(action.targetPos), other);
-						break;
-					
-					}
-				}
-				team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
+				executeMove(moveInstance, sourceTeam, opponentTeam);
 				break;
 			
 			}
 			break;
 			
 		case SWITCH:
-			team.swap(activePos, action.id);
-			publish(new MCombatTeamActiveChanged(this, team, action.id, activePos));
+			sourceTeam.swap(activePos, action.id);
+			publish(new MCombatTeamActiveChanged(this, sourceTeam, action.id, activePos));
 			break;
 			
 		case USE:
@@ -191,6 +185,14 @@ public class BattleContext implements Publisher {
 			break;
 		
 		}
+	}
+	
+	private void executeMove(MoveInstance moveInstance, BattleTeam sourceTeam, BattleTeam opponentTeam) {
+		for(MoveAction a : moveInstance.move.actions) {
+			a.activate(moveInstance, sourceTeam, opponentTeam);
+		}
+		
+		moveInstance.source.variables.setVariable("_PREVIOUS_MOVE", moveInstance);
 	}
 	
 	/**
@@ -298,21 +300,21 @@ public class BattleContext implements Publisher {
 		}
 		//Check for special charging case - we'll need different actions
 		if(control.isCharging()) {
-			actions.add(new BattleAction(BattleActionType.MOVE, control.getChargingTargetPos(), control.getCharging()));
+			actions.add(new BattleAction(BattleActionType.MOVE, control.getCharging(), control.getChargingTargetPos()));
 			control.setAllActions(actions);
 			return;
 		}
 		
 		if(control.isRecharging()) {
 			//TODO: this uses -1 for target index because the "wait" action doesn't have a logical target, maybe a problem?
-			actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
+			actions.add(new BattleAction(BattleActionType.WAIT, 0));
 			control.setAllActions(actions);
 			return;
 		}
 		
 		for(int i = team.numActives; i < CreatureTeam.TEAM_SIZE; ++i) {
 			if(team.get(i) != null && !team.get(i).isDead()) {
-				actions.add(new BattleAction(BattleActionType.SWITCH, -1, i));
+				actions.add(new BattleAction(BattleActionType.SWITCH, i));
 			}
 		}
 		
@@ -320,33 +322,36 @@ public class BattleContext implements Publisher {
 		for(int moveIndex = 0; moveIndex < creature.moves.length; ++moveIndex) {
 			Move move = MoveDatabase.getMove(creature.moves[moveIndex]);
 			
-			BattleTeam enemyTeam;
+			BattleTeam enemyTeam = (team == teamA) ? teamB : teamA;
 			
 			switch(move.targetSelectType) {
 				
 			case NONE:
 			case FRIENDLY_TEAM:
 			case OPPONENT_TEAM:
-				actions.add(new BattleAction(BattleActionType.MOVE, -1, moveIndex));
+				int[] targets = new int[enemyTeam.numActives];
+				for(int i = 0; i < targets.length; ++i) {
+					targets[i] = i;
+				}
+				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, targets));
 				break;
 				
 			case SELF:
-				actions.add(new BattleAction(BattleActionType.MOVE, position, moveIndex));
+				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, position));
 				break;
 				
 			case SINGLE_FRIENDLY:
 				for(int teamIndex = 0; teamIndex < team.numActives; ++teamIndex) {
 					if(!(team.get(teamIndex) == null) && !team.get(teamIndex).isDead()) {
-						actions.add(new BattleAction(BattleActionType.MOVE, teamIndex, moveIndex));
+						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, teamIndex));
 					}
 				}
 				break;
 				
 			case SINGLE_OPPONENT:
-				enemyTeam = (team == teamA) ? teamB : teamA;
 				for(int teamIndex = 0; teamIndex < enemyTeam.numActives; ++teamIndex) {
 					if(!(team.get(teamIndex) == null) && !enemyTeam.get(teamIndex).isDead()) {
-						actions.add(new BattleAction(BattleActionType.MOVE, teamIndex, moveIndex));
+						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, teamIndex));
 					}
 				}
 				break;
@@ -354,7 +359,7 @@ public class BattleContext implements Publisher {
 			}
 		}		
 
-		actions.add(new BattleAction(BattleActionType.WAIT, -1, 0));
+		actions.add(new BattleAction(BattleActionType.WAIT, 0));
 		
 		control.setAllActions(actions);
 	}
@@ -548,12 +553,21 @@ public class BattleContext implements Publisher {
 		while(delays.hasNext()) {
 			DelayedMoveInfo inf = delays.next();
 			if(inf.delayTurns == 0) {
+				
+				//Grab move
 				Move move = inf.move;
-				for(MoveAction a : move.actions) {
-					a.activate(move, this, inf.sourceCreature, inf.sourceTeam, inf.targetTeam.get(inf.targetPos), inf.targetTeam);
+				
+				//Create move instance
+				Creature[] targets = new Creature[inf.targets.length];
+				for(int i = 0; i < targets.length; ++i) {
+					targets[i] = inf.opponentTeam.get(inf.targets[i]);
 				}
-				inf.sourceCreature.variables.setVariable("_PREVIOUS_MOVE", move);
+				MoveInstance moveInstance = new MoveInstance(move, inf.sourceCreature, targets, this);
+				
+				//Do the action
+				executeMove(moveInstance, inf.sourceTeam, inf.opponentTeam);
 				delays.remove();
+				
 			}
 			else {
 				inf.delayTurns--;
@@ -754,16 +768,16 @@ public class BattleContext implements Publisher {
 		BattleTeam sourceTeam;
 		Creature sourceCreature;
 		Move move;
-		BattleTeam targetTeam;
-		int targetPos;
+		BattleTeam opponentTeam;
+		int[] targets;
 		int delayTurns;
 		
-		public DelayedMoveInfo(BattleTeam team, Creature creature, Move move, BattleTeam target, int targetPos, int turns) {
+		public DelayedMoveInfo(BattleTeam team, Creature creature, Move move, BattleTeam target, int[] targets, int turns) {
 			sourceTeam = team;
 			sourceCreature = creature;
 			this.move = move;
-			targetTeam = target;
-			this.targetPos = targetPos;
+			opponentTeam = target;
+			this.targets = targets;
 			delayTurns = turns;
 		}
 		

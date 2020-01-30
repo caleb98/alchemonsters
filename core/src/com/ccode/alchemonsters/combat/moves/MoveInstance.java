@@ -1,8 +1,10 @@
 package com.ccode.alchemonsters.combat.moves;
 
 import com.ccode.alchemonsters.combat.BattleContext;
+import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
+import com.ccode.alchemonsters.util.GameRandom;
 
 public class MoveInstance {
 
@@ -34,6 +36,45 @@ public class MoveInstance {
 		this.source = source;
 		this.targets = targets;
 		this.context = context;
+	}
+	
+	public boolean rollHit() {
+		float accuracy = getAccuracy();
+		
+		//TODO: globalize variables related to deluge accuracy increase 
+		if(context.battleground.weather == WeatherType.DELUGE && move.elementType == ElementType.LIGHTNING) {
+			accuracy += 0.2f;
+		}
+		//TODO: globalize variables related to pyronimbus accuracy decrease
+		else if(context.battleground.weather == WeatherType.PYRONIMBUS && move.elementType == ElementType.WATER) {
+			accuracy -= 0.2f;
+		}
+		//TODO: globalize variables related to tempest accuracy increase
+		else if(context.battleground.weather == WeatherType.TEMPEST) {
+			if(move.elementType == ElementType.WATER || move.elementType == ElementType.AIR) {
+				accuracy += 0.2f;
+			}
+		}
+		
+		return GameRandom.nextFloat() < accuracy;
+	}
+	
+	public boolean rollCrit() {
+		for(int i = 0; i < getCritStages(); ++i) {
+			if(GameRandom.nextFloat() < source.critChance) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkStab() {
+		for(ElementType e : source.base.types) {
+			if(e == move.elementType) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public float getAccuracy() {

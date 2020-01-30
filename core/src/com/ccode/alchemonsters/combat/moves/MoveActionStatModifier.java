@@ -1,6 +1,5 @@
 package com.ccode.alchemonsters.combat.moves;
 
-import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.StatType;
@@ -22,12 +21,14 @@ public class MoveActionStatModifier implements MoveAction {
 	public byte amount;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
+	public void activate(MoveInstance moveInstance, BattleTeam sourceTeam, BattleTeam opponentTeam) {
 		switch(this.target) {
 		
 		case TARGET:
-			target.mods.addMod(amount, stat);
-			publish(new MCombatStatBuffApplied(context, source, target, move, stat, amount));
+			for(Creature tar : moveInstance.targets) {
+				tar.mods.addMod(amount, stat);
+				publish(new MCombatStatBuffApplied(moveInstance.context, moveInstance.source, tar, moveInstance, stat, amount));
+			}
 			break;
 			
 		case OPPONENT_TEAM:
@@ -35,13 +36,13 @@ public class MoveActionStatModifier implements MoveAction {
 			for(int i = 0; i < opponentTeam.numActives; ++i) {
 				opp = opponentTeam.get(i);
 				opp.mods.addMod(amount, stat);
-				publish(new MCombatStatBuffApplied(context, source, opp, move, stat, amount));
+				publish(new MCombatStatBuffApplied(moveInstance.context, moveInstance.source, opp, moveInstance, stat, amount));
 			}
 			break;
 			
 		case SELF:
-			source.mods.addMod(amount, stat);
-			publish(new MCombatStatBuffApplied(context, source, source, move, stat, amount));
+			moveInstance.source.mods.addMod(amount, stat);
+			publish(new MCombatStatBuffApplied(moveInstance.context, moveInstance.source, moveInstance.source, moveInstance, stat, amount));
 			break;
 			
 		case SELF_TEAM:
@@ -49,7 +50,7 @@ public class MoveActionStatModifier implements MoveAction {
 			for(int i = 0; i < sourceTeam.numActives; ++i) {
 				friendly = sourceTeam.get(i);
 				friendly.mods.addMod(amount, stat);
-				publish(new MCombatStatBuffApplied(context, source, source, move, stat, amount));
+				publish(new MCombatStatBuffApplied(moveInstance.context, moveInstance.source, friendly, moveInstance, stat, amount));
 			}
 			break;
 

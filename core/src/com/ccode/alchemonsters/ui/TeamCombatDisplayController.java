@@ -120,7 +120,7 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (no target)", 
 										team.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targetPos));
+										a.targets));
 						break;
 						
 					case FRIENDLY_TEAM:
@@ -129,7 +129,7 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (friendly team)", 
 										team.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targetPos));
+										a.targets));
 						break;
 						
 					case OPPONENT_TEAM:
@@ -138,7 +138,7 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (opponent team)", 
 										team.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targetPos));
+										a.targets));
 						break;
 						
 					case SELF:
@@ -147,7 +147,7 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (self)", 
 										team.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targetPos));
+										a.targets));
 						break;
 						
 					case SINGLE_FRIENDLY:
@@ -156,7 +156,7 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (friendly: %s)", 
 										team.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targetPos));
+										a.targets));
 						break;
 						
 					case SINGLE_OPPONENT:
@@ -165,7 +165,7 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (enemy: %s)", 
 										team.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targetPos));
+										a.targets));
 						break;				
 					
 					}

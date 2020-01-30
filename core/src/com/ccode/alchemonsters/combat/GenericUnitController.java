@@ -11,7 +11,7 @@ public class GenericUnitController implements UnitController {
 	private boolean isActionSubmitted = false; 
 	
 	private int chargingMove = -1;
-	private int chargingTargetPos = -1;
+	private int[] chargingTargets = new int[]{};
 	
 	private boolean isRecharging = false;
 	
@@ -76,9 +76,9 @@ public class GenericUnitController implements UnitController {
 	}
 
 	@Override
-	public void setCharging(int move, int tar) {
+	public void setCharging(int move, int[] targets) {
 		chargingMove = move;
-		chargingTargetPos = tar;
+		chargingTargets = targets;
 	}
 
 	@Override
@@ -97,8 +97,8 @@ public class GenericUnitController implements UnitController {
 	}
 	
 	@Override
-	public int getChargingTargetPos() {
-		return chargingTargetPos;
+	public int[] getChargingTargetPos() {
+		return chargingTargets;
 	}
 
 	@Override

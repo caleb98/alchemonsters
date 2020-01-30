@@ -1,8 +1,6 @@
 package com.ccode.alchemonsters.combat.moves;
 
-import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
-import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.util.GameRandom;
 
 public class MoveActionAilmentApplicator implements MoveAction {
@@ -21,7 +19,7 @@ public class MoveActionAilmentApplicator implements MoveAction {
 	public float chance = 1f;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
+	public void activate(MoveInstance moveInstance, BattleTeam sourceTeam,BattleTeam opponentTeam) {
 		if(!(GameRandom.nextFloat() <= chance)) {
 			return;
 		}

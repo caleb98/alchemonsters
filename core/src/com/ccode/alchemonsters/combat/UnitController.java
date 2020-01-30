@@ -3,9 +3,6 @@ package com.ccode.alchemonsters.combat;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
-import com.ccode.alchemonsters.creature.Creature;
-import com.ccode.alchemonsters.util.Pair;
-
 /**
  * A controller interface for managing and directing the actions
  * of a single creature unit in battle.
@@ -74,7 +71,7 @@ public interface UnitController {
 	 * @param move the index of the charging move in the mon's move list
 	 * @param tar the index of the target on the opposing team
 	 */
-	public void setCharging(int move, int tar);
+	public void setCharging(int move, int[] targets);
 	public void stopCharging();
 	/**
 	 * Checks to see if a controller is charging any move
@@ -85,7 +82,10 @@ public interface UnitController {
 	 * @return the index of the move the active creature is charging
 	 */
 	public int getCharging();
-	public int getChargingTargetPos();
+	/**
+	 * @return an array of indexes the charging move will target
+	 */
+	public int[] getChargingTargetPos();
 	
 	// ************************************* 
 	//         RECHARGING FUNCTIONS

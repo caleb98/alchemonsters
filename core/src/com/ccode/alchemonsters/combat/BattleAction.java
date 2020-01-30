@@ -10,7 +10,7 @@ public class BattleAction implements Comparable<BattleAction> {
 	}
 	
 	public final BattleActionType type;
-	public final int targetPos;
+	public final int[] targets;
 	/**
 	 * Represents various values depending on the BattleActionType of this action.
 	 * For switch: the index of the creature to switch to in the team.
@@ -22,13 +22,13 @@ public class BattleAction implements Comparable<BattleAction> {
 
 	private BattleAction() {
 		type = null;
-		targetPos = -1;
+		targets = new int[]{};
 		id = -1;
 	}
 	
-	public BattleAction(BattleActionType type, int targetPos, int id) {
+	public BattleAction(BattleActionType type, int id, int... targets) {
 		this.type = type;
-		this.targetPos = targetPos;
+		this.targets = targets;
 		this.id = id;
 	}
 	
@@ -39,7 +39,7 @@ public class BattleAction implements Comparable<BattleAction> {
 		}
 		
 		BattleAction other = (BattleAction) obj;
-		return type == other.type && targetPos == other.targetPos && id == other.id;
+		return type == other.type && targets == other.targets && id == other.id;
 	}
 	
 	@Override

@@ -1,10 +1,6 @@
 package com.ccode.alchemonsters.combat.moves;
 
-import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.WeatherType;
-import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
-import com.ccode.alchemonsters.util.GameRandom;
 
 public class Move {
 	
@@ -22,38 +18,34 @@ public class Move {
 	public static final int CRIT_STAGE_3 = 3;
 	public static final int CRIT_STAGE_4 = 4;
 
-	public String name;
-	public String desc;
-	public float accuracy;
-	public int manaCost;
-	public int critStage;
-	public ElementType elementType;
-	public MoveType moveType;
-	public MoveAction[] actions;
-	public MoveTargetSelectType targetSelectType;
+	public final String name;
+	public final String desc;
+	public final float accuracy;
+	public final int manaCost;
+	public final int critStage;
+	public final ElementType elementType;
+	public final MoveType moveType;
+	public final MoveAction[] actions;
+	public final MoveTargetSelectType targetSelectType;
 
-	public int priority;
-	public TurnType turnType;
-	public int delayAmount = 1;
+	public final int priority;
+	public final TurnType turnType;
+	public final int delayAmount;
 	
-	public boolean rollHit(BattleContext context, Creature source, Creature target) {
-		float accuracy = this.accuracy;
-		
-		//TODO: globalize variables related to deluge accuracy increase 
-		if(context.battleground.weather == WeatherType.DELUGE && elementType == ElementType.LIGHTNING) {
-			accuracy += 0.2f;
-		}
-		//TODO: globalize variables related to pyronimbus accuracy decrease
-		else if(context.battleground.weather == WeatherType.PYRONIMBUS && elementType == ElementType.WATER) {
-			accuracy -= 0.2f;
-		}
-		//TODO: globalize variables related to tempest accuracy increase
-		else if(context.battleground.weather == WeatherType.TEMPEST) {
-			if(elementType == ElementType.WATER || elementType == ElementType.AIR) {
-				accuracy += 0.2f;
-			}
-		}
-		return GameRandom.nextFloat() < accuracy;
+	public Move() {
+		name = "<NO NAME ADDED>";             
+		desc = "<NO DESCRIPTION ADDED>";      
+		accuracy = 1f;                         
+		manaCost = 0;                            
+		critStage = CRIT_STAGE_1;                
+		elementType = null;              
+		moveType = null;                    
+		actions = null;                 
+		targetSelectType = null;
+		                                             
+		priority = PRIORITY_NORMAL;              
+		turnType = null;                    
+		delayAmount = 1;                         
 	}
 	
 }

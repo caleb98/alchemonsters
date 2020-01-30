@@ -1,8 +1,6 @@
 package com.ccode.alchemonsters.combat.moves;
 
-import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
-import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.util.GameRandom;
 
 public class MoveActionRepeat implements MoveAction {
@@ -25,11 +23,11 @@ public class MoveActionRepeat implements MoveAction {
 	public float repeatChance = 1f;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target, BattleTeam opponentTeam) {
-		action.activate(move, context, source, sourceTeam, target, opponentTeam);
+	public void activate(MoveInstance moveInstance, BattleTeam sourceTeam, BattleTeam opponentTeam) {
+		action.activate(moveInstance, sourceTeam, opponentTeam);
 		for(int i = 1; i < repeatTimes; ++i) {
 			if(GameRandom.nextFloat() < repeatChance) {
-				action.activate(move, context, source, sourceTeam, target, opponentTeam);
+				action.activate(moveInstance, sourceTeam, opponentTeam);
 			}
 			else {
 				return;

@@ -1,9 +1,7 @@
 package com.ccode.alchemonsters.combat.moves;
 
-import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.BiomeType;
-import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
 
 public class MoveActionSetBiome implements MoveAction {
@@ -14,10 +12,10 @@ public class MoveActionSetBiome implements MoveAction {
 	public BiomeType biome;
 	
 	@Override
-	public void activate(Move move, BattleContext context, Creature source, BattleTeam sourceTeam, Creature target,	BattleTeam opponentTeam) {
-		BiomeType old = context.battleground.biome;
-		context.battleground.biome = biome;
-		publish(new MCombatTerrainChanged(context, source, move.name, old, biome));
+	public void activate(MoveInstance moveInstance, BattleTeam sourceTeam, BattleTeam opponentTeam) {
+		BiomeType old = moveInstance.context.battleground.biome;
+		moveInstance.context.battleground.biome = biome;
+		publish(new MCombatTerrainChanged(moveInstance.context, moveInstance.source, moveInstance.move.name, old, biome));
 	}
 	
 }

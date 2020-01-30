@@ -1,5 +1,6 @@
 package com.ccode.alchemonsters.engine.database;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -51,28 +52,97 @@ public class MoveDatabase {
 			ResultSet moves = GameData.executeQuery("SELECT * FROM Moves");
 			String actionJSON;
 			
+			final Field mName;
+			final Field mDesc;
+			final Field mAccuracy;
+			final Field mManaCost;
+			final Field mCritStage;
+			final Field mElementType;
+			final Field mMoveType;
+			final Field mTargetSelectType;
+			
+			final Field mPriority;
+			final Field mTurnType;
+			final Field mDelayAmount;
+			
+			final Field mActions;
+			
+			try {
+				
+				mName = Move.class.getDeclaredField("name");
+				mName.setAccessible(true);
+				
+				mDesc = Move.class.getDeclaredField("desc");
+				mDesc.setAccessible(true);
+				
+				mAccuracy = Move.class.getDeclaredField("accuracy");
+				mAccuracy.setAccessible(true);
+				
+				mManaCost = Move.class.getDeclaredField("manaCost");
+				mManaCost.setAccessible(true);
+				
+				mCritStage = Move.class.getDeclaredField("critStage");
+				mCritStage.setAccessible(true);
+				
+				mElementType = Move.class.getDeclaredField("elementType");
+				mElementType.setAccessible(true);
+				
+				mMoveType = Move.class.getDeclaredField("moveType");
+				mMoveType.setAccessible(true);
+				
+				mTargetSelectType = Move.class.getDeclaredField("targetSelectType");
+				mTargetSelectType.setAccessible(true);
+				
+				mPriority = Move.class.getDeclaredField("priority");
+				mPriority.setAccessible(true);
+				
+				mTurnType = Move.class.getDeclaredField("turnType");
+				mTurnType.setAccessible(true);
+				
+				mDelayAmount = Move.class.getDeclaredField("delayAmount");
+				mDelayAmount.setAccessible(true);
+				
+				mActions = Move.class.getDeclaredField("actions");
+				mActions.setAccessible(true);
+				
+			} catch (NoSuchFieldException | SecurityException e) {
+				e.printStackTrace();
+				return;
+			}
+			
+			
 			while(moves.next()) {
 				
 				Move m = new Move();
 				
-				m.name = moves.getString("MoveName");
-				m.desc = moves.getString("Description");
-				m.accuracy = moves.getFloat("Accuracy");
-				m.manaCost = moves.getInt("ManaCost");
-				m.critStage = moves.getInt("CritStage");
-				m.elementType = ElementType.valueOf(moves.getString("ElementType"));
-				m.moveType = MoveType.valueOf(moves.getString("MoveType"));
-				m.targetSelectType = MoveTargetSelectType.valueOf(moves.getString("TargetSelectType"));
-				
-				m.priority = moves.getInt("Priority");
-				m.turnType = TurnType.valueOf(moves.getString("TurnType"));
-				m.delayAmount = moves.getInt("DelayAmount");
-				
-				actionJSON = moves.getString("ActionData");
-				m.actions = json.fromJson(MoveAction[].class, actionJSON);
+				try {
+					
+					mName.set(m, moves.getString("MoveName"));
+					mDesc.set(m, moves.getString("Description"));
+					
+					mAccuracy.set(m, moves.getFloat("Accuracy"));
+					mManaCost.set(m, moves.getInt("ManaCost"));
+					mCritStage.set(m, moves.getInt("CritStage"));
+					
+					mElementType.set(m, ElementType.valueOf(moves.getString("ElementType")));
+					mMoveType.set(m, MoveType.valueOf(moves.getString("MoveType")));
+					mTargetSelectType.set(m, MoveTargetSelectType.valueOf(moves.getString("TargetSelectType")));
+					
+					mPriority.set(m, moves.getInt("Priority"));
+					mTurnType.set(m, TurnType.valueOf(moves.getString("TurnType")));
+					mDelayAmount.set(m, moves.getInt("DelayAmount"));
+					
+					actionJSON = moves.getString("ActionData");
+					mActions.set(m, json.fromJson(MoveAction[].class, actionJSON));
+					
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					System.err.printf("Error assigning move fields! (for move %s)\n", moves.getString("MoveName"));
+					e.printStackTrace();
+					continue;
+				}
 				
 				if(MOVE_DICTIONARY.containsKey(m.name)) {
-					System.err.printf("[Error] Move ID clash for \'%s\'! Move with that name already exists.", m.name);
+					System.err.printf("[Error] Move ID clash for \'%s\'! Move with that name already exists.\n", m.name);
 					continue;
 				}
 				

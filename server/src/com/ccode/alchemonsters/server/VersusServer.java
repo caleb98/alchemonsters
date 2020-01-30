@@ -486,31 +486,31 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 			case CHARGE:
 				//First check for dreamscape, which makes charge moves occur instantly
 				if(context.battleground.weather == WeatherType.DREAMSCAPE) {
-					publish(new MCombatChargeStarted(context, team.get(activePos), other.get(action.targetPos), move));
+					publish(new MCombatChargeStarted(context, team.get(activePos), other.get(action.targets), move));
 					for(MoveAction a : move.actions) {
-						a.activate(move, context, team.get(activePos), team, other.get(action.targetPos), other);
+						a.activate(move, context, team.get(activePos), team, other.get(action.targets), other);
 					}
 					team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
-					publish(new MCombatChargeFinished(context, team.get(activePos), other.get(action.targetPos), move));
+					publish(new MCombatChargeFinished(context, team.get(activePos), other.get(action.targets), move));
 				}
 				//If they aren't  charging already, then start the charge
 				else if(!control.isCharging()) {
-					control.setCharging(action.id, action.targetPos);
-					publish(new MCombatChargeStarted(context, team.get(activePos), other.get(action.targetPos), move));
+					control.setCharging(action.id, action.targets);
+					publish(new MCombatChargeStarted(context, team.get(activePos), other.get(action.targets), move));
 				}
 				//Otherwise they were already charging, so execute the move
 				else {
 					control.stopCharging();
 					for(MoveAction a : move.actions) {
-						a.activate(move, context, team.get(activePos), team, other.get(action.targetPos), other);
+						a.activate(move, context, team.get(activePos), team, other.get(action.targets), other);
 					}
 					team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
-					publish(new MCombatChargeFinished(context, team.get(activePos), other.get(action.targetPos), move));
+					publish(new MCombatChargeFinished(context, team.get(activePos), other.get(action.targets), move));
 				}
 				break;
 				
 			case DELAYED:
-				delayedMoves.add(new DelayedMoveInfo(team, team.get(activePos), move, other, action.targetPos, move.delayAmount));
+				delayedMoves.add(new DelayedMoveInfo(team, team.get(activePos), move, other, action.targets, move.delayAmount));
 				break;
 				
 			case RECHARGE:
@@ -521,7 +521,7 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 				}
 			case INSTANT:
 				for(MoveAction a : move.actions) {
-					a.activate(move, context, team.get(activePos), team, other.get(action.targetPos), other);
+					a.activate(move, context, team.get(activePos), team, other.get(action.targets), other);
 				}
 				team.get(activePos).variables.setVariable("_PREVIOUS_MOVE", move);
 				break;

@@ -18,8 +18,6 @@ import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.TerrainType;
 import com.ccode.alchemonsters.combat.WeatherType;
-import com.ccode.alchemonsters.combat.ailments.StatusAilment;
-import com.ccode.alchemonsters.combat.ailments.StatusAilmentEffect;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveActionAilmentApplicator;
@@ -30,8 +28,8 @@ import com.ccode.alchemonsters.combat.moves.MoveActionCombine;
 import com.ccode.alchemonsters.combat.moves.MoveActionDamage;
 import com.ccode.alchemonsters.combat.moves.MoveActionRepeat;
 import com.ccode.alchemonsters.combat.moves.MoveActionScript;
-import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetBiome;
+import com.ccode.alchemonsters.combat.moves.MoveActionSetTerrain;
 import com.ccode.alchemonsters.combat.moves.MoveActionSetWeather;
 import com.ccode.alchemonsters.combat.moves.MoveActionStatModifier;
 import com.ccode.alchemonsters.combat.moves.MoveActionTarget;
@@ -106,10 +104,6 @@ public class KryoCreator {
 		kryo.register(TerrainType.class);
 		kryo.register(BiomeType.class);
 		kryo.register(WeatherType.class);
-		
-		//com.ccode.alchemonsters.combat.ailments
-		kryo.register(StatusAilment.class);
-		kryo.register(StatusAilmentEffect.class);
 		
 		//com.ccode.alchemonsters.combat.moves
 		kryo.register(Move.class);
