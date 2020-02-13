@@ -26,58 +26,69 @@ public class MoveActionDamage implements MoveAction {
 	public void activate(MoveInstance moveInstance, BattleTeam sourceTeam, BattleTeam opponentTeam) {
 		
 		//Check accuracy/hit chance
-		boolean isHit = moveInstance.rollHit();
+		boolean isHit;
 		//Check for crit
-		boolean isCrit = moveInstance.rollCrit();
+		boolean isCrit;
 		//STAB
 		boolean isStab = moveInstance.checkStab();
 		
 		int damage;
 		
-		if(isHit) {
-			switch(this.target) {
-			
-			case TARGET:
-				for(Creature tar : moveInstance.targets) {
-					damage = getDamageAgainst(moveInstance, moveInstance.source, tar, power, isCrit, isStab);
-					tar.modifyHealth(-damage);
-					publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, tar, moveInstance.move.name, moveInstance.getElementType(), damage, isHit, isCrit, false));
-				}
-				break;
+		switch(this.target) {
+		
+		case TARGET:
+			for(Creature tar : moveInstance.targets) {
+				isHit = moveInstance.rollHit();
+				isCrit = moveInstance.rollCrit();
 				
-			case OPPONENT_TEAM:
-				Creature opp;
-				for(int i = 0; i < opponentTeam.numActives; ++i) {
-					opp = opponentTeam.get(i);
-					damage = getDamageAgainst(moveInstance, moveInstance.source, opp, power, isCrit, isStab);
-					opp.modifyHealth(-damage);
-					publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, opp, moveInstance.move.name, moveInstance.getElementType(), damage, isHit, isCrit, false));
-				}
-				break;
-				
-			case SELF:
-				damage = getDamageAgainst(moveInstance, moveInstance.source, moveInstance.source, power, isCrit, isStab);
-				moveInstance.source.modifyHealth(-damage);
-				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, moveInstance.source, moveInstance.move.name, moveInstance.getElementType(), damage, isHit, isCrit, false));
-				break;
-				
-			case SELF_TEAM:
-				Creature friendly;
-				for(int i = 0; i < sourceTeam.numActives; ++i) {
-					friendly = sourceTeam.get(i);
-					damage = getDamageAgainst(moveInstance, moveInstance.source, friendly, power, isCrit, isStab);
-					friendly.modifyHealth(-damage);
-					publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, friendly, moveInstance.move.name, moveInstance.getElementType(), damage, isHit, isCrit, false));
-				}
-				break;
-			
+				damage = getDamageAgainst(moveInstance, tar, power, isCrit, isStab);
+				tar.modifyHealth(-damage);
+				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, tar, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
 			}
+			break;
+			
+		case OPPONENT_TEAM:
+			Creature opp;
+			for(int i = 0; i < opponentTeam.numActives; ++i) {
+				isHit = moveInstance.rollHit();
+				isCrit = moveInstance.rollCrit();
+				
+				opp = opponentTeam.get(i);
+				damage = getDamageAgainst(moveInstance, opp, power, isCrit, isStab);
+				opp.modifyHealth(-damage);
+				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, opp, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+			}
+			break;
+			
+		case SELF:
+			isHit = moveInstance.rollHit();
+			isCrit = moveInstance.rollCrit();
+			
+			damage = getDamageAgainst(moveInstance, moveInstance.source, power, isCrit, isStab);
+			moveInstance.source.modifyHealth(-damage);
+			publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, moveInstance.source, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+			break;
+			
+		case SELF_TEAM:
+			Creature friendly;
+			for(int i = 0; i < sourceTeam.numActives; ++i) {
+				isHit = moveInstance.rollHit();
+				isCrit = moveInstance.rollCrit();
+				
+				friendly = sourceTeam.get(i);
+				damage = getDamageAgainst(moveInstance, friendly, power, isCrit, isStab);
+				friendly.modifyHealth(-damage);
+				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, friendly, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+			}
+			break;
+		
 		}
 	}
 	
-	public int getDamageAgainst(MoveInstance moveInstance, Creature source, Creature target, int power, boolean isCrit, boolean isStab) {
+	public static int getDamageAgainst(MoveInstance moveInstance, Creature target, int power, boolean isCrit, boolean isStab) {
 		BattleContext context = moveInstance.context;
 		ElementType elementType = moveInstance.getElementType();
+		Creature source = moveInstance.source;
 		
 		float sourceAttack = moveInstance.move.moveType == MoveType.MAGIC ? source.calcTotalMagicAtk(context) : source.calcTotalPhysAtk(context);
 		float sourcePen = source.calcTotalPen(context);

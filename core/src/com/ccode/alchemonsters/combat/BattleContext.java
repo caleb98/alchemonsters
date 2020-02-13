@@ -123,7 +123,7 @@ public class BattleContext implements Publisher {
 			MoveInstance moveInstance = new MoveInstance(move, sourceTeam.get(activePos), targets, this);
 		
 			//Go ahead and subtract the mana cost
-			sourceTeam.get(activePos).currentMana -= move.manaCost;
+			sourceTeam.get(activePos).modifyMana(-move.manaCost);
 			
 			//Carry out the move depending on its turn type
 			switch(move.turnType) {
@@ -376,7 +376,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamA.numActives; ++i) {
 				for(ElementType t : teamA.get(i).base.types) {
 					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-						teamA.get(i).currentHealth -= teamA.get(i).maxHealth / 16f;
+						teamA.get(i).modifyHealth(-(int) (teamA.get(i).maxHealth / 16f));
 						break;
 					}
 				}
@@ -385,7 +385,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamB.numActives; ++i) {
 				for(ElementType t : teamB.get(i).base.types) {
 					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-						teamB.get(i).currentHealth -= teamB.get(i).maxHealth / 16f;
+						teamB.get(i).modifyHealth(-(int) (teamB.get(i).maxHealth / 16f));
 						break;
 					}
 				}
@@ -413,15 +413,11 @@ public class BattleContext implements Publisher {
 		if(battleground.weather == WeatherType.DREAMSCAPE) {
 			
 			for(int i = 0; i < teamA.numActives; ++i) {
-				teamA.get(i).currentHealth += teamA.get(i).maxHealth / 16f;
-				if(teamA.get(i).currentHealth > teamA.get(i).maxHealth) 
-					teamA.get(i).currentHealth = teamA.get(i).maxHealth;
+				teamA.get(i).modifyHealth((int) (teamA.get(i).maxHealth / 16f));
 			}
 			
 			for(int i = 0; i < teamB.numActives; ++i) {
-				teamB.get(i).currentHealth += teamB.get(i).maxHealth / 16f;
-				if(teamB.get(i).currentHealth > teamB.get(i).maxHealth) 
-					teamB.get(i).currentHealth = teamB.get(i).maxHealth;
+				teamB.get(i).modifyHealth((int) (teamB.get(i).maxHealth / 16f));
 			}
 			
 		}
@@ -432,9 +428,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamA.numActives; ++i) {
 				for(ElementType t : teamA.get(i).base.types) {
 					if(t == ElementType.UNDEAD) {
-						teamA.get(i).currentHealth += teamA.get(i).maxHealth / 16f;
-						if(teamA.get(i).currentHealth > teamA.get(i).maxHealth) 
-							teamA.get(i).currentHealth = teamA.get(i).maxHealth;
+						teamA.get(i).modifyHealth((int) (teamA.get(i).maxHealth / 16f));
 						break;
 					}
 				}
@@ -443,9 +437,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamB.numActives; ++i) {
 				for(ElementType t : teamB.get(i).base.types) {
 					if(t == ElementType.UNDEAD) {
-						teamB.get(i).currentHealth += teamB.get(i).maxHealth / 16f;
-						if(teamB.get(i).currentHealth > teamB.get(i).maxHealth) 
-							teamB.get(i).currentHealth = teamB.get(i).maxHealth;
+						teamB.get(i).modifyHealth((int) (teamB.get(i).maxHealth / 16f));
 						break;
 					}
 				}

@@ -139,8 +139,8 @@ public class Creature {
 	public String defaultManaCalculator = StatCalculators.defaultManaCalculator;
 	
 	//Active values
-	public int currentHealth;
-	public int currentMana;
+	private int currentHealth;
+	private int currentMana;
 	
 	//effects
 	public ArrayList<Effect> activeEffects = new ArrayList<>();
@@ -176,7 +176,21 @@ public class Creature {
 	public void modifyHealth(int amt) {
 		currentHealth += amt;
 		if(currentHealth < 0) currentHealth = 0;
-		if(currentHealth > maxHealth) currentHealth = maxHealth;
+		else if(currentHealth > maxHealth) currentHealth = maxHealth;
+	}
+	
+	public int getCurrentHealth() {
+		return currentHealth;
+	}
+	
+	public void modifyMana(int amt) {
+		currentMana += amt;
+		if(currentMana < 0) currentMana = 0;
+		else if(currentMana > maxMana) currentMana = maxMana;
+	}
+	
+	public int getCurrentMana() {
+		return currentMana;
 	}
 	
 	//===========================================

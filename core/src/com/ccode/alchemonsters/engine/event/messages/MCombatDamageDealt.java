@@ -18,8 +18,8 @@ public class MCombatDamageDealt extends Message {
 	public final String cause;
 	public final ElementType elementType;
 	public final int amount;
-	public final boolean isHit;
 	public final boolean isCrit;
+	public final boolean isStab;
 	/**
 	 * Whether or not this damage was a triggered effect.
 	 */
@@ -33,13 +33,13 @@ public class MCombatDamageDealt extends Message {
 		cause = null;
 		elementType = null;
 		amount = -1;
-		isHit = false;
 		isCrit = false;
+		isStab = false;
 		isTriggered = false;
 	}
 	
 	public MCombatDamageDealt(BattleContext context, Creature source, Creature target, String cause,
-							  ElementType elementType, int amount, boolean isHit, boolean isCrit, boolean isTriggered) {
+							  ElementType elementType, int amount, boolean isCrit, boolean isStab, boolean isTriggered) {
 		super(ID);
 		this.context = context;
 		this.source = source;
@@ -47,8 +47,8 @@ public class MCombatDamageDealt extends Message {
 		this.cause = cause;
 		this.elementType = elementType;
 		this.amount = amount;
-		this.isHit = isHit;
 		this.isCrit = isCrit;
+		this.isStab = isStab;
 		this.isTriggered = isTriggered;
 	}
 	

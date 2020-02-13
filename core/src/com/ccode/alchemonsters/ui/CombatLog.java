@@ -59,17 +59,12 @@ public class CombatLog extends ScrollPane implements Subscriber {
 			 if(m instanceof MCombatDamageDealt) {
 				 MCombatDamageDealt damage = (MCombatDamageDealt) m;
 					String damageText;
-					if(damage.isHit) {
-						damageText = String.format("%s dealt %s %s damage to %s%s", 
-								damage.source.personalName, 
-								damage.amount, 
-								damage.elementType, 
-								damage.target.personalName, 
-								damage.isCrit ? " (CRIT!)" : ".");
-					}
-					else {
-						damageText = String.format("%s attacked with %s, but missed!", damage.source.personalName, damage.cause);
-					}
+					damageText = String.format("%s dealt %s %s damage to %s%s", 
+							damage.source.personalName, 
+							damage.amount, 
+							damage.elementType, 
+							damage.target.personalName, 
+							damage.isCrit ? " (CRIT!)" : ".");
 					println(damageText);
 			 }
 			 else if(m instanceof MCombatStarted) {

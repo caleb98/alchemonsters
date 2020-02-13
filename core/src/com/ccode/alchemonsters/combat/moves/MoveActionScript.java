@@ -13,7 +13,7 @@ public class MoveActionScript implements MoveAction {
 
 	@Override
 	public void activate(MoveInstance moveInstance, BattleTeam sourceTeam, BattleTeam opponentTeam) {
-		try {
+		try {			
 			ScriptDatabase.getScript(scriptName).invoke(new LuaValue[] {
 				CoerceJavaToLua.coerce(moveInstance),
 				CoerceJavaToLua.coerce(sourceTeam),

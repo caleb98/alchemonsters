@@ -127,11 +127,11 @@ public class TeamCombatDisplay extends Table {
 				name.setText(creature.personalName);
 			}
 			hpBar.setRange(0, creature.maxHealth);
-			hpBar.setValue(creature.currentHealth);
-			hpLabel.setText(String.format("%s/%s", creature.currentHealth, creature.maxHealth));
+			hpBar.setValue(creature.getCurrentHealth());
+			hpLabel.setText(String.format("%s/%s", creature.getCurrentHealth(), creature.maxHealth));
 			manaBar.setRange(0, creature.maxMana);
-			manaBar.setValue(creature.currentMana);
-			manaLabel.setText(String.format("%s/%s", creature.currentMana, creature.maxMana));	
+			manaBar.setValue(creature.getCurrentMana());
+			manaLabel.setText(String.format("%s/%s", creature.getCurrentMana(), creature.maxMana));	
 		}
 		
 	}
