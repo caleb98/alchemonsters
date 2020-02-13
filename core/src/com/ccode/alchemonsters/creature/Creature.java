@@ -165,6 +165,16 @@ public class Creature {
 		return currentHealth <= 0;
 	}
 	
+	public void addEffect(Effect e) {
+		activeEffects.add(e);
+		e.onApply(this);
+	}
+	
+	public void removeEffect(Effect e) {
+		activeEffects.remove(e);
+		e.onRemove(this);
+	}
+	
 	/**
 	 * Resets the mon's HP and Mana values
 	 */

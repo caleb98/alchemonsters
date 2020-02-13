@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ccode.alchemonsters.engine.ProcessManager;
 import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.UI;
+import com.ccode.alchemonsters.engine.database.AilmentDatabase;
 import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.GameData;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
@@ -56,6 +57,7 @@ public class AlchemonstersGame extends Game {
 		ScriptDatabase.initAndLoad();
 		
 		//Load databases
+		AilmentDatabase.init();
 		CreatureDatabase.initAndLoad();
 		MoveDatabase.initAndLoad();
 		StatCalculators.init();

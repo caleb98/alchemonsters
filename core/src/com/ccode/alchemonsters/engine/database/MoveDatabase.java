@@ -48,6 +48,7 @@ public class MoveDatabase {
 			json.addClassTag("SetWeather", MoveActionSetWeather.class);
 			json.addClassTag("SetBiome", MoveActionSetBiome.class);
 			json.addClassTag("SetTerrain", MoveActionSetTerrain.class);
+			json.addClassTag("AilmentApplicator", MoveActionAilmentApplicator.class);
 			
 			ResultSet moves = GameData.executeQuery("SELECT * FROM Moves");
 			String actionJSON;
