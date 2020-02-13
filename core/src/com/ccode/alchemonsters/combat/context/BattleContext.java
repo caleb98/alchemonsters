@@ -1,10 +1,19 @@
-package com.ccode.alchemonsters.combat;
+package com.ccode.alchemonsters.combat.context;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 
+import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
+import com.ccode.alchemonsters.combat.BattleTeam;
+import com.ccode.alchemonsters.combat.Battleground;
+import com.ccode.alchemonsters.combat.CombatState;
+import com.ccode.alchemonsters.combat.CreatureTeam;
+import com.ccode.alchemonsters.combat.UnitController;
+import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveInstance;
@@ -34,9 +43,14 @@ public class BattleContext implements Publisher {
 	
 	private boolean isWaitingOnActionSelect = false;
 	
+	private boolean isWaitingOnBattleEventProcessing = false;
+	private CombatState nextState;
+	
 	public Battleground battleground = new Battleground();
 	
 	public ArrayList<DelayedMoveInfo> delayedMoves = new ArrayList<>();
+	
+	public LinkedList<BattleEvent> unprocessed = new LinkedList<>();
 	
 	private boolean isTeamADoubleAttack = false;
 	private boolean isTeamBDoubleAttack = false;
@@ -63,7 +77,31 @@ public class BattleContext implements Publisher {
 	 * @return true if updated; false otherwise
 	 */
 	public boolean updateBattle() {
-		if(isWaitingOnActionSelect) {
+		//Check for unprocessed BattleEvents and run them if they exist
+		if(isWaitingOnBattleEventProcessing) {
+			
+			while(unprocessed.size() > 0) {
+				BattleEvent next = unprocessed.pop();
+				next.runEvent(this);
+			}
+			
+			isWaitingOnBattleEventProcessing = false;
+			
+			//Check for defeat
+			if(teamA.isDefeated()) {
+				publish(new MCombatFinished(this, teamB, teamA));
+			}
+			else if(teamB.isDefeated()) {
+				publish(new MCombatFinished(this, teamA, teamB));
+			}
+			else {
+				setCombatState(nextState);
+			}
+			
+			return true;
+			
+		}
+		else if(isWaitingOnActionSelect) {
 			if(areTeamActionsSelected()) {
 				isWaitingOnActionSelect = false;
 				
@@ -102,7 +140,7 @@ public class BattleContext implements Publisher {
 	 * @param sourceTeam the team the unit using the action is on
 	 * @param opponentTeam the opposite (opponent) team
 	 */
-	private void doBattleAction(UnitController control, int activePos, BattleTeam sourceTeam, BattleTeam opponentTeam) {
+	protected void doBattleAction(UnitController control, int activePos, BattleTeam sourceTeam, BattleTeam opponentTeam) {
 		if(sourceTeam.get(activePos).isDead() && control.getSelectedAction().type != BattleActionType.SWITCH) {
 			return;
 		}
@@ -204,6 +242,23 @@ public class BattleContext implements Publisher {
 		MCombatStateChanged changed = new MCombatStateChanged(this, currentState, next);
 		currentState = next;
 		publish(changed);
+		
+		//Loop through the effects on creatures and update them
+		for(Creature c : teamA.creatures()) {
+			if(c != null) {
+				for(Effect e : c.activeEffects) {
+					e.enterState(next);
+				}
+			}
+		}
+		for(Creature c : teamB.creatures()) {
+			if(c != null) {
+				for(Effect e : c.activeEffects) {
+					e.enterState(next);
+				}
+			}
+		}
+		
 		switch(next) {
 		
 		case ACTIVE_DEATH_SWAP:
@@ -376,7 +431,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamA.numActives; ++i) {
 				for(ElementType t : teamA.get(i).base.types) {
 					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-						teamA.get(i).modifyHealth(-(int) (teamA.get(i).maxHealth / 16f));
+						unprocessed.add(new BattleEventDamage("Sandstorm", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
 						break;
 					}
 				}
@@ -385,7 +440,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamB.numActives; ++i) {
 				for(ElementType t : teamB.get(i).base.types) {
 					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-						teamB.get(i).modifyHealth(-(int) (teamB.get(i).maxHealth / 16f));
+						unprocessed.add(new BattleEventDamage("Sandstorm", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
 						break;
 					}
 				}
@@ -413,11 +468,11 @@ public class BattleContext implements Publisher {
 		if(battleground.weather == WeatherType.DREAMSCAPE) {
 			
 			for(int i = 0; i < teamA.numActives; ++i) {
-				teamA.get(i).modifyHealth((int) (teamA.get(i).maxHealth / 16f));
+				unprocessed.add(new BattleEventHealing("Dreamscape", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
 			}
 			
 			for(int i = 0; i < teamB.numActives; ++i) {
-				teamB.get(i).modifyHealth((int) (teamB.get(i).maxHealth / 16f));
+				unprocessed.add(new BattleEventHealing("Dreamscape", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
 			}
 			
 		}
@@ -428,7 +483,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamA.numActives; ++i) {
 				for(ElementType t : teamA.get(i).base.types) {
 					if(t == ElementType.UNDEAD) {
-						teamA.get(i).modifyHealth((int) (teamA.get(i).maxHealth / 16f));
+						unprocessed.add(new BattleEventHealing("Tempest", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
 						break;
 					}
 				}
@@ -437,7 +492,7 @@ public class BattleContext implements Publisher {
 			for(int i = 0; i < teamB.numActives; ++i) {
 				for(ElementType t : teamB.get(i).base.types) {
 					if(t == ElementType.UNDEAD) {
-						teamB.get(i).modifyHealth((int) (teamB.get(i).maxHealth / 16f));
+						unprocessed.add(new BattleEventHealing("Tempest", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
 						break;
 					}
 				}
@@ -478,7 +533,7 @@ public class BattleContext implements Publisher {
 			return a.c.compareTo(b.c);
 		});
 		
-		//Process all switch, use, and wait actions 
+		//Add all switch, use, and wait actions 
 		Iterator<Triple<BattleTeam, Integer, BattleAction>> iter = monActions.iterator();
 		while(iter.hasNext()) {
 			Triple<BattleTeam, Integer, BattleAction> info = iter.next();
@@ -487,10 +542,11 @@ public class BattleContext implements Publisher {
 				break;
 			}
 			else {
-				doBattleAction(info.a == teamA ? teamAControls[info.b] : teamBControls[info.b], 
-						       info.b, 
-						       info.a, 
-						       info.a == teamA ? teamB : teamA);
+				unprocessed.add(new BattleEventAction(
+						info.a == teamA ? teamAControls[info.b] : teamBControls[info.b],
+						info.b,
+						info.a,
+						info.a == teamA ? teamB : teamA));
 				iter.remove();
 			}
 		}
@@ -534,10 +590,11 @@ public class BattleContext implements Publisher {
 		//Run the rest of the actions
 		//This will be all the moves
 		for(Triple<BattleTeam, Integer, BattleAction> info : monActions) {
-			doBattleAction(info.a == teamA ? teamAControls[info.b] : teamBControls[info.b], 
-				       info.b, 
-				       info.a, 
-				       info.a == teamA ? teamB : teamA);
+			unprocessed.add(new BattleEventAction(
+					info.a == teamA ? teamAControls[info.b] : teamBControls[info.b],
+					info.b,
+					info.a,
+					info.a == teamA ? teamB : teamA));
 		}
 		
 		//Do delayed moves
@@ -564,16 +621,6 @@ public class BattleContext implements Publisher {
 			else {
 				inf.delayTurns--;
 			}
-		}
-		
-		//Check for defeat
-		if(teamA.isDefeated()) {
-			publish(new MCombatFinished(this, teamB, teamA));
-			return;
-		}
-		else if(teamB.isDefeated()) {
-			publish(new MCombatFinished(this, teamA, teamB));
-			return;
 		}
 		
 		//Check for double attack
@@ -623,7 +670,10 @@ public class BattleContext implements Publisher {
 					isTeamBDoubleAttack = false;
 				}
 				doubleAttackPosition = firstInfo.b;
-				setCombatState(CombatState.MAIN_PHASE_2);
+				
+				isWaitingOnBattleEventProcessing = true;
+				nextState = CombatState.MAIN_PHASE_2;
+				return;
 			}
 		}
 		else if(monActions.size() > 1) {
@@ -647,12 +697,15 @@ public class BattleContext implements Publisher {
 				}
 				doubleAttackPosition = firstInfo.b;
 				this.variables.setVariable("_PREV_DOUBLE_ATTACK_MON", doubleAttackMon);
-				setCombatState(CombatState.MAIN_PHASE_2);
+
+				isWaitingOnBattleEventProcessing = true;
+				nextState = CombatState.MAIN_PHASE_2;
 				return;
 			}
 		}
 		
-		setCombatState(CombatState.END_PHASE);
+		isWaitingOnBattleEventProcessing = true;
+		nextState = CombatState.END_PHASE;
 	}
 	
 	private void doMainPhaseTwo() {
@@ -669,22 +722,15 @@ public class BattleContext implements Publisher {
 	
 	private void doBattlePhaseTwo() {
 		if(isTeamADoubleAttack) {
-			doBattleAction(teamAControls[doubleAttackPosition], doubleAttackPosition, teamA, teamB);
+			unprocessed.add(new BattleEventAction(teamAControls[doubleAttackPosition], doubleAttackPosition, teamA, teamB));
+			
 		}
 		else if(isTeamBDoubleAttack) {
-			doBattleAction(teamBControls[doubleAttackPosition], doubleAttackPosition, teamB, teamA);
+			unprocessed.add(new BattleEventAction(teamBControls[doubleAttackPosition], doubleAttackPosition, teamB, teamA));
 		}
-		if(teamA.isDefeated()) {
-			publish(new MCombatFinished(this, teamB, teamA));
-			return;
-		}
-		else if(teamB.isDefeated()) {
-			publish(new MCombatFinished(this, teamA, teamB));
-			return;
-		}
-		else {
-			setCombatState(CombatState.END_PHASE);	
-		}
+		
+		isWaitingOnBattleEventProcessing = true;
+		nextState = CombatState.END_PHASE;
 	}
 	
 	private void doEndPhase() {

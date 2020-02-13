@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
-import com.ccode.alchemonsters.combat.BattleContext;
+import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;

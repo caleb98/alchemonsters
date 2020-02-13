@@ -1,7 +1,7 @@
 package com.ccode.alchemonsters.engine.event.messages;
 
-import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
+import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.engine.event.Message;
 
 public class MCombatFinished extends Message {

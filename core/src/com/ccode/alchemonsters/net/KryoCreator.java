@@ -9,8 +9,6 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaClosure;
 
 import com.ccode.alchemonsters.combat.BattleAction;
-import com.ccode.alchemonsters.combat.BattleContext;
-import com.ccode.alchemonsters.combat.BattleEvent;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.Battleground;
 import com.ccode.alchemonsters.combat.BiomeType;
@@ -18,6 +16,8 @@ import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.TerrainType;
 import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.combat.context.BattleContext;
+import com.ccode.alchemonsters.combat.context.BattleEvent;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveActionAilmentApplicator;

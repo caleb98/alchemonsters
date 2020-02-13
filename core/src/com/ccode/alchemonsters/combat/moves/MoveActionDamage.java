@@ -1,8 +1,8 @@
 package com.ccode.alchemonsters.combat.moves;
 
-import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;

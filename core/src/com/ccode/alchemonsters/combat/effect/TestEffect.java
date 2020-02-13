@@ -12,6 +12,11 @@ public class TestEffect extends Effect {
 	public TestEffect() {
 		super("Test Effect", false);
 	}
+	
+	@Override
+	public boolean needsRemoval() {
+		return false;
+	}
 
 	@Override
 	public void onApply(Creature c) {

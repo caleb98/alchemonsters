@@ -1,6 +1,6 @@
 package com.ccode.alchemonsters.engine.event.messages;
 
-import com.ccode.alchemonsters.combat.BattleContext;
+import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.combat.moves.MoveInstance;
 import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.StatType;

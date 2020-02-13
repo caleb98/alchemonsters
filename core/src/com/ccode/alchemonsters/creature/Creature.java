@@ -2,8 +2,8 @@ package com.ccode.alchemonsters.creature;
 
 import java.util.ArrayList;
 
-import com.ccode.alchemonsters.combat.BattleContext;
 import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.creature.equip.Affix;
 import com.ccode.alchemonsters.creature.equip.Amplifier;

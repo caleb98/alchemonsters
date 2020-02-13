@@ -1,6 +1,6 @@
 package com.ccode.alchemonsters.net;
 
-import com.ccode.alchemonsters.combat.BattleContext;
+import com.ccode.alchemonsters.combat.context.BattleContext;
 
 public class NetBattleContextUpdate {
 
