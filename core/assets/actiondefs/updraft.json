@@ -1,0 +1,17 @@
+[
+	{
+		"class":"Damage",
+		"target":"OPPONENT_TEAM",
+		"power":40
+	},
+	{
+		"class":"Chance",
+		"chance":0.1,
+		"action":{
+			"class":"StatModifier",
+			"target":"SELF",
+			"stat":"SPEED",
+			"amount":1
+		}
+	}
+]

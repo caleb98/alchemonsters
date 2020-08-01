@@ -20,6 +20,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTerrainChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatWeatherChanged;
+import com.ccode.alchemonsters.engine.event.messages.MConsoleMessage;
 
 public class CombatLog extends ScrollPane implements Subscriber {
 
@@ -48,6 +49,7 @@ public class CombatLog extends ScrollPane implements Subscriber {
 		subscribe(MCombatTerrainChanged.ID);
 		subscribe(MCombatWeatherChanged.ID);
 		subscribe(MCombatGroundChanged.ID);
+		subscribe(MConsoleMessage.ID);
 	}
 	
 	@Override
@@ -59,12 +61,25 @@ public class CombatLog extends ScrollPane implements Subscriber {
 			 if(m instanceof MCombatDamageDealt) {
 				 MCombatDamageDealt damage = (MCombatDamageDealt) m;
 					String damageText;
-					damageText = String.format("%s dealt %s %s damage to %s%s", 
-							damage.source.personalName, 
-							damage.amount, 
-							damage.elementType, 
-							damage.target.personalName, 
-							damage.isCrit ? " (CRIT!)" : ".");
+					if(damage.source != null) {
+						damageText = String.format("%s's %s dealt %s %s to %s%s%s", 
+								damage.source.personalName,
+								damage.cause,
+								damage.amount, 
+								damage.elementType == null ? "damage" : damage.elementType + " damage", 
+								damage.target.personalName, 
+								damage.isCrit ? " (CRIT!)" : "",
+								damage.isStab ? " (STAB!)" : ".");
+					}
+					else {
+						damageText = String.format("%s dealt %s %s to %s%s%s", 
+								damage.cause,
+								damage.amount, 
+								damage.elementType == null ? "damage" : damage.elementType + " damage", 
+								damage.target.personalName, 
+								damage.isCrit ? " (CRIT!)" : "",
+								damage.isStab ? " (STAB!)" : ".");
+					}
 					println(damageText);
 			 }
 			 else if(m instanceof MCombatStarted) {
@@ -166,6 +181,10 @@ public class CombatLog extends ScrollPane implements Subscriber {
 						 full.cause,
 						 full.oldWeather,
 						 full.newWeather));
+			 }
+			 else if(m instanceof MConsoleMessage) {
+				 MConsoleMessage full = (MConsoleMessage) m;
+				 println(full.message);
 			 }
 		}
 	}

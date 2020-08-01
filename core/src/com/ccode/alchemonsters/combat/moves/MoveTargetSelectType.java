@@ -29,5 +29,14 @@ public enum MoveTargetSelectType {
 	 * These moves may not have a move action that requires a MoveTarget.
 	 */
 	NONE,
+	/**
+	 * For moves that can target a single unit on either team.
+	 */
+	SINGLE_ANY,
+	/**
+	 * For moves that target all units on the field.
+	 * These moves may not have a move action that requires a MoveTarget.
+	 */
+	ALL,
 	
 }

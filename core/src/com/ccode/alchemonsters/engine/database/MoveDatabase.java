@@ -1,5 +1,9 @@
 package com.ccode.alchemonsters.engine.database;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +14,6 @@ import com.badlogic.gdx.utils.Json;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveActionAilmentApplicator;
-import com.ccode.alchemonsters.combat.moves.MoveActionAilmentRemoval;
 import com.ccode.alchemonsters.combat.moves.MoveActionChance;
 import com.ccode.alchemonsters.combat.moves.MoveActionChooseRandom;
 import com.ccode.alchemonsters.combat.moves.MoveActionCombine;
@@ -28,6 +31,8 @@ import com.ccode.alchemonsters.combat.moves.TurnType;
 import com.ccode.alchemonsters.creature.ElementType;
 
 public class MoveDatabase {
+	
+	private static final String ACTION_DEFINITIONS_DIRECTORY = "actiondefs";
 	
 	private static HashMap<String, Move> MOVE_DICTIONARY;
 	private static boolean isInitialized = false;
@@ -51,7 +56,10 @@ public class MoveDatabase {
 			json.addClassTag("AilmentApplicator", MoveActionAilmentApplicator.class);
 			
 			ResultSet moves = GameData.executeQuery("SELECT * FROM Moves");
-			String actionJSON;
+			String actionJson;
+			String actionTagJson;
+			String moveTagJson;
+			String metaJson;
 			
 			final Field mName;
 			final Field mDesc;
@@ -60,10 +68,10 @@ public class MoveDatabase {
 			final Field mCritStage;
 			final Field mElementType;
 			final Field mMoveType;
+			final Field mTurnType;
 			final Field mTargetSelectType;
 			
 			final Field mPriority;
-			final Field mTurnType;
 			final Field mDelayAmount;
 			
 			final Field mActions;
@@ -91,14 +99,14 @@ public class MoveDatabase {
 				mMoveType = Move.class.getDeclaredField("moveType");
 				mMoveType.setAccessible(true);
 				
+				mTurnType = Move.class.getDeclaredField("turnType");
+				mTurnType.setAccessible(true);
+				
 				mTargetSelectType = Move.class.getDeclaredField("targetSelectType");
 				mTargetSelectType.setAccessible(true);
 				
 				mPriority = Move.class.getDeclaredField("priority");
 				mPriority.setAccessible(true);
-				
-				mTurnType = Move.class.getDeclaredField("turnType");
-				mTurnType.setAccessible(true);
 				
 				mDelayAmount = Move.class.getDeclaredField("delayAmount");
 				mDelayAmount.setAccessible(true);
@@ -111,6 +119,7 @@ public class MoveDatabase {
 				return;
 			}
 			
+			ResultSet moveMeta;
 			
 			while(moves.next()) {
 				
@@ -125,16 +134,40 @@ public class MoveDatabase {
 					mManaCost.set(m, moves.getInt("ManaCost"));
 					mCritStage.set(m, moves.getInt("CritStage"));
 					
-					mElementType.set(m, ElementType.valueOf(moves.getString("ElementType")));
-					mMoveType.set(m, MoveType.valueOf(moves.getString("MoveType")));
-					mTargetSelectType.set(m, MoveTargetSelectType.valueOf(moves.getString("TargetSelectType")));
-					
 					mPriority.set(m, moves.getInt("Priority"));
-					mTurnType.set(m, TurnType.valueOf(moves.getString("TurnType")));
 					mDelayAmount.set(m, moves.getInt("DelayAmount"));
 					
-					actionJSON = moves.getString("ActionData");
-					mActions.set(m, json.fromJson(MoveAction[].class, actionJSON));
+					File actionDef = new File(ACTION_DEFINITIONS_DIRECTORY + "/" + moves.getString("ActionDefinition"));
+					actionJson = "";
+					try {
+						BufferedReader reader = new BufferedReader(new FileReader(actionDef));
+						String line;
+						while((line = reader.readLine()) != null) {
+							actionJson += line;
+						}
+						reader.close();
+					} catch (IOException e) {
+						System.err.println("Error loading move " + m.name + ". Unable to read action def.");
+						e.printStackTrace();
+						continue;
+					}
+					mActions.set(m, json.fromJson(MoveAction[].class, actionJson));
+					
+					moveMeta = GameData.executeQuery(
+							"SELECT Moves.ID, ElementTypes.Type AS ElementType, MoveTypes.Type AS MoveType, TurnTypes.Type AS TurnType, TargetSelectTypes.Type AS TargetSelectType\n" + 
+							"FROM Moves\n" + 
+							"LEFT JOIN ElementTypes ON Moves.ElementType = ElementTypes.ID\n" + 
+							"LEFT JOIN MoveTypes ON Moves.MoveType = MoveTypes.ID\n" + 
+							"LEFT JOIN TurnTypes ON Moves.TurnType = TurnTypes.ID\n" + 
+							"LEFT JOIN TargetSelectTypes ON Moves.TargetSelectType = TargetSelectTypes.ID\n" +
+							"WHERE Moves.ID = '" + moves.getString("ID") + "';"
+							);
+					moveMeta.next();
+					
+					mElementType.set(m, ElementType.valueOf(moveMeta.getString("ElementType")));
+					mMoveType.set(m, MoveType.valueOf(moveMeta.getString("MoveType")));
+					mTurnType.set(m, TurnType.valueOf(moveMeta.getString("TurnType")));
+					mTargetSelectType.set(m, MoveTargetSelectType.valueOf(moveMeta.getString("TargetSelectType")));
 					
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					System.err.printf("Error assigning move fields! (for move %s)\n", moves.getString("MoveName"));
@@ -155,11 +188,6 @@ public class MoveDatabase {
 					for(MoveAction a : m.actions) {
 						if(a instanceof MoveActionAilmentApplicator) {
 							if(((MoveActionAilmentApplicator) a).target == MoveActionTarget.TARGET) {
-								isInvalid = true;
-							}
-						}
-						else if(a instanceof MoveActionAilmentRemoval) {
-							if(((MoveActionAilmentRemoval) a).target == MoveActionTarget.TARGET) {
 								isInvalid = true;
 							}
 						}
@@ -190,11 +218,6 @@ public class MoveDatabase {
 								isInvalid = true;
 							}
 						}
-						else if(a instanceof MoveActionAilmentRemoval) {
-							if(((MoveActionAilmentRemoval) a).target == MoveActionTarget.TARGET) {
-								isInvalid = true;
-							}
-						}
 						else if(a instanceof MoveActionDamage) {
 							if(((MoveActionDamage) a).target == MoveActionTarget.TARGET) {
 								isInvalid = true;
@@ -219,11 +242,6 @@ public class MoveDatabase {
 					for(MoveAction a : m.actions) {						
 						if(a instanceof MoveActionAilmentApplicator) {
 							if(((MoveActionAilmentApplicator) a).target == MoveActionTarget.TARGET) {
-								isInvalid = true;
-							}
-						}
-						else if(a instanceof MoveActionAilmentRemoval) {
-							if(((MoveActionAilmentRemoval) a).target == MoveActionTarget.TARGET) {
 								isInvalid = true;
 							}
 						}

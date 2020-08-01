@@ -3,33 +3,24 @@ package com.ccode.alchemonsters.engine.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class GameData {
 
-	private static final String GAME_DATA_DIR = "gamedata.accdb";
+	private static final String GAME_DATA_DIR = "gamedata.db";
 	
 	private static boolean isInitialized = false;
 	private static Connection connection;
-	private static Statement statement;
 	
 	public static void initAndLoad() {		
-		try {
-			Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-			
-			String dbURL = "jdbc:ucanaccess://" + GAME_DATA_DIR;
-			
+		try {			
+			String dbURL = "jdbc:sqlite:" + GAME_DATA_DIR;
 			connection = DriverManager.getConnection(dbURL);
-			statement = connection.createStatement();
 		} catch (SQLException e) {
 			System.err.println("Unable to load game data database.");
 			e.printStackTrace();
 			System.exit(-1);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
 		isInitialized = true;
@@ -39,6 +30,7 @@ public class GameData {
 		if(!isInitialized) {
 			throw new IllegalStateException("Attempted to execute SQL query without loading database.");
 		}
+		Statement statement = connection.createStatement();
 		return statement.executeQuery(sql);
 	}
 	

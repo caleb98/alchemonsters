@@ -1,0 +1,7 @@
+[
+	{
+		"class":"Damage",
+		"target":"OPPONENT_TEAM",
+		"power":120
+	}
+]

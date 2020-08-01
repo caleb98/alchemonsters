@@ -18,15 +18,15 @@ public class CreatureDatabase {
 		CREATURE_DICTIONARY = new HashMap<String, CreatureBase>();
 		
 		try {
-			ResultSet creaturesTable = GameData.executeQuery("SELECT * FROM BaseCollection");
+			ResultSet creaturesTable = GameData.executeQuery("SELECT * FROM CreatureBases");
 			ResultSet elementTypes;
 			ResultSetMetaData meta;
 			
 			while(creaturesTable.next()) {
 				CreatureBase base = new CreatureBase();
 				
-				base.name = creaturesTable.getNString("CreatureName");
-				base.desc = creaturesTable.getNString("Description");
+				base.name = creaturesTable.getString("CreatureName");
+				base.desc = creaturesTable.getString("Description");
 				
 				base.minBaseHealth = creaturesTable.getInt("MinBaseHealth");
 				base.maxBaseHealth = creaturesTable.getInt("MaxBaseHealth");
@@ -45,13 +45,12 @@ public class CreatureDatabase {
 				base.baseSpeed = creaturesTable.getInt("BaseSpeed");
 				
 				elementTypes = GameData.executeQuery(
-						"SELECT CreatureType.CreatureID, TypeChartOne.Type AS TypeOne, TypeChartTwo.Type AS TypeTwo "
-						+ "FROM CreatureType "
-						+ "INNER JOIN TypeChart AS TypeChartOne "
-						+ "ON CreatureType.TypeOneID=TypeChartOne.ID "
-						+ "INNER JOIN TypeChart AS TypeChartTwo "
-						+ "ON CreatureType.TypeTwoID=TypeChartTwo.ID "
-						+ "WHERE CreatureID=" + creaturesTable.getInt("ID"));
+						"SELECT CreatureBases.CreatureName AS Name, TypeOne.Type AS TypeOne, TypeTwo.Type AS TypeTwo\n" +
+						"FROM CreatureBases\n" +
+						"LEFT JOIN ElementTypes AS TypeOne ON CreatureBases.TypeOne = TypeOne.ID\n" +
+						"LEFT JOIN ElementTypes AS TypeTwo ON CreatureBases.TypeTwo = TypeTwo.ID\n" + 
+						"WHERE Name = '" + base.name + "';"
+						);
 
 				int total = 0;
 				while(elementTypes.next()) {
@@ -64,8 +63,9 @@ public class CreatureDatabase {
 					
 					base.types = new ElementType[]{
 							ElementType.valueOf(elementTypes.getString("TypeOne")),
-							ElementType.valueOf(elementTypes.getString("TypeTwo"))
+							elementTypes.getString("TypeTwo") == null ? null : ElementType.valueOf(elementTypes.getString("TypeTwo"))
 					};
+					total++;
 				}
 				
 				if(CREATURE_DICTIONARY.containsKey(base.name)) {

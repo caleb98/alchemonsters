@@ -10,12 +10,20 @@ public class MCombatDamageDealt extends Message {
 	public static final String ID = "COMBAT_DAMAGE_DEALT";
 	
 	public final BattleContext context;
+	/**
+	 * The creature that caused this damage. May be null if the damage came from
+	 * a triggered/battleground source.
+	 */
 	public final Creature source;
 	public final Creature target;
 	/**
 	 * The thing that caused the damage (name of move, ailment, etc.)
 	 */
 	public final String cause;
+	/**
+	 * The elemental type of the damage. May be null if the damage came from
+	 * a triggered/battleground source.
+	 */
 	public final ElementType elementType;
 	public final int amount;
 	public final boolean isCrit;

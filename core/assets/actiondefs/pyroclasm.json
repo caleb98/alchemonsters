@@ -1,0 +1,7 @@
+[
+	{
+		"class":"Damage",
+		"target":"TARGET",
+		"power":100
+	}
+]

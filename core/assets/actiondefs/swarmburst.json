@@ -1,0 +1,20 @@
+[
+	{
+		"class":"Repeat",
+		"repeatTimes":3,
+		"repeatChance":0.6,
+		"action":{
+			"class":"Damage",
+			"target":"TARGET",
+			"power":60
+		}
+	},
+	{
+		"class":"Chance",
+		"chance":0.5,
+		"action":{
+			"class":"SetWeather",
+			"weather":"LOCUST_SWARM"
+		}
+	}
+]

@@ -1,6 +1,7 @@
 package com.ccode.alchemonsters.combat.context;
 
 import com.ccode.alchemonsters.creature.Creature;
+import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.event.Publisher;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
 
@@ -9,15 +10,24 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
  */
 public class BattleEventDamage implements BattleEvent, Publisher {
 
-	private String source;
+	private Creature source;
+	private String cause;
 	private Creature target;
+	private ElementType element;
 	private int amt;
+	boolean isCrit;
+	boolean isStab;
 	private boolean isTriggered;
 	
-	public BattleEventDamage(String source, Creature target, int amt, boolean isTriggered) {
+	public BattleEventDamage(Creature source, String cause, Creature target, ElementType element, 
+			int amt, boolean isCrit, boolean isStab, boolean isTriggered) {
 		this.source = source;
+		this.cause = cause;
 		this.target = target;
+		this.element = element;
 		this.amt = amt;
+		this.isCrit = isCrit;
+		this.isStab = isStab;
 		this.isTriggered = isTriggered;
 	}
 	
@@ -26,13 +36,13 @@ public class BattleEventDamage implements BattleEvent, Publisher {
 		target.modifyHealth(-amt);
 		publish(new MCombatDamageDealt(
 				context,
-				null,
-				target,
 				source,
-				null,
+				target,
+				cause,
+				element,
 				amt,
-				false,
-				false,
+				isCrit,
+				isStab,
 				isTriggered
 		));
 	}

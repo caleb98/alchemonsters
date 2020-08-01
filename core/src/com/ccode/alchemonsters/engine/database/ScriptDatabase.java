@@ -1,7 +1,9 @@
 package com.ccode.alchemonsters.engine.database;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.luaj.vm2.LuaValue;
@@ -16,31 +18,41 @@ public class ScriptDatabase {
 	public static void initAndLoad() {
 		SCRIPT_DICTIONARY = new HashMap<String, LuaValue>();
 		
-		try {
-			ResultSet scripts = GameData.executeQuery("SELECT * FROM MoveScripts");
+		File scriptsDir = new File("scripts");
+		File[] scripts = scriptsDir.listFiles((f)->{
+			return f.getName().endsWith(".lua");
+		});
+		
+		String scriptName;
+		String scriptData;
+		for(File script : scripts) {
 			
-			while(scripts.next()) {
-				
-				String scriptName = scripts.getString("ScriptName");
-				String scriptData = scripts.getString("ScriptData");
-				
-				if(SCRIPT_DICTIONARY.containsKey(scriptName)) {
-					System.err.printf("[Error] Script ID clas for \'%s\'! Script with that name already exists.", scriptName);
-					continue;
-				}
-				
-				String fullScript = String.format("function activate(moveInstance, sourceTeam, opponentTeam)\n%s\nend", scriptData);
-				ScriptManager.GLOBAL_CONTEXT.load(fullScript).call();
-				LuaValue scriptFunction = ScriptManager.GLOBAL_CONTEXT.get("activate");
-				
-				SCRIPT_DICTIONARY.put(scriptName, scriptFunction);
-				System.out.printf("Script \'%s\' loaded.\n", scriptName);
-				
+			scriptName = script.getName().replace(".lua", "");
+			
+			if(SCRIPT_DICTIONARY.containsKey(scriptName)) {
+				System.err.printf("[Error] Script ID clas for \'%s\'! Script with that name already exists.", scriptName);
+				continue;
 			}
-		} catch (SQLException e) {
-			System.err.println("Error loading scripts!");
-			e.printStackTrace();
-			System.exit(-1);
+			
+			scriptData = "";
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(script));
+				String line;
+				while((line = reader.readLine()) != null) {
+					scriptData += line + "\n";
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				continue;
+			}
+			
+			String fullScript = String.format("function activate(moveInstance, sourceTeam, opponentTeam)\n%s\nend", scriptData);
+			ScriptManager.GLOBAL_CONTEXT.load(fullScript).call();
+			LuaValue scriptFunction = ScriptManager.GLOBAL_CONTEXT.get("activate");
+			
+			SCRIPT_DICTIONARY.put(scriptName, scriptFunction);
+			System.out.printf("Script \'%s\' loaded.\n", scriptName);
+			
 		}
 		
 		isInitialized = true;

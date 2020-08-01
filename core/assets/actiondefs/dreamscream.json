@@ -1,0 +1,15 @@
+[
+	{
+		"class":"Damage",
+		"target":"TARGET",
+		"power":80
+	},
+	{
+		"class":"Chance",
+		"chance":0.1,
+		"action":{
+			"class":"SetWeather",
+			"weather":"DREAMSCAPE"
+		}
+	}
+]

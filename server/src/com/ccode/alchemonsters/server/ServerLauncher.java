@@ -34,7 +34,6 @@ public class ServerLauncher implements ApplicationListener {
 		ScriptDatabase.initAndLoad();
 		CreatureDatabase.initAndLoad();
 		MoveDatabase.initAndLoad();
-		StatusAilmentDatabase.init();
 		
 		//Create the server
 		Server server = KryoCreator.createServer();

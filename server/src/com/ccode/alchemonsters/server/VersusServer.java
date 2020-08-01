@@ -595,7 +595,7 @@ public class VersusServer extends Listener implements Publisher, Subscriber {
 		}
 		//Check for special charging case - we'll need different actions
 		if(control.isCharging()) {
-			actions.add(new BattleAction(BattleActionType.MOVE, control.getChargingTargetPos(), control.getCharging()));
+			actions.add(new BattleAction(BattleActionType.MOVE, control.getCharging(), control.getChargingTargetPos()));
 			control.setAllActions(actions);
 			return;
 		}

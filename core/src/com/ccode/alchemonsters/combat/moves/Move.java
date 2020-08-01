@@ -45,7 +45,7 @@ public class Move {
 		                                             
 		priority = PRIORITY_NORMAL;              
 		turnType = null;                    
-		delayAmount = 1;                         
+		delayAmount = 1;
 	}
 	
 }

@@ -1,0 +1,16 @@
+[
+	{
+		"class":"Chance",
+		"chance":0.5,
+		"action":{
+			"class":"SetWeather",
+			"weather":"SANDSTORM"
+		}
+	},
+	{
+		"class":"StatModifier",
+		"target":"SELF",
+		"stat":"RESISTANCE",
+		"amount":2
+	}
+]

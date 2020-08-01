@@ -13,6 +13,7 @@ import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.combat.effect.Ailment;
 import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
@@ -24,6 +25,8 @@ import com.ccode.alchemonsters.engine.event.Publisher;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeFinished;
 import com.ccode.alchemonsters.engine.event.messages.MCombatChargeStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
+import com.ccode.alchemonsters.engine.event.messages.MCombatMovePostCast;
+import com.ccode.alchemonsters.engine.event.messages.MCombatMovePreCast;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
 import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.engine.event.messages.MCombatTeamActiveChanged;
@@ -50,7 +53,7 @@ public class BattleContext implements Publisher {
 	
 	public ArrayList<DelayedMoveInfo> delayedMoves = new ArrayList<>();
 	
-	public LinkedList<BattleEvent> unprocessed = new LinkedList<>();
+	private LinkedList<BattleEvent> unprocessed = new LinkedList<>();
 	
 	private boolean isTeamADoubleAttack = false;
 	private boolean isTeamBDoubleAttack = false;
@@ -69,6 +72,10 @@ public class BattleContext implements Publisher {
 	public void startCombat() {
 		publish(new MCombatStarted(this));
 		setCombatState(CombatState.MAIN_PHASE_1);
+	}
+	
+	public void addBattleEvent(BattleEvent e) {
+		unprocessed.add(e);
 	}
 	
 	/**
@@ -94,6 +101,9 @@ public class BattleContext implements Publisher {
 			else if(teamB.isDefeated()) {
 				publish(new MCombatFinished(this, teamA, teamB));
 			}
+			else if(needsActiveSwap()) {
+				setCombatState(CombatState.ACTIVE_DEATH_SWAP);
+			}
 			else {
 				setCombatState(nextState);
 			}
@@ -113,7 +123,7 @@ public class BattleContext implements Publisher {
 				}
 				else if(currentState == CombatState.ACTIVE_DEATH_SWAP) {
 					doActiveDeathSwapPost();
-					setCombatState(CombatState.MAIN_PHASE_1);
+					setCombatState(nextState);
 				}
 				
 				return true;
@@ -226,9 +236,13 @@ public class BattleContext implements Publisher {
 	}
 	
 	private void executeMove(MoveInstance moveInstance, BattleTeam sourceTeam, BattleTeam opponentTeam) {
+		publish(new MCombatMovePreCast(moveInstance));
+		
 		for(MoveAction a : moveInstance.move.actions) {
 			a.activate(moveInstance, sourceTeam, opponentTeam);
 		}
+		
+		publish(new MCombatMovePostCast(moveInstance));
 		
 		moveInstance.source.variables.setVariable("_PREVIOUS_MOVE", moveInstance);
 	}
@@ -243,19 +257,77 @@ public class BattleContext implements Publisher {
 		currentState = next;
 		publish(changed);
 		
-		//Loop through the effects on creatures and update them
+		//Loop through the effects on creatures and update them. Check if they need to be removed
 		for(Creature c : teamA.creatures()) {
 			if(c != null) {
-				for(Effect e : c.activeEffects) {
-					e.enterState(next);
+				
+				//Update Effects
+				Iterator<Effect> effectIter = c.activeEffects.iterator();
+				while(effectIter.hasNext()) {
+					Effect e = effectIter.next();
+					e.enterState(this, next);
+					if(e.needsRemoval()) {
+						e.onRemove(c);
+						effectIter.remove();
+					}
 				}
+				
+				//Update Ailments
+				Iterator<Ailment> ailmentIter = c.activeAilments.iterator();
+				while(ailmentIter.hasNext()) {
+					Ailment a = ailmentIter.next();
+					a.enterState(this, next);
+					if(a.needsRemoval()) {
+						a.onRemove(c);
+						ailmentIter.remove();
+					}
+				}
+				
+				//Check strong ailment
+				if(c.strongAilment != null) {
+					c.strongAilment.enterState(this, next);
+					if(c.strongAilment.needsRemoval()) {
+						c.strongAilment.onRemove(c);
+						c.strongAilment = null;
+					}
+				}
+				
 			}
 		}
 		for(Creature c : teamB.creatures()) {
 			if(c != null) {
-				for(Effect e : c.activeEffects) {
-					e.enterState(next);
+				
+				//Update Effects
+				Iterator<Effect> effectIter = c.activeEffects.iterator();
+				while(effectIter.hasNext()) {
+					Effect e = effectIter.next();
+					e.enterState(this, next);
+					if(e.needsRemoval()) {
+						e.onRemove(c);
+						effectIter.remove();
+					}
 				}
+				
+				//Update Ailments
+				Iterator<Ailment> ailmentIter = c.activeAilments.iterator();
+				while(ailmentIter.hasNext()) {
+					Ailment a = ailmentIter.next();
+					a.enterState(this, next);
+					if(a.needsRemoval()) {
+						a.onRemove(c);
+						ailmentIter.remove();
+					}
+				}
+				
+				//Check strong ailment
+				if(c.strongAilment != null) {
+					c.strongAilment.enterState(this, next);
+					if(c.strongAilment.needsRemoval()) {
+						c.strongAilment.onRemove(c);
+						c.strongAilment = null;
+					}
+				}
+				
 			}
 		}
 		
@@ -295,7 +367,7 @@ public class BattleContext implements Publisher {
 	 * @return whether or not any team in this battle needs to swap any of
 	 * their active mons
 	 */
-	private boolean checkNeedsActiveSwap() {
+	private boolean needsActiveSwap() {
 		for(int i = 0; i < teamA.numActives; ++i) {
 			if(teamA.get(i) != null && teamA.get(i).isDead()) {
 				//One of the actives is dead, make sure that
@@ -424,82 +496,7 @@ public class BattleContext implements Publisher {
 	// - Each of these will be called once whenever
 	//   the state of the battle is changed.
 	//*******************************************
-	private void doMainPhaseOne() {
-		//Apply damage from sandstorm
-		if(battleground.weather == WeatherType.SANDSTORM) {
-			
-			for(int i = 0; i < teamA.numActives; ++i) {
-				for(ElementType t : teamA.get(i).base.types) {
-					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-						unprocessed.add(new BattleEventDamage("Sandstorm", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
-						break;
-					}
-				}
-			}
-			
-			for(int i = 0; i < teamB.numActives; ++i) {
-				for(ElementType t : teamB.get(i).base.types) {
-					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
-						unprocessed.add(new BattleEventDamage("Sandstorm", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
-						break;
-					}
-				}
-			}
-				
-			//Check for sandstorm death
-			if(checkNeedsActiveSwap()) {
-				if(teamA.isDefeated()) {
-					publish(new MCombatFinished(this, teamB, teamA));
-					return;
-				}
-				else if(teamB.isDefeated()) {
-					publish(new MCombatFinished(this, teamA, teamB));
-					return;
-				}
-				else {
-					setCombatState(CombatState.ACTIVE_DEATH_SWAP);
-					return;
-				}
-			}
-			
-		}
-		
-		//Apply healing from dreamscape if applicable
-		if(battleground.weather == WeatherType.DREAMSCAPE) {
-			
-			for(int i = 0; i < teamA.numActives; ++i) {
-				unprocessed.add(new BattleEventHealing("Dreamscape", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
-			}
-			
-			for(int i = 0; i < teamB.numActives; ++i) {
-				unprocessed.add(new BattleEventHealing("Dreamscape", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
-			}
-			
-		}
-		
-		//Apply healing from tempest if applicable
-		if(battleground.weather == WeatherType.TEMPEST) {
-			
-			for(int i = 0; i < teamA.numActives; ++i) {
-				for(ElementType t : teamA.get(i).base.types) {
-					if(t == ElementType.UNDEAD) {
-						unprocessed.add(new BattleEventHealing("Tempest", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
-						break;
-					}
-				}
-			}
-			
-			for(int i = 0; i < teamB.numActives; ++i) {
-				for(ElementType t : teamB.get(i).base.types) {
-					if(t == ElementType.UNDEAD) {
-						unprocessed.add(new BattleEventHealing("Tempest", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
-						break;
-					}
-				}
-			}
-			
-		}
-		
+	private void doMainPhaseOne() {		
 		isWaitingOnActionSelect = true;
 		setDefaultControllerActions(teamAControls, teamA);
 		setDefaultControllerActions(teamBControls, teamB);
@@ -734,12 +731,83 @@ public class BattleContext implements Publisher {
 	}
 	
 	private void doEndPhase() {
-		if(!checkNeedsActiveSwap()) {
-			setCombatState(CombatState.MAIN_PHASE_1);
+		//Apply damage from sandstorm
+		if(battleground.weather == WeatherType.SANDSTORM) {
+			
+			for(int i = 0; i < teamA.numActives; ++i) {
+				for(ElementType t : teamA.get(i).base.types) {
+					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+						unprocessed.add(new BattleEventDamage(
+								null,
+								"Sandstorm", 
+								teamA.get(i),
+								null,
+								(int) (teamA.get(i).maxHealth / 16f),
+								false,
+								false,
+								false));
+						break;
+					}
+				}
+			}
+			
+			for(int i = 0; i < teamB.numActives; ++i) {
+				for(ElementType t : teamB.get(i).base.types) {
+					if(t == ElementType.WATER || t == ElementType.FIRE || t == ElementType.FEY || t == ElementType.LIGHTNING) {
+						unprocessed.add(new BattleEventDamage(
+								null,
+								"Sandstorm", 
+								teamB.get(i),
+								null,
+								(int) (teamB.get(i).maxHealth / 16f),
+								false,
+								false,
+								false));						
+						break;
+					}
+				}
+			}
+			
 		}
-		else {
-			setCombatState(CombatState.ACTIVE_DEATH_SWAP);
+		
+		//Apply healing from dreamscape if applicable
+		if(battleground.weather == WeatherType.DREAMSCAPE) {
+			
+			for(int i = 0; i < teamA.numActives; ++i) {
+				unprocessed.add(new BattleEventHealing("Dreamscape", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
+			}
+			
+			for(int i = 0; i < teamB.numActives; ++i) {
+				unprocessed.add(new BattleEventHealing("Dreamscape", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
+			}
+			
 		}
+		
+		//Apply healing from tempest if applicable
+		if(battleground.weather == WeatherType.TEMPEST) {
+			
+			for(int i = 0; i < teamA.numActives; ++i) {
+				for(ElementType t : teamA.get(i).base.types) {
+					if(t == ElementType.UNDEAD) {
+						unprocessed.add(new BattleEventHealing("Tempest", teamA.get(i), (int) (teamA.get(i).maxHealth / 16f), false));
+						break;
+					}
+				}
+			}
+			
+			for(int i = 0; i < teamB.numActives; ++i) {
+				for(ElementType t : teamB.get(i).base.types) {
+					if(t == ElementType.UNDEAD) {
+						unprocessed.add(new BattleEventHealing("Tempest", teamB.get(i), (int) (teamB.get(i).maxHealth / 16f), false));
+						break;
+					}
+				}
+			}
+			
+		}
+		
+		isWaitingOnBattleEventProcessing = true;
+		nextState = CombatState.MAIN_PHASE_1;
 	}
 	
 	private void doActiveDeathSwap() {			

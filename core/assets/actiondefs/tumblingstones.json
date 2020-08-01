@@ -1,0 +1,12 @@
+[
+	{
+		"class":"Repeat",
+		"repeatTimes":2,
+		"repeatChance":1.0,
+		"action":{
+			"class":"Damage",
+			"target":"TARGET",
+			"power":60
+		}
+	}
+]

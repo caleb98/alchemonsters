@@ -1,0 +1,10 @@
+[
+	{
+		"class":"Chance",
+		"chance":1.0,
+		"action":{
+			"class":"SetWeather",
+			"weather":"DELUGE"
+		}
+	}
+]

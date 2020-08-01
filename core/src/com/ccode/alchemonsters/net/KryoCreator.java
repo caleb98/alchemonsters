@@ -21,7 +21,6 @@ import com.ccode.alchemonsters.combat.context.BattleEvent;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveActionAilmentApplicator;
-import com.ccode.alchemonsters.combat.moves.MoveActionAilmentRemoval;
 import com.ccode.alchemonsters.combat.moves.MoveActionChance;
 import com.ccode.alchemonsters.combat.moves.MoveActionChooseRandom;
 import com.ccode.alchemonsters.combat.moves.MoveActionCombine;
@@ -110,7 +109,6 @@ public class KryoCreator {
 		kryo.register(MoveAction.class);
 		kryo.register(MoveAction[].class);
 		kryo.register(MoveActionAilmentApplicator.class);
-		kryo.register(MoveActionAilmentRemoval.class);
 		kryo.register(MoveActionChance.class);
 		kryo.register(MoveActionChooseRandom.class);
 		kryo.register(MoveActionCombine.class);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.ccode.alchemonsters.combat.WeatherType;
 import com.ccode.alchemonsters.combat.context.BattleContext;
+import com.ccode.alchemonsters.combat.effect.Ailment;
 import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.creature.equip.Affix;
 import com.ccode.alchemonsters.creature.equip.Amplifier;
@@ -142,8 +143,10 @@ public class Creature {
 	private int currentHealth;
 	private int currentMana;
 	
-	//effects
+	//Effects and Ailments
 	public ArrayList<Effect> activeEffects = new ArrayList<>();
+	public ArrayList<Ailment> activeAilments = new ArrayList<>();
+	public Ailment strongAilment;
 
 	public CombatMods mods = new CombatMods();
 	
@@ -165,14 +168,59 @@ public class Creature {
 		return currentHealth <= 0;
 	}
 	
+	public boolean hasAilment(String ailmentName) {
+		for(Ailment a : activeAilments) {
+			if(a.name.equals(ailmentName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasEffect(String effectName) {
+		for(Effect e : activeEffects) {
+			if(e.name.equals(effectName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addAilment(Ailment a) {
+		if(a.isStrong) {
+			if(strongAilment != null) {
+				strongAilment.onRemove(this);
+			}
+			strongAilment = a;
+			a.onApply(this);
+		}
+		else {
+			activeAilments.add(a);
+			a.onApply(this);
+		}
+	}
+	
+	public void removeAilment(Ailment a) {
+		if(a.isStrong) {
+			if(strongAilment == a) {
+				a.onRemove(this);
+				strongAilment = null;
+			}
+		}
+		else {
+			if(activeAilments.remove(a)) 
+				a.onRemove(this);
+		}
+	}
+	
 	public void addEffect(Effect e) {
 		activeEffects.add(e);
 		e.onApply(this);
 	}
 	
 	public void removeEffect(Effect e) {
-		activeEffects.remove(e);
-		e.onRemove(this);
+		if(activeEffects.remove(e))
+			e.onRemove(this);
 	}
 	
 	/**

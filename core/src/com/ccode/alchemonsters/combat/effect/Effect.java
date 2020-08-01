@@ -1,7 +1,9 @@
 package com.ccode.alchemonsters.combat.effect;
 
 import com.ccode.alchemonsters.combat.CombatState;
+import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.creature.Creature;
+import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
 import com.ccode.alchemonsters.engine.event.Subscriber;
 
@@ -20,7 +22,7 @@ public abstract class Effect implements Subscriber, Publisher {
 	/**
 	 * Called whenever the battle context enters a new state.
 	 */
-	public void enterState(CombatState state) {};
+	public void enterState(BattleContext context, CombatState state) {};
 
 	/**
 	 * Called when this effect is applied to a creature.
@@ -33,5 +35,8 @@ public abstract class Effect implements Subscriber, Publisher {
 	 * @param c creature effect is removed from
 	 */
 	public void onRemove(Creature c) {}
+	
+	@Override
+	public void handleMessage(Message currentMessage) {}
 	
 }

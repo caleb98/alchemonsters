@@ -1,0 +1,14 @@
+[
+	{
+		"class":"StatModifier",
+		"target":"SELF",
+		"stat":"MAGIC_ATK",
+		"amount":1
+	},
+	{
+		"class":"StatModifier",
+		"target":"SELF",
+		"stat":"MAGIC_DEF",
+		"amount":1
+	}
+]
