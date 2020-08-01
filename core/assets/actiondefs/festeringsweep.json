@@ -8,10 +8,10 @@
 		"class":"Chance",
 		"chance":0.25,
 		"action":{
-			"class":"StatModifier",
-			"target":"OPPONENT_TEAM",
-			"stat":"PHYS_DEF",
-			"amount":1
+			"class": "StatModifier",
+			"target": "OPPONENT_TEAM",
+			"stat": "PHYS_DEF",
+			"amount": -1
 		}
 	}
 ]
