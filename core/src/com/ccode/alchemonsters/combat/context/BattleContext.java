@@ -217,6 +217,22 @@ public class BattleContext implements Publisher {
 				break;
 			
 			}
+			
+			//After the move is complete, check to see if this unit has a double attack for
+			//this round. If so, make sure that the target of this move was not killed, as
+			//killing an enemy removes the chance for a second attack.
+			if((sourceTeam == teamA && isTeamADoubleAttack) || (sourceTeam == teamB && isTeamBDoubleAttack)) {
+				if(activePos == doubleAttackPosition) {
+					for(Creature t : targets) {
+						if(t.isDead()) {
+							isTeamADoubleAttack = false;
+							isTeamBDoubleAttack = false;
+							nextState = CombatState.END_PHASE;
+							break;
+						}
+					}
+				}
+			}
 			break;
 			
 		case SWITCH:
@@ -294,6 +310,7 @@ public class BattleContext implements Publisher {
 				
 			}
 		}
+		
 		for(Creature c : teamB.creatures()) {
 			if(c != null) {
 				
@@ -646,7 +663,7 @@ public class BattleContext implements Publisher {
 			Triple<BattleTeam, Integer, BattleAction> firstInfo = monActions.get(0);
 			BattleTeam otherTeam = (firstInfo.a == teamA) ? teamB : teamA;
 			
-			int maxSpeed = 0;
+			int maxSpeed = -1;
 			for(int activeIndex = 0; activeIndex < otherTeam.numActives; ++activeIndex) {
 				//Ignore empty slots or dead mons
 				if(otherTeam.get(activeIndex) == null || otherTeam.get(activeIndex).isDead()) {
@@ -659,15 +676,18 @@ public class BattleContext implements Publisher {
 			}
 			
 			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed(this) >= 1.5 * maxSpeed) {
+				Creature doubleAttackMon;
 				//There should be a double attack
 				if(firstInfo.a == teamA) {
 					isTeamADoubleAttack = true;
+					doubleAttackMon = teamA.get(firstInfo.b);
 				}
 				else {
-					isTeamBDoubleAttack = false;
+					isTeamBDoubleAttack = true;
+					doubleAttackMon = teamB.get(firstInfo.b);
 				}
 				doubleAttackPosition = firstInfo.b;
-				
+
 				isWaitingOnBattleEventProcessing = true;
 				nextState = CombatState.MAIN_PHASE_2;
 				return;
@@ -693,7 +713,6 @@ public class BattleContext implements Publisher {
 					doubleAttackMon = teamB.get(firstInfo.b);
 				}
 				doubleAttackPosition = firstInfo.b;
-				this.variables.setVariable("_PREV_DOUBLE_ATTACK_MON", doubleAttackMon);
 
 				isWaitingOnBattleEventProcessing = true;
 				nextState = CombatState.MAIN_PHASE_2;
@@ -817,7 +836,10 @@ public class BattleContext implements Publisher {
 				//Look for an inactive, non-dead creature to swap to
 				for(int k = teamA.numActives; k < CreatureTeam.TEAM_SIZE; ++k) {
 					if(!teamA.get(k).isDead()) {
+						teamAControls[i].stopCharging();
+						teamAControls[i].setRecharging(false);
 						teamAControls[i].refresh();
+						setDefaultControllerActions(teamAControls[i], i, teamA);
 						teamAControls[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
 						break;
 					}
@@ -831,7 +853,10 @@ public class BattleContext implements Publisher {
 				//Look for an inactive, non-dead creature to swap to
 				for(int k = teamB.numActives; k < CreatureTeam.TEAM_SIZE; ++k) {
 					if(!teamB.get(k).isDead()) {
+						teamBControls[i].stopCharging();
+						teamBControls[i].setRecharging(false);
 						teamBControls[i].refresh();
+						setDefaultControllerActions(teamBControls[i], i, teamB);
 						teamBControls[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
 						break;
 					}

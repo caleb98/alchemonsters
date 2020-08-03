@@ -294,8 +294,12 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			
 			game.setScreen(new MainMenuScreen(game));
 			return true;
-				
+		
+		case Keys.F1:
+			return true;
+			
 		}
+		
 		return false;
 	}
 
