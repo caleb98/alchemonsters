@@ -31,8 +31,9 @@ public class GenericUnitController implements UnitController {
 	
 	@Override
 	public void filterAllActions(Predicate<BattleAction> filter) {
-		allActions.removeIf(filter);
-		resetAvailableActions();
+		availableActions.clear();
+		availableActions.addAll(allActions);
+		availableActions.removeIf(filter);
 	}
 
 	@Override
