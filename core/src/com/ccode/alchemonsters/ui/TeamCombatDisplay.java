@@ -14,7 +14,8 @@ import com.ccode.alchemonsters.engine.UI;
 public class TeamCombatDisplay extends Table {
 	
 	String teamName;
-	BattleTeam team;
+	BattleTeam thisTeam;
+	BattleTeam opponentTeam;
 	Cell<CreatureDisplay>[] allDisplays;
 	Dialog sameActionError;
 	
@@ -37,8 +38,9 @@ public class TeamCombatDisplay extends Table {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void setup(BattleTeam team, Stage ui) {
-		this.team = team;
+	public void setup(BattleTeam team, BattleTeam opponentTeam, Stage ui) {
+		this.thisTeam = team;
+		this.opponentTeam = opponentTeam;
 		
 		clear();
 		
@@ -64,7 +66,7 @@ public class TeamCombatDisplay extends Table {
 	}
 	
 	public void setTeam(BattleTeam t) {
-		team = t;
+		thisTeam = t;
 	}
 	
 	public void updateStrings() {
@@ -114,7 +116,7 @@ public class TeamCombatDisplay extends Table {
 		}
 		
 		void updateStrings() {
-			Creature creature = team.get(teamId);
+			Creature creature = thisTeam.get(teamId);
 			
 			if(creature == null) {
 				return;

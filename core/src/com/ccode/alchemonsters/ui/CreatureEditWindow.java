@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -32,6 +31,7 @@ import com.ccode.alchemonsters.util.GameRandom;
 public class CreatureEditWindow extends Window {
 	
 	private SelectBox<String> creatureSelectBox;
+	private TextField creatureNameEdit;
 	private Slider levelSlider;
 	private Label levelDisplay;
 	private Slider baseHealthSlider;
@@ -83,7 +83,10 @@ public class CreatureEditWindow extends Window {
 			}
 		});
 		
-		add(creatureSelectText, creatureSelectBox);
+		Label creatureNameText = new Label("Name: ", UI.DEFAULT_SKIN);
+		creatureNameEdit = new TextField("", UI.DEFAULT_SKIN);
+		
+		add(creatureSelectText, creatureSelectBox, creatureNameText, creatureNameEdit);
 		row();
 		
 		Label levelLabel = new Label("Level", UI.DEFAULT_SKIN);
@@ -286,7 +289,7 @@ public class CreatureEditWindow extends Window {
 					
 					edit.currentLevel = (int) levelSlider.getValue();
 					edit.moves = movesActiveList.getItems().toArray(String.class);
-					edit.personalName = edit.base.name + " (LVL " + edit.currentLevel + ")";
+					edit.personalName = creatureNameEdit.getText().equals("") ? edit.base.name + " (LVL " + edit.currentLevel + ")" : creatureNameEdit.getText();
 					
 					edit.recalculateAllStats(true);
 					
@@ -408,6 +411,7 @@ public class CreatureEditWindow extends Window {
 			CreatureBase b = c.base;
 			
 			creatureSelectBox.setSelected(b.name);
+			creatureNameEdit.setText(c.personalName);
 			
 			levelSlider.setValue(c.currentLevel);
 			baseHealthSlider.setRange(b.minBaseHealth, b.maxBaseHealth);
@@ -457,6 +461,7 @@ public class CreatureEditWindow extends Window {
 	
 	private void resetCreatureStatsDisplay() {
 		creatureSelectBox.setSelectedIndex(0);
+		creatureNameEdit.setText("");
 		
 		levelSlider.setValue(1);
 		

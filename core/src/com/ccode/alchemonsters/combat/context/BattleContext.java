@@ -839,6 +839,14 @@ public class BattleContext implements Publisher {
 						teamAControls[i].stopCharging();
 						teamAControls[i].setRecharging(false);
 						teamAControls[i].refresh();
+						
+						//We have to reset the default controller actions here
+						//because the controller may have been charging, which
+						//would result in no switch actions being available
+						//(as you can only choose to continue charging). Since
+						//we call stopCharging() and setRecharging(false) right
+						//before this, we know we'll have all the switch actions
+						//available to filter down to.
 						setDefaultControllerActions(teamAControls[i], i, teamA);
 						teamAControls[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
 						break;
@@ -856,6 +864,14 @@ public class BattleContext implements Publisher {
 						teamBControls[i].stopCharging();
 						teamBControls[i].setRecharging(false);
 						teamBControls[i].refresh();
+						
+						//We have to reset the default controller actions here
+						//because the controller may have been charging, which
+						//would result in no switch actions being available
+						//(as you can only choose to continue charging). Since
+						//we call stopCharging() and setRecharging(false) right
+						//before this, we know we'll have all the switch actions
+						//available to filter down to.
 						setDefaultControllerActions(teamBControls[i], i, teamB);
 						teamBControls[i].filterAllActions((a)->{return a.type != BattleActionType.SWITCH;});
 						break;

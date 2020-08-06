@@ -2,7 +2,6 @@ package com.ccode.alchemonsters.ui;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -23,9 +22,9 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 		super(teamName);
 	}
 	
-	public void setup(BattleTeam team, UnitController[] activeControllers, Stage ui) {
+	public void setup(BattleTeam team, BattleTeam opponentTeam, UnitController[] activeControllers, Stage ui) {
 		this.activeControllers = activeControllers;
-		super.setup(team, ui);
+		super.setup(team, opponentTeam, ui);
 	}
 	
 	public UnitController[] getControllers() {
@@ -83,11 +82,11 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 			
 			//See if this mon is dead and there's no other mon
 			//that can be swapped in.
-			if(team.get(teamId) != null && team.get(teamId).isDead()) {
+			if(thisTeam.get(teamId) != null && thisTeam.get(teamId).isDead()) {
 				boolean isSwapAvailable = false;
 				
-				for(int i = team.numActives; i < CreatureTeam.TEAM_SIZE; ++i) {
-					if(team.get(i) != null && !team.get(i).isDead()) {
+				for(int i = thisTeam.numActives; i < CreatureTeam.TEAM_SIZE; ++i) {
+					if(thisTeam.get(i) != null && !thisTeam.get(i).isDead()) {
 						isSwapAvailable = true;
 						break;
 					}
@@ -107,72 +106,70 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 				switch(a.type) {
 				
 				case MOVE:
-					String moveName = team.get(teamId).moves[a.id];
+					String moveName = thisTeam.get(teamId).moves[a.id];
 					if(activeControllers[teamId].isCharging()) {
 						stringVer.add("Continue charging " + moveName);
 						break;
 					}
-					switch(MoveDatabase.getMove(team.get(teamId).moves[a.id]).targetSelectType) {
+					switch(MoveDatabase.getMove(thisTeam.get(teamId).moves[a.id]).targetSelectType) {
 					
 					case NONE:
 						stringVer.add(
 								String.format(
-										"Use move %s [%s mana] (no target)", 
-										team.get(teamId).moves[a.id], 
-										MoveDatabase.getMove(moveName).manaCost, 
-										a.targets));
+										"Use move %s [%s mana] (move has no target)", 
+										thisTeam.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost));
 						break;
 						
 					case FRIENDLY_TEAM:
 						stringVer.add(
 								String.format(
 										"Use move %s [%s mana] (friendly team)", 
-										team.get(teamId).moves[a.id], 
-										MoveDatabase.getMove(moveName).manaCost, 
-										a.targets));
+										thisTeam.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost));
 						break;
 						
 					case OPPONENT_TEAM:
 						stringVer.add(
 								String.format(
 										"Use move %s [%s mana] (opponent team)", 
-										team.get(teamId).moves[a.id], 
-										MoveDatabase.getMove(moveName).manaCost, 
-										a.targets));
+										thisTeam.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost));
 						break;
 						
 					case SELF:
 						stringVer.add(
 								String.format(
 										"Use move %s [%s mana] (self)", 
-										team.get(teamId).moves[a.id], 
-										MoveDatabase.getMove(moveName).manaCost, 
-										a.targets));
+										thisTeam.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost));
 						break;
 						
 					case SINGLE_FRIENDLY:
 						stringVer.add(
 								String.format(
-										"Use move %s [%s mana] (friendly: %s)", 
-										team.get(teamId).moves[a.id], 
+										"Use move %s [%s mana] (friendly %s: %s)", 
+										thisTeam.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targets));
+										a.targets[0],
+										thisTeam.get(a.targets[0]).personalName));
 						break;
 						
 					case SINGLE_OPPONENT:
 						stringVer.add(
 								String.format(
-										"Use move %s [%s mana] (enemy: %s)", 
-										team.get(teamId).moves[a.id], 
-										MoveDatabase.getMove(moveName).manaCost, 
-										a.targets));
+										"Use move %s [%s mana] (enemy %s: %s)", 
+										thisTeam.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost,
+										a.targets[0],
+										opponentTeam.get(a.targets[0]).personalName));
 						break;				
 					
 					}
 					break;
 					
 				case SWITCH:
-					stringVer.add(String.format("Switch to %s (%s)", team.get(a.id).personalName, a.id));
+					stringVer.add(String.format("Switch to %s (%s)", thisTeam.get(a.id).personalName, a.id));
 					break;
 					
 				case USE:

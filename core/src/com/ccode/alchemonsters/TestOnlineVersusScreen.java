@@ -375,12 +375,12 @@ public class TestOnlineVersusScreen extends GameScreen implements InputProcessor
 			if(m instanceof MCombatStarted) {
 				MCombatStarted full = (MCombatStarted) m;
 				if(full.teamA.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
-					myTeamDisplay.setup(full.teamA, myControls, ui);
-					theirTeamDisplay.setup(full.teamB, ui);
+					myTeamDisplay.setup(full.teamA, full.teamB, myControls, ui);
+					theirTeamDisplay.setup(full.teamB, full.teamA, ui);
 				}
 				else if(full.teamB.variables.getAs(UUID.class, UUID_NAME).equals(myID)) {
-					myTeamDisplay.setup(full.teamB, myControls, ui);
-					theirTeamDisplay.setup(full.teamA, ui);
+					myTeamDisplay.setup(full.teamB, full.teamA, myControls, ui);
+					theirTeamDisplay.setup(full.teamA, full.teamB, ui);
 				}
 				else {
 					//TODO: should never happen

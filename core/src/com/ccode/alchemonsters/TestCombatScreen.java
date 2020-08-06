@@ -198,8 +198,8 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		}
 		
 		//Setup display windows
-		teamADisplay.setup(battleTeamA, (new TeamController(positions)).getControls(), ui);
-		teamBDisplay.setup(battleTeamB, (new TeamController(positions)).getControls(), ui);
+		teamADisplay.setup(battleTeamA, battleTeamB, (new TeamController(positions)).getControls(), ui);
+		teamBDisplay.setup(battleTeamB, battleTeamA, (new TeamController(positions)).getControls(), ui);
 		
 		//Combat setup
 		battleContext = new BattleContext(
