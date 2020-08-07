@@ -8,7 +8,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
 /**
  * A generic damage event that is <i>not</i> caused by a move.
  */
-public class BattleEventDamage implements BattleEvent, Publisher {
+public class BattleEventDamage extends BattleEvent implements Publisher {
 
 	private Creature source;
 	private String cause;
@@ -21,6 +21,7 @@ public class BattleEventDamage implements BattleEvent, Publisher {
 	
 	public BattleEventDamage(Creature source, String cause, Creature target, ElementType element, 
 			int amt, boolean isCrit, boolean isStab, boolean isTriggered) {
+		super(()->{return 0;});
 		this.source = source;
 		this.cause = cause;
 		this.target = target;

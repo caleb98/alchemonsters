@@ -3,6 +3,7 @@
 **/pdn/
 gamedata.db
 sprites_packed/
+*.db-journal
 
 ## Java
 

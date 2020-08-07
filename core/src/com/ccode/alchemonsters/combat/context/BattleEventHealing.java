@@ -7,7 +7,7 @@ import com.ccode.alchemonsters.engine.event.messages.MCombatHealingReceived;
 /**
  * A generic healing event that is <i>not</i> caused by a move.
  */
-public class BattleEventHealing implements BattleEvent, Publisher {
+public class BattleEventHealing extends BattleEvent implements Publisher {
 
 	private String source;
 	private Creature target;
@@ -15,6 +15,7 @@ public class BattleEventHealing implements BattleEvent, Publisher {
 	private boolean isTriggered;
 	
 	public BattleEventHealing(String source, Creature target, int amt, boolean isTriggered) {
+		super(()->{return 0;});
 		this.source = source;
 		this.target = target;
 		this.amt = amt;

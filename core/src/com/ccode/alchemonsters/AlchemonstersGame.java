@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.ccode.alchemonsters.creature.StatCalculators;
 import com.ccode.alchemonsters.engine.ProcessManager;
 import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.UI;
@@ -17,7 +18,6 @@ import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.GameData;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.database.ScriptDatabase;
-import com.ccode.alchemonsters.engine.database.StatCalculators;
 
 public class AlchemonstersGame extends Game {
 	

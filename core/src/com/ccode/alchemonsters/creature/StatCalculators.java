@@ -1,15 +1,11 @@
-package com.ccode.alchemonsters.engine.database;
+package com.ccode.alchemonsters.creature;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
-import com.ccode.alchemonsters.creature.Creature;
-import com.ccode.alchemonsters.creature.StatCalculator;
-import com.ccode.alchemonsters.creature.StatType;
-
 public class StatCalculators {
 
-	private static HashMap<String, StatCalculator> CALCULATOR_DICTIONARY;
+	private static HashMap<String, StatCalculator<?>> CALCULATOR_DICTIONARY;
 	private static boolean isInitialized = false;
 	
 	public static final String defaultTotalVitaeCalculator = "DefaultTotalVitaeCalculator";
@@ -218,7 +214,7 @@ public class StatCalculators {
 			throw new IllegalStateException("Attempted to retreive stat calculator before initializing.");
 		}
 		
-		 return CALCULATOR_DICTIONARY.get(name);
+		 return (StatCalculator<T>) CALCULATOR_DICTIONARY.get(name);
 	}
 	
 	public static StatCalculator<Integer> getIntCalculator(String name) {

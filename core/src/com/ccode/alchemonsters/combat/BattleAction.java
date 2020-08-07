@@ -11,6 +11,7 @@ public class BattleAction implements Comparable<BattleAction> {
 	
 	public final BattleActionType type;
 	public final int[] targets;
+	public final boolean isTargetingEnemy;
 	/**
 	 * Represents various values depending on the BattleActionType of this action.
 	 * For switch: the index of the creature to switch to in the team.
@@ -23,12 +24,14 @@ public class BattleAction implements Comparable<BattleAction> {
 	private BattleAction() {
 		type = null;
 		targets = new int[]{};
+		isTargetingEnemy = true;
 		id = -1;
 	}
 	
-	public BattleAction(BattleActionType type, int id, int... targets) {
+	public BattleAction(BattleActionType type, int id, boolean isTargetingEnemy, int... targets) {
 		this.type = type;
 		this.targets = targets;
+		this.isTargetingEnemy = isTargetingEnemy;
 		this.id = id;
 	}
 	
@@ -39,7 +42,7 @@ public class BattleAction implements Comparable<BattleAction> {
 		}
 		
 		BattleAction other = (BattleAction) obj;
-		return type == other.type && targets == other.targets && id == other.id;
+		return type == other.type && targets == other.targets && isTargetingEnemy == other.isTargetingEnemy && id == other.id;
 	}
 	
 	@Override

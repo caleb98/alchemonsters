@@ -12,6 +12,7 @@ public class GenericUnitController implements UnitController {
 	
 	private int chargingMove = -1;
 	private int[] chargingTargets = new int[]{};
+	private boolean doesChargeTargetEnemy = true;
 	
 	private boolean isRecharging = false;
 	
@@ -75,11 +76,12 @@ public class GenericUnitController implements UnitController {
 	public void setSelectedAction(int selectedIndex) {
 		selectedAction = availableActions.get(selectedIndex);
 	}
-
+	
 	@Override
-	public void setCharging(int move, int[] targets) {
+	public void setCharging(int move, int[] targets, boolean doesChargeTargetEnemy) {
 		chargingMove = move;
 		chargingTargets = targets;
+		this.doesChargeTargetEnemy = doesChargeTargetEnemy;
 	}
 
 	@Override
@@ -90,6 +92,11 @@ public class GenericUnitController implements UnitController {
 	@Override
 	public boolean isCharging() {
 		return chargingMove != -1;
+	}
+	
+	@Override
+	public boolean isChargeTargetingEnemy() {
+		return doesChargeTargetEnemy;
 	}
 
 	@Override

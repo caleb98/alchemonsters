@@ -8,7 +8,6 @@ import com.ccode.alchemonsters.combat.effect.Ailment;
 import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.creature.equip.Affix;
 import com.ccode.alchemonsters.creature.equip.Amplifier;
-import com.ccode.alchemonsters.engine.database.StatCalculators;
 import com.ccode.alchemonsters.util.DynamicVariables;
 
 public class Creature {
@@ -94,15 +93,15 @@ public class Creature {
 	public String totalResCalculator = StatCalculators.defaultTotalResCalculator;
 	
 	//totaled stats
-	public int totalVitae;
-	public int totalFocus;
-	public int totalMagicAtk;
-	public int totalMagicDef;
-	public int totalPhysAtk;
-	public int totalPhysDef;
-	public int totalPenetration;
-	public int totalResistance;
-	public int totalSpeed;
+	int totalVitae;
+	int totalFocus;
+	int totalMagicAtk;
+	int totalMagicDef;
+	int totalPhysAtk;
+	int totalPhysDef;
+	int totalPenetration;
+	int totalResistance;
+	int totalSpeed;
 	
 	//secondaries
 	public float critChance = BASE_CRIT_CHANCE;
@@ -255,88 +254,115 @@ public class Creature {
 	//         STAT RETRIEVAL METHODS
 	//===========================================
 	public int calcTotalMagicAtk(BattleContext context) {
-		if(context == null) return totalMagicAtk;
-		
-		//Check for magic atk boost to fire types from pyronimbus
 		int total = totalMagicAtk;
-		if(context.battleground.weather == WeatherType.PYRONIMBUS) {
-			for(ElementType t : base.types) {
-				if(t == ElementType.FIRE) {
-					total *= PYRONIMBUS_MAGIC_ATK_MULTIPLIER;
-					break;
+		
+		if(context != null) {
+			//Check for magic atk boost to fire types from pyronimbus
+			if(context.battleground.weather == WeatherType.PYRONIMBUS) {
+				for(ElementType t : base.types) {
+					if(t == ElementType.FIRE) {
+						total *= PYRONIMBUS_MAGIC_ATK_MULTIPLIER;
+						break;
+					}
 				}
 			}
 		}
+		
+		total *= mods.getMagicAtkMultiplier();
 		
 		return total;
 	}
 	
 	public int calcTotalMagicDef(BattleContext context) {
-		if(context == null) return totalMagicDef;
-		
-		//Check for magic def boost to ground types from sandstorm
 		int total = totalMagicDef;
-		if(context.battleground.weather == WeatherType.SANDSTORM) {
-			for(ElementType t : base.types) {
-				if(t == ElementType.GROUND) {
-					total *= SANDSTORM_MAGIC_DEF_MULTIPLIER;
-					break;
+		
+		if(context != null) {
+			//Check for magic def boost to ground types from sandstorm
+			if(context.battleground.weather == WeatherType.SANDSTORM) {
+				for(ElementType t : base.types) {
+					if(t == ElementType.GROUND) {
+						total *= SANDSTORM_MAGIC_DEF_MULTIPLIER;
+						break;
+					}
 				}
 			}
 		}
+		
+		total *= mods.getMagicDefMultiplier();
+		
 		return total;
 	}
 	
 	public int calcTotalPhysAtk(BattleContext context) {
-		if(context == null) return totalPhysAtk;
-		
 		int total = totalPhysAtk;
-		if(context.battleground.weather == WeatherType.PYRONIMBUS) {
-			for(ElementType t : base.types) {
-				if(t == ElementType.FIRE) {
-					total *= SANDSTORM_MAGIC_DEF_MULTIPLIER;
-					break;
+		
+		if(context != null) {
+			if(context.battleground.weather == WeatherType.PYRONIMBUS) {
+				for(ElementType t : base.types) {
+					if(t == ElementType.FIRE) {
+						total *= SANDSTORM_MAGIC_DEF_MULTIPLIER;
+						break;
+					}
 				}
 			}
 		}
+
+		total *= mods.getPhysAtkMultiplier();
+		
 		return total;
 	}
 	
 	public int calcTotalPhysDef(BattleContext context) {
-		return totalPhysDef;
+		int total = totalPhysDef;
+		
+		total *= mods.getPhysDefMultiplier();
+		
+		return total;
 	}
 	
 	public int calcTotalPen(BattleContext context) {
+		int total = totalPenetration;
+		
+		total *= mods.getPenMultiplier();
+		
 		return totalPenetration;
 	}
 	
 	public int calcTotalRes(BattleContext context) {
-		if(context == null) return totalResistance;
-		
 		int total = totalResistance;
-		if(context.battleground.weather == WeatherType.LOCUST_SWARM) {
-			for(ElementType t : base.types) {
-				if(t == ElementType.UNDEAD) {
-					total *= LOCUST_SWARM_RES_MULTIPLIER;
-					break;
+		
+		if(context != null) {
+			if(context.battleground.weather == WeatherType.LOCUST_SWARM) {
+				for(ElementType t : base.types) {
+					if(t == ElementType.UNDEAD) {
+						total *= LOCUST_SWARM_RES_MULTIPLIER;
+						break;
+					}
 				}
 			}
 		}
+		
+		total *= mods.getResMultiplier();
+		
 		return total;
 	}
 	
 	public int calcTotalSpeed(BattleContext context) {
-		if(context == null) return totalSpeed;
-		
 		int total = totalSpeed;
-		if(context.battleground.weather == WeatherType.JETSTREAM) {
-			for(ElementType t : base.types) {
-				if(t == ElementType.AIR) {
-					total *= JETSTREAM_SPEED_MULTIPLIER;
-					break;
+		
+		if(context != null) {
+				if(context.battleground.weather == WeatherType.JETSTREAM) {
+					for(ElementType t : base.types) {
+						if(t == ElementType.AIR) {
+							total *= JETSTREAM_SPEED_MULTIPLIER;
+							break;
+						}
+					}
 				}
-			}
 		}
+		
+		total *= mods.getSpeedMultiplier();
+				
 		return total;
 	}
 	
