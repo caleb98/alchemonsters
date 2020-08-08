@@ -3,9 +3,9 @@ package com.ccode.alchemonsters.creature;
 import java.util.ArrayList;
 
 import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.combat.ailment.Ailment;
+import com.ccode.alchemonsters.combat.ailment.Effect;
 import com.ccode.alchemonsters.combat.context.BattleContext;
-import com.ccode.alchemonsters.combat.effect.Ailment;
-import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.creature.equip.Affix;
 import com.ccode.alchemonsters.creature.equip.Amplifier;
 import com.ccode.alchemonsters.util.DynamicVariables;

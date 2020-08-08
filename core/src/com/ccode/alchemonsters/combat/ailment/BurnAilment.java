@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters.combat.effect;
+package com.ccode.alchemonsters.combat.ailment;
 
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.context.BattleContext;
@@ -7,11 +7,12 @@ import com.ccode.alchemonsters.creature.Creature;
 import com.ccode.alchemonsters.creature.ElementType;
 import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.messages.MCombatDamageDealt;
+import com.ccode.alchemonsters.util.GameRandom;
 
-public class ScorchAilment extends Ailment {
+public class BurnAilment extends Ailment {
 
-	public ScorchAilment(int duration) {
-		super("Scorch", false, duration);
+	public BurnAilment(int duration) {
+		super("Burn", false, duration);
 	}
 	
 	@Override
@@ -33,16 +34,16 @@ public class ScorchAilment extends Ailment {
 		super.enterState(context, state);
 		
 		if(state == CombatState.END_PHASE) {
-			int scorchDamage = (int) (appliedTo.maxHealth / 16f);
+			int burnDamage = (int) (appliedTo.maxHealth / 16f);
 			context.addBattleEvent(new BattleEventDamage(
 					null, 
 					name, 
 					appliedTo, 
 					ElementType.FIRE, 
-					scorchDamage, 
+					burnDamage, 
 					false, 
 					false, 
-					false //This damage is not triggered because it occurs at a specified moment in the game turn cycle
+					false
 			));
 		}
 	}
@@ -52,17 +53,10 @@ public class ScorchAilment extends Ailment {
 		if(currentMessage instanceof MCombatDamageDealt) {
 			MCombatDamageDealt full = (MCombatDamageDealt) currentMessage;
 			if(full.target == appliedTo) {
-				int scorchDamage = (int) (appliedTo.maxHealth / 16f);
-				full.context.addBattleEvent(new BattleEventDamage(
-						null,
-						name,
-						appliedTo,
-						ElementType.FIRE,
-						scorchDamage,
-						false,
-						false,
-						true //This damage is triggered because it occurs after a spell hit
-				));
+				float scorchChance = 0.10f;
+				if(GameRandom.nextFloat() < 0.10f) {
+					//TODO: apply scorched and remove burn
+				}
 			}
 		}
 	}

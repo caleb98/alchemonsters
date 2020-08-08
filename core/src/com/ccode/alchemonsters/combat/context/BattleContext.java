@@ -7,14 +7,14 @@ import java.util.LinkedList;
 
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
+import com.ccode.alchemonsters.combat.ailment.Ailment;
+import com.ccode.alchemonsters.combat.ailment.Effect;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.Battleground;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.WeatherType;
-import com.ccode.alchemonsters.combat.effect.Ailment;
-import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveInstance;

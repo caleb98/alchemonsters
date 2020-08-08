@@ -296,6 +296,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 			return true;
 		
 		case Keys.F1:
+			ui.setDebugAll(ui.isDebugAll() ? false : true);
 			return true;
 			
 		}

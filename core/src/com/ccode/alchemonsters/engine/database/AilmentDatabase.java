@@ -3,10 +3,10 @@ package com.ccode.alchemonsters.engine.database;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import com.ccode.alchemonsters.combat.effect.Ailment;
-import com.ccode.alchemonsters.combat.effect.BlightAilment;
-import com.ccode.alchemonsters.combat.effect.BurnAilment;
-import com.ccode.alchemonsters.combat.effect.ScorchAilment;
+import com.ccode.alchemonsters.combat.ailment.Ailment;
+import com.ccode.alchemonsters.combat.ailment.BlightAilment;
+import com.ccode.alchemonsters.combat.ailment.BurnAilment;
+import com.ccode.alchemonsters.combat.ailment.ScorchAilment;
 
 public class AilmentDatabase {
 
