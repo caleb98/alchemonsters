@@ -87,7 +87,6 @@ public class BattleContext implements Publisher {
 		//Check for unprocessed BattleEvents and run them if they exist
 		if(isWaitingOnBattleEventProcessing) {
 			
-			int cycle = 0;
 			while(unprocessed.size() > 0) {
 				
 				BattleEvent next = unprocessed.pop();
@@ -97,8 +96,6 @@ public class BattleContext implements Publisher {
 						return b.getSpeed() - a.getSpeed(); //Do this backwards to we sort from highest to lowest
 					}
 				});
-				
-				System.out.println(teamA.get(1).mods.getSpeedMultiplier());
 				
 			}
 			
