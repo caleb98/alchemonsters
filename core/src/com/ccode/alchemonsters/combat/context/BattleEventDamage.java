@@ -21,7 +21,8 @@ public class BattleEventDamage extends BattleEvent implements Publisher {
 	
 	public BattleEventDamage(Creature source, String cause, Creature target, ElementType element, 
 			int amt, boolean isCrit, boolean isStab, boolean isTriggered) {
-		super(()->{return 0;});
+		//TODO: this uses a speed and priority of 0. this is fine right now because these events dont occur inline with action events, but if they ever do they will need to be sorted accordingly
+		super(()->{return 0;}, ()->{return 0;});
 		this.source = source;
 		this.cause = cause;
 		this.target = target;

@@ -13,8 +13,8 @@ public class BattleEventAction extends BattleEvent implements Publisher {
 	private BattleTeam sourceTeam;
 	private BattleTeam opponentTeam;
 	
-	public BattleEventAction(UnitController control, int activePos, BattleTeam sourceTeam, BattleTeam opponentTeam, IntSupplier speed) {
-		super(speed);
+	public BattleEventAction(UnitController control, int activePos, BattleTeam sourceTeam, BattleTeam opponentTeam, IntSupplier speed, IntSupplier priority) {
+		super(speed, priority);
 		this.control = control;
 		this.activePos = activePos;
 		this.sourceTeam = sourceTeam;

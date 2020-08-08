@@ -93,7 +93,12 @@ public class BattleContext implements Publisher {
 				next.runEvent(this);
 				unprocessed.sort(new Comparator<BattleEvent>() {
 					public int compare(BattleEvent a, BattleEvent b) {
-						return b.getSpeed() - a.getSpeed(); //Do this backwards to we sort from highest to lowest
+						if(a.getPriority() == b.getPriority()) {
+							return b.getSpeed() - a.getSpeed(); //Do this backwards to we sort from highest to lowest
+						}
+						else {
+							return b.getPriority() - a.getPriority(); //Do this backwards to we sort from highest to lowest
+						}
 					}
 				});
 				
@@ -638,7 +643,8 @@ public class BattleContext implements Publisher {
 						info.b,
 						info.a,
 						info.a == teamA ? teamB : teamA,
-						()->{return thisMovePos;}));
+						()->{return thisMovePos;},
+						()->{return Integer.MAX_VALUE;}));
 				iter.remove();
 				movePos--;
 			}
@@ -688,7 +694,8 @@ public class BattleContext implements Publisher {
 					info.b,
 					info.a,
 					info.a == teamA ? teamB : teamA,
-					()->{return info.a.get(info.b).calcTotalSpeed(this);}));
+					()->{return info.a.get(info.b).calcTotalSpeed(this);},
+					()->{return MoveDatabase.getMove(info.a.get(info.b).moves[info.c.id]).priority;}));
 		}
 		
 		//Do delayed moves
@@ -812,11 +819,28 @@ public class BattleContext implements Publisher {
 	
 	private void doBattlePhaseTwo() {
 		if(isTeamADoubleAttack) {
-			unprocessed.add(new BattleEventAction(teamAControls[doubleAttackPosition], doubleAttackPosition, teamA, teamB, ()->{return teamA.get(doubleAttackPosition).calcTotalSpeed(this);}));
+			unprocessed.add(new BattleEventAction(
+					teamAControls[doubleAttackPosition], 
+					doubleAttackPosition, 
+					teamA, 
+					teamB, 
+					()->{return teamA.get(doubleAttackPosition).calcTotalSpeed(this);},
+					()->{
+						return MoveDatabase.getMove(teamA.get(doubleAttackPosition).moves[teamAControls[doubleAttackPosition].getSelectedAction().id]).priority;
+					}));
+					
 			
 		}
 		else if(isTeamBDoubleAttack) {
-			unprocessed.add(new BattleEventAction(teamBControls[doubleAttackPosition], doubleAttackPosition, teamB, teamA, ()->{return teamB.get(doubleAttackPosition).calcTotalSpeed(this);}));
+			unprocessed.add(new BattleEventAction(
+					teamBControls[doubleAttackPosition], 
+					doubleAttackPosition, 
+					teamB, 
+					teamA, 
+					()->{return teamB.get(doubleAttackPosition).calcTotalSpeed(this);},
+					()->{
+						return MoveDatabase.getMove(teamB.get(doubleAttackPosition).moves[teamBControls[doubleAttackPosition].getSelectedAction().id]).priority;
+					}));
 		}
 		
 		isWaitingOnBattleEventProcessing = true;

@@ -20,7 +20,7 @@ CREATE TABLE CreatureBases (
 	BaseResistance INTEGER NOT NULL,
 	BaseSpeed INTEGER NOT NULL,
 	TypeOne INTEGER NOT NULL REFERENCES ElementTypes(ID),
-	TypeTwo INTEGER REFERENCES Types(ID),
+	TypeTwo INTEGER REFERENCES ElementTypes(ID),
 	Tier INTEGER NOT NULL
 );
 

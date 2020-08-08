@@ -90,9 +90,17 @@ public class MoveActionDamage implements MoveAction {
 		ElementType elementType = moveInstance.getElementType();
 		Creature source = moveInstance.source;
 		
-		float sourceAttack = moveInstance.move.moveType == MoveType.MAGIC ? source.calcTotalMagicAtk(context) : source.calcTotalPhysAtk(context);
+		float sourceAttack, targetDefense;
+		if(moveInstance.move.moveType != MoveType.NEUTRAL) {
+			sourceAttack = moveInstance.move.moveType == MoveType.MAGIC ? source.calcTotalMagicAtk(context) : source.calcTotalPhysAtk(context);
+			targetDefense = moveInstance.move.moveType == MoveType.MAGIC ? target.calcTotalMagicDef(context) : target.calcTotalPhysDef(context);
+		}
+		else {
+			sourceAttack = 1;
+			targetDefense = 1;
+		}
+		
 		float sourcePen = source.calcTotalPen(context);
-		float targetDefense = moveInstance.move.moveType == MoveType.MAGIC ? target.calcTotalMagicDef(context) : target.calcTotalPhysDef(context);	
 		float targetRes = target.calcTotalRes(context);
 		
 		float atkDefRatio = sourceAttack / targetDefense;
