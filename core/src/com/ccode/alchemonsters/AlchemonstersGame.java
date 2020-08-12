@@ -1,7 +1,6 @@
 package com.ccode.alchemonsters;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -88,8 +87,6 @@ public class AlchemonstersGame extends Game {
 			System.exit(0);
 			
 		}
-		
-		processManager.updateProcesses(Gdx.graphics.getDeltaTime());
 		
 		super.render();
 	}
