@@ -3,11 +3,9 @@ package com.ccode.alchemonsters.combat.ailment;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.creature.Creature;
-import com.ccode.alchemonsters.engine.event.Message;
 import com.ccode.alchemonsters.engine.event.Publisher;
-import com.ccode.alchemonsters.engine.event.Subscriber;
 
-public abstract class Effect implements Subscriber, Publisher {
+public abstract class Effect implements Publisher {
 
 	public final String name;
 	public boolean isVisible;
@@ -35,8 +33,5 @@ public abstract class Effect implements Subscriber, Publisher {
 	 * @param c creature effect is removed from
 	 */
 	public void onRemove(Creature c) {}
-	
-	@Override
-	public void handleMessage(Message currentMessage) {}
 	
 }

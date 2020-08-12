@@ -16,7 +16,6 @@ public class Creature {
 	public static final int LEVEL_ONE_STAT_VALUE = 5;
 	public static final float BASE_CRIT_CHANCE = 0.05f;
 	public static final float BASE_CRIT_MULTIPLIER = 1.5f;
-	public static final float BASE_FLINCH_CHANCE = 0.0f;
 	public static final float BASE_DODGE_CHANCE = 0.0f;
 	public static final float BASE_STAB_MULTIPLIER = 1.5f;
 	
@@ -92,33 +91,24 @@ public class Creature {
 	public String totalPenCalculator = StatCalculators.defaultTotalPenCalculator;
 	public String totalResCalculator = StatCalculators.defaultTotalResCalculator;
 	
-	//totaled stats
-	int totalVitae;
-	int totalFocus;
-	int totalMagicAtk;
-	int totalMagicDef;
-	int totalPhysAtk;
-	int totalPhysDef;
-	int totalPenetration;
-	int totalResistance;
-	int totalSpeed;
-	
 	//secondaries
 	public float critChance = BASE_CRIT_CHANCE;
 	public float critMultiplier = BASE_CRIT_MULTIPLIER;
-	public float flinchChance = BASE_FLINCH_CHANCE;
 	public float dodgeChance = BASE_DODGE_CHANCE;
 	public float stabMultiplier = BASE_STAB_MULTIPLIER;
 	
 	public float critChanceIncrease = 0f;
 	public float critMultiplierIncrease = 0f;
-	public float flinchChanceIncrease = 0f;
 	public float dodgeChanceIncrease = 0f;
 	public float stabMultiplierIncrease = 0f;
 	
+	public float critChanceEffectiveness = 1f;
+	public float critMultiplierEffectiveness = 1f;
+	public float dodgeChanceEffectiveness = 1f;
+	public float stabMultiplierEffectiveness = 1f;
+	
 	public String critChanceCalculator = StatCalculators.defaultCritChanceCalculator;
 	public String critMultiplieCalculator = StatCalculators.defaultCritMultiplierCalculator;
-	public String flinchChanceCalculator = StatCalculators.defaultFlinchChanceCalculator;
 	public String dodgeChanceCalculator = StatCalculators.defaultDodgeChanceCalculator;
 	public String stabMultiplierCalculator = StatCalculators.defaultStabMultiplierCalculator;
 
@@ -153,7 +143,7 @@ public class Creature {
 	
 	//TODO: Equipment
 	public Amplifier amplifier;	
-//	public HeldItem heldItem;
+	//public HeldItem heldItem;
 	
 	//Moves/Abilities
 	public String[] moves = new String[]{};
@@ -253,8 +243,20 @@ public class Creature {
 	//===========================================
 	//         STAT RETRIEVAL METHODS
 	//===========================================
+	public int calcTotalVitae() {
+		int total = StatCalculators.getIntCalculator(totalVitaeCalculator).calculateStat(this);
+		
+		return total;
+	}
+	
+	public int calcTotalFocus() {
+		int total = StatCalculators.getIntCalculator(totalFocusCalculator).calculateStat(this);
+		
+		return total;
+	}
+	
 	public int calcTotalMagicAtk(BattleContext context) {
-		int total = totalMagicAtk;
+		int total = StatCalculators.getIntCalculator(totalMagicAtkCalculator).calculateStat(this);
 		
 		if(context != null) {
 			//Check for magic atk boost to fire types from pyronimbus
@@ -274,7 +276,7 @@ public class Creature {
 	}
 	
 	public int calcTotalMagicDef(BattleContext context) {
-		int total = totalMagicDef;
+		int total = StatCalculators.getIntCalculator(totalMagicDefCalculator).calculateStat(this);
 		
 		if(context != null) {
 			//Check for magic def boost to ground types from sandstorm
@@ -294,7 +296,7 @@ public class Creature {
 	}
 	
 	public int calcTotalPhysAtk(BattleContext context) {
-		int total = totalPhysAtk;
+		int total = StatCalculators.getIntCalculator(totalPhysAtkCalculator).calculateStat(this);
 		
 		if(context != null) {
 			if(context.battleground.weather == WeatherType.PYRONIMBUS) {
@@ -313,7 +315,7 @@ public class Creature {
 	}
 	
 	public int calcTotalPhysDef(BattleContext context) {
-		int total = totalPhysDef;
+		int total = StatCalculators.getIntCalculator(totalPhysDefCalculator).calculateStat(this);
 		
 		total *= mods.getPhysDefMultiplier();
 		
@@ -321,15 +323,15 @@ public class Creature {
 	}
 	
 	public int calcTotalPen(BattleContext context) {
-		int total = totalPenetration;
+		int total = StatCalculators.getIntCalculator(totalPenCalculator).calculateStat(this);
 		
 		total *= mods.getPenMultiplier();
 		
-		return totalPenetration;
+		return total;
 	}
 	
 	public int calcTotalRes(BattleContext context) {
-		int total = totalResistance;
+		int total = StatCalculators.getIntCalculator(totalResCalculator).calculateStat(this);
 		
 		if(context != null) {
 			if(context.battleground.weather == WeatherType.LOCUST_SWARM) {
@@ -348,7 +350,7 @@ public class Creature {
 	}
 	
 	public int calcTotalSpeed(BattleContext context) {
-		int total = totalSpeed;
+		int total = StatCalculators.getIntCalculator(totalSpeedCalculator).calculateStat(this);
 		
 		if(context != null) {
 				if(context.battleground.weather == WeatherType.JETSTREAM) {
@@ -391,23 +393,7 @@ public class Creature {
 		calculateTotalStats(resetCurrentHealthAndMana);
 	}
 	
-	private void calculateTotalStats(boolean resetCurrentHealthAndMana) {
-		totalVitae = StatCalculators.doIntCalc(totalVitaeCalculator, this);
-		totalFocus = StatCalculators.doIntCalc(totalFocusCalculator, this);
-		totalMagicAtk = StatCalculators.doIntCalc(totalMagicAtkCalculator, this);
-		totalMagicDef = StatCalculators.doIntCalc(totalMagicDefCalculator, this);
-		totalPhysAtk = StatCalculators.doIntCalc(totalPhysAtkCalculator, this);
-		totalPhysDef = StatCalculators.doIntCalc(totalPhysDefCalculator, this);
-		totalSpeed = StatCalculators.doIntCalc(totalSpeedCalculator, this);
-		totalPenetration = StatCalculators.doIntCalc(totalPenCalculator, this);
-		totalResistance = StatCalculators.doIntCalc(totalResCalculator, this);
-		
-		critChance = StatCalculators.doFloatCalc(critChanceCalculator, this);
-		critMultiplier = StatCalculators.doFloatCalc(critMultiplieCalculator, this);
-		flinchChance = StatCalculators.doFloatCalc(flinchChanceCalculator, this);
-		dodgeChance = StatCalculators.doFloatCalc(dodgeChanceCalculator, this);
-		stabMultiplier = StatCalculators.doFloatCalc(stabMultiplierCalculator, this);
-		
+	private void calculateTotalStats(boolean resetCurrentHealthAndMana) {		
 		if(resetCurrentHealthAndMana) {
 			maxHealth = StatCalculators.doIntCalc(defaultHealthCalculator, this);
 			maxMana = StatCalculators.doIntCalc(defaultManaCalculator, this);
@@ -450,7 +436,6 @@ public class Creature {
 		
 		critChance = BASE_CRIT_CHANCE;        
 		critMultiplier = BASE_CRIT_MULTIPLIER;
-		flinchChance = BASE_FLINCH_CHANCE;    
 		dodgeChance = BASE_DODGE_CHANCE;      
 		stabMultiplier = BASE_STAB_MULTIPLIER;
 	}

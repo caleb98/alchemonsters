@@ -28,10 +28,6 @@ public class StatIncreaseAffix implements Affix {
 			c.dodgeChance += increaseAmount;
 			break;
 			
-		case FLINCH_CHANCE:
-			c.flinchChance += increaseAmount;
-			break;
-			
 		case FOCUS:
 			c.focusIncreases += increaseAmount;
 			break;
@@ -89,10 +85,6 @@ public class StatIncreaseAffix implements Affix {
 			
 		case DODGE_CHANCE:
 			c.dodgeChance -= increaseAmount;
-			break;
-			
-		case FLINCH_CHANCE:
-			c.flinchChance -= increaseAmount;
 			break;
 			
 		case FOCUS:

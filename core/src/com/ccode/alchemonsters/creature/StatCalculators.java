@@ -20,7 +20,6 @@ public class StatCalculators {
 	
 	public static final String defaultCritChanceCalculator = "DefaultCritChanceCalculator";
 	public static final String defaultCritMultiplierCalculator = "DefaultCritMultiplierCalculator";
-	public static final String defaultFlinchChanceCalculator = "DefaultFlinchChanceCalculator";
 	public static final String defaultDodgeChanceCalculator = "DefaultDodgeChanceCalculator";
 	public static final String defaultStabMultiplierCalculator = "DefaultStabMultiplierCalculator";
 	
@@ -177,31 +176,36 @@ public class StatCalculators {
 		});
 		
 		CALCULATOR_DICTIONARY.put(defaultCritChanceCalculator, 
-				(StatCalculator<Float> & Serializable)(c)->{ return Creature.BASE_CRIT_CHANCE + c.critChanceIncrease; });
+				(StatCalculator<Float> & Serializable)(c)->{ 
+					return (c.critChance + c.critChanceIncrease) * c.critChanceEffectiveness; 
+				});
 		
 		CALCULATOR_DICTIONARY.put(defaultCritMultiplierCalculator, 
-				(StatCalculator<Float> & Serializable)(c)->{ return Creature.BASE_CRIT_MULTIPLIER + c.critMultiplierIncrease; });
-		
-		CALCULATOR_DICTIONARY.put(defaultFlinchChanceCalculator, 
-				(StatCalculator<Float> & Serializable)(c)->{ return Creature.BASE_FLINCH_CHANCE + c.flinchChanceIncrease; });
+				(StatCalculator<Float> & Serializable)(c)->{
+					return (c.critMultiplier + c.critMultiplierIncrease) * c.critMultiplierEffectiveness; 
+				});
 		
 		CALCULATOR_DICTIONARY.put(defaultDodgeChanceCalculator, 
-				(StatCalculator<Float> & Serializable)(c)->{ return Creature.BASE_DODGE_CHANCE + c.dodgeChanceIncrease; });
+				(StatCalculator<Float> & Serializable)(c)->{
+					return (c.dodgeChance + c.dodgeChanceIncrease) * c.dodgeChanceEffectiveness;
+				});
 		
 		CALCULATOR_DICTIONARY.put(defaultStabMultiplierCalculator, 
-				(StatCalculator<Float> & Serializable)(c)->{ return Creature.BASE_STAB_MULTIPLIER + c.stabMultiplierIncrease; });
+				(StatCalculator<Float> & Serializable)(c)->{
+					return (c.stabMultiplier + c.stabMultiplierIncrease) * c.stabMultiplierEffectiveness; 
+				});
 		
 		CALCULATOR_DICTIONARY.put(defaultHealthCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			return Math.round((c.baseHealth + 
 					(c.currentLevel * (c.base.maxBaseHealth - c.base.minBaseHealth) / 10f) +
-					(c.currentLevel * c.totalVitae / 50f) +
+					(c.currentLevel * c.calcTotalVitae() / 50f) +
 					c.healthIncreases) * c.healthMultiplier);
 		});
 		
 		CALCULATOR_DICTIONARY.put(defaultManaCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			return Math.round((c.baseMana + 
 					(c.currentLevel * (c.base.maxBaseMana - c.base.minBaseMana) / 10f) +
-					(c.currentLevel * c.totalFocus / 50f) +
+					(c.currentLevel * c.calcTotalFocus() / 50f) +
 					c.manaIncreases) * c.manaMultiplier);
 		});
 		

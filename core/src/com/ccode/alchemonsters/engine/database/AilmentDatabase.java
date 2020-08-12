@@ -5,8 +5,6 @@ import java.util.HashMap;
 
 import com.ccode.alchemonsters.combat.ailment.Ailment;
 import com.ccode.alchemonsters.combat.ailment.BlightAilment;
-import com.ccode.alchemonsters.combat.ailment.BurnAilment;
-import com.ccode.alchemonsters.combat.ailment.ScorchAilment;
 
 public class AilmentDatabase {
 
@@ -16,8 +14,6 @@ public class AilmentDatabase {
 	public static void init() {
 		//Ailment labels and classes added here
 		AILMENT_DATABASE.put("Blight", BlightAilment.class);
-		AILMENT_DATABASE.put("Burn", BurnAilment.class);
-		AILMENT_DATABASE.put("Scorch", ScorchAilment.class);
 		isInitialized = true;
 	}
 	
