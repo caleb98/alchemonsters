@@ -13,7 +13,7 @@ public class GameData {
 	private static boolean isInitialized = false;
 	private static Connection connection;
 	
-	public static void initAndLoad() {		
+	public static void init() {		
 		try {			
 			String dbURL = "jdbc:sqlite:" + GAME_DATA_DIR;
 			connection = DriverManager.getConnection(dbURL);

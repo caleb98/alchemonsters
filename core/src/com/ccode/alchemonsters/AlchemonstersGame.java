@@ -16,6 +16,7 @@ import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.GameData;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.database.ScriptDatabase;
+import com.ccode.alchemonsters.engine.event.EventManager;
 
 public class AlchemonstersGame extends Game {
 	
@@ -42,17 +43,20 @@ public class AlchemonstersGame extends Game {
 		assetManager.finishLoading();
 		
 		//Connect to game database
-		GameData.initAndLoad();
+		GameData.init();
 		
 		//Init script systems
 		ScriptManager.init();
-		ScriptDatabase.initAndLoad();
+		ScriptDatabase.init();
 		
 		//Load databases
 		AilmentDatabase.init();
-		CreatureDatabase.initAndLoad();
-		MoveDatabase.initAndLoad();
+		CreatureDatabase.init();
+		MoveDatabase.init();
 		StatCalculators.init();
+		
+		//Start the event manager thread
+		EventManager.init();
 		
 		//Setup Box2d
 		Box2D.init();

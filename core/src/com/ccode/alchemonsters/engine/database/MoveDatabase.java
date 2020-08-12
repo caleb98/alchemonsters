@@ -37,7 +37,7 @@ public class MoveDatabase {
 	private static HashMap<String, Move> MOVE_DICTIONARY;
 	private static boolean isInitialized = false;
 	
-	public static void initAndLoad() {
+	public static void init() {
 		try {
 			MOVE_DICTIONARY = new HashMap<String, Move>();
 			Json json = new Json();

@@ -31,9 +31,9 @@ public class ServerLauncher implements ApplicationListener {
 		
 		//Init systems
 		ScriptManager.init();
-		ScriptDatabase.initAndLoad();
-		CreatureDatabase.initAndLoad();
-		MoveDatabase.initAndLoad();
+		ScriptDatabase.init();
+		CreatureDatabase.init();
+		MoveDatabase.init();
 		
 		//Create the server
 		Server server = KryoCreator.createServer();

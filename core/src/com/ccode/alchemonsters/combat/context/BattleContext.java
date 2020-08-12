@@ -7,14 +7,14 @@ import java.util.LinkedList;
 
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
-import com.ccode.alchemonsters.combat.ailment.Ailment;
-import com.ccode.alchemonsters.combat.ailment.Effect;
 import com.ccode.alchemonsters.combat.BattleTeam;
 import com.ccode.alchemonsters.combat.Battleground;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.WeatherType;
+import com.ccode.alchemonsters.combat.ailment.Ailment;
+import com.ccode.alchemonsters.combat.ailment.Effect;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveInstance;
@@ -58,6 +58,8 @@ public class BattleContext implements Publisher {
 	private boolean isTeamADoubleAttack = false;
 	private boolean isTeamBDoubleAttack = false;
 	private int doubleAttackPosition = -1;
+	
+	private boolean isCombatFinished = false;
 	
 	@SuppressWarnings("unused")
 	private BattleContext() {}
@@ -109,9 +111,11 @@ public class BattleContext implements Publisher {
 			//Check for defeat
 			if(teamA.isDefeated()) {
 				publish(new MCombatFinished(this, teamB, teamA));
+				isCombatFinished = true;
 			}
 			else if(teamB.isDefeated()) {
 				publish(new MCombatFinished(this, teamA, teamB));
+				isCombatFinished = true;
 			}
 			else if(needsActiveSwap()) {
 				setCombatState(CombatState.ACTIVE_DEATH_SWAP);
@@ -1006,6 +1010,10 @@ public class BattleContext implements Publisher {
 				}
 			}
 		}
+	}
+	
+	public boolean isCombatFinished() {
+		return isCombatFinished;
 	}
 	
 	private class DelayedMoveInfo {

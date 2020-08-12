@@ -15,7 +15,7 @@ public class ScriptDatabase {
 	private static HashMap<String, LuaValue> SCRIPT_DICTIONARY;
 	private static boolean isInitialized = false;
 	
-	public static void initAndLoad() {
+	public static void init() {
 		SCRIPT_DICTIONARY = new HashMap<String, LuaValue>();
 		
 		File scriptsDir = new File("scripts");

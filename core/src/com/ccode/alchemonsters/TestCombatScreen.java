@@ -28,16 +28,11 @@ import com.ccode.alchemonsters.engine.database.CreatureDatabase;
 import com.ccode.alchemonsters.engine.database.GameData;
 import com.ccode.alchemonsters.engine.database.MoveDatabase;
 import com.ccode.alchemonsters.engine.database.ScriptDatabase;
-import com.ccode.alchemonsters.engine.event.Message;
-import com.ccode.alchemonsters.engine.event.Subscriber;
-import com.ccode.alchemonsters.engine.event.messages.MCombatFinished;
-import com.ccode.alchemonsters.engine.event.messages.MCombatStarted;
-import com.ccode.alchemonsters.engine.event.messages.MCombatStateChanged;
 import com.ccode.alchemonsters.ui.CombatLog;
 import com.ccode.alchemonsters.ui.TeamBuilderWindow;
 import com.ccode.alchemonsters.ui.TeamCombatDisplayController;
 
-public class TestCombatScreen extends GameScreen implements InputProcessor, Screen, Subscriber {
+public class TestCombatScreen extends GameScreen implements InputProcessor, Screen {
 	
 	//Overall Frame
 	private TeamBuilderWindow teamABuilder;
@@ -154,10 +149,6 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		
 		InputMultiplexer multi = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(multi);
-		
-		subscribe(MCombatStateChanged.ID);
-		subscribe(MCombatFinished.ID);
-		subscribe(MCombatStarted.ID);
 	}	
 
 	private void startCombat(int positions) {
@@ -227,12 +218,6 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	}
 	
 	@Override
-	public void handleMessage(Message currentMessage) {
-		teamADisplay.updateStrings();
-		teamBDisplay.updateStrings();
-	}
-	
-	@Override
 	public void renderGraphics(float delta) {
 		//no graphics for this screen
 	}
@@ -240,7 +225,7 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 	@Override
 	public void renderUI(float delta) {		
 
-		if(battleContext != null) {
+		if(battleContext != null && !battleContext.isCombatFinished()) {
 			battleContext.updateBattle();
 			teamADisplay.updateStrings();
 			teamBDisplay.updateStrings();
@@ -286,11 +271,11 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		switch(keycode) {
 		
 		case Keys.F5:
-			GameData.initAndLoad();
+			GameData.init();
 			ScriptManager.init();
-			ScriptDatabase.initAndLoad();
-			CreatureDatabase.initAndLoad();
-			MoveDatabase.initAndLoad();
+			ScriptDatabase.init();
+			CreatureDatabase.init();
+			MoveDatabase.init();
 			
 			game.setScreen(new MainMenuScreen(game));
 			return true;

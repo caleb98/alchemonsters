@@ -14,7 +14,7 @@ public class CreatureDatabase {
 	private static HashMap<String, CreatureBase> CREATURE_DICTIONARY;
 	private static boolean isInitialized = false;
 	
-	public static void initAndLoad() {		
+	public static void init() {		
 		CREATURE_DICTIONARY = new HashMap<String, CreatureBase>();
 		
 		try {
