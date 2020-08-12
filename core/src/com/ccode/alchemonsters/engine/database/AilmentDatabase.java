@@ -3,8 +3,8 @@ package com.ccode.alchemonsters.engine.database;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import com.ccode.alchemonsters.combat.ailment.Ailment;
-import com.ccode.alchemonsters.combat.ailment.BlightAilment;
+import com.ccode.alchemonsters.combat.effect.Ailment;
+import com.ccode.alchemonsters.combat.effect.BlightAilment;
 
 public class AilmentDatabase {
 

@@ -32,10 +32,12 @@ public class StatCalculators {
 		//Add default calculators
 		CALCULATOR_DICTIONARY.put(defaultTotalVitaeCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre = Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseVitae - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.baseVitae - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.vitaeAttunement * c.currentLevel / 100f)  + 
-							(c.vitaeLearned * c.currentLevel / 100f)) 
-					* c.vitaeIncreases * c.vitaeEffectiveness);
+							(c.vitaeLearned * c.currentLevel / 100f) + 
+							c.getVitaeIncreases())
+					* c.getVitaeEffectiveness());
 			
 			if(c.nature.increased == StatType.VITAE) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -48,10 +50,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalFocusCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre = Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseFocus - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.baseFocus - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.focusAttunement * c.currentLevel / 100f) + 
-							(c.focusLearned * c.currentLevel / 100f)) 
-					* c.focusIncreases * c.focusEffectiveness);
+							(c.focusLearned * c.currentLevel / 100f) +
+							c.getFocusIncreases())
+					* c.getFocusEffectiveness());
 			
 			if(c.nature.increased == StatType.FOCUS) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -65,10 +69,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalMagicAtkCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre = Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseMagicAtk - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
-							c.magicAtkAttunement + 
-							c.magicAtkLearned) 
-					* c.magicAtkIncreases * c.magicAtkEffectiveness * c.mods.getMagicAtkMultiplier());
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.baseMagicAtk - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+							(c.magicAtkAttunement * c.currentLevel / 100f) + 
+							(c.magicAtkLearned * c.currentLevel / 100f) +
+							c.getMagicAtkIncreases())
+					* c.getMagicAtkEffectiveness() * c.mods.getMagicAtkMultiplier());
 			
 			if(c.nature.increased == StatType.MAGIC_ATK) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -81,10 +87,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalMagicDefCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre =  Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseMagicDef - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.baseMagicDef - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.magicDefAttunement * c.currentLevel / 100f) + 
-							(c.magicDefLearned * c.currentLevel / 100f)) 
-					* c.magicDefIncreases * c.magicDefEffectiveness * c.mods.getMagicDefMultiplier());
+							(c.magicDefLearned * c.currentLevel / 100f) +
+							c.getMagicDefIncreases())
+					* c.getMagicDefEffectiveness() * c.mods.getMagicDefMultiplier());
 			
 			if(c.nature.increased == StatType.MAGIC_DEF) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -97,10 +105,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalPhysAtkCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre =  Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.basePhysAtk - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.basePhysAtk - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.physAtkAttunement * c.currentLevel / 100f) + 
-							(c.physAtkLearned * c.currentLevel / 100f)) 
-					* c.physAtkIncreases * c.physAtkEffectiveness * c.mods.getPhysAtkMultiplier());
+							(c.physAtkLearned * c.currentLevel / 100f) +
+							c.getPhysAtkIncreases()) 
+					* c.getPhysAtkEffectiveness() * c.mods.getPhysAtkMultiplier());
 			
 			if(c.nature.increased == StatType.PHYS_ATK) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -113,10 +123,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalPhysDefCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre = Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.basePhysDef - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.basePhysDef - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.physDefAttunement * c.currentLevel / 100f) + 
-							(c.physDefLearned * c.currentLevel / 100f)) 
-					* c.physDefIncreases * c.physDefEffectiveness * c.mods.getPhysDefMultiplier());
+							(c.physDefLearned * c.currentLevel / 100f) +
+							c.getPhysDefIncreases())
+					* c.getPhysDefEffectiveness() * c.mods.getPhysDefMultiplier());
 			 
 			if(c.nature.increased == StatType.PHYS_DEF) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -129,10 +141,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalSpeedCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre = Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseSpeed - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.baseSpeed - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.speedAttunement * c.currentLevel / 100f) + 
-							(c.speedLearned * c.currentLevel / 100f)) 
-					* c.speedIncreases * c.speedEffectiveness * c.mods.getSpeedMultiplier());
+							(c.speedLearned * c.currentLevel / 100f) +
+							c.getSpeedIncreases()) 
+					* c.getSpeedEffectiveness() * c.mods.getSpeedMultiplier());
 			
 			if(c.nature.increased == StatType.SPEED) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -145,10 +159,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalPenCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre = Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.basePenetration - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.basePenetration - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.penAttunement  * c.currentLevel / 100f) + 
-							(c.penLearned * c.currentLevel / 100f)) 
-					* c.penIncreases * c.penEffectiveness * c.mods.getPenMultiplier());
+							(c.penLearned * c.currentLevel / 100f) +
+							c.getPenIncreases())
+					* c.getPenEffectiveness() * c.mods.getPenMultiplier());
 			
 			if(c.nature.increased == StatType.PENETRATION) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -161,10 +177,12 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultTotalResCalculator, (StatCalculator<Integer> & Serializable)(c)->{
 			int pre = Math.round(
-					(Creature.LEVEL_ONE_STAT_VALUE + ((c.base.baseResistance - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
+					(Creature.LEVEL_ONE_STAT_VALUE + 
+							((c.base.baseResistance - Creature.LEVEL_ONE_STAT_VALUE) * (c.currentLevel / 100f)) + 
 							(c.resAttunement * c.currentLevel / 100f) + 
-							(c.resLearned * c.currentLevel / 100f)) 
-					* c.resIncreases * c.resEffectiveness * c.mods.getResMultiplier());
+							(c.resLearned * c.currentLevel / 100f) +
+							c.getResIncreases())
+					* c.getResEffectiveness() * c.mods.getResMultiplier());
 			
 			if(c.nature.increased == StatType.RESISTANCE) {
 				pre *= Creature.POSITIVE_NATURE_MULTIPLIER;
@@ -177,22 +195,22 @@ public class StatCalculators {
 		
 		CALCULATOR_DICTIONARY.put(defaultCritChanceCalculator, 
 				(StatCalculator<Float> & Serializable)(c)->{ 
-					return (c.critChance + c.critChanceIncrease) * c.critChanceEffectiveness; 
+					return (Creature.BASE_CRIT_CHANCE + c.getCritChanceIncrease()) * c.getCritChanceEffectiveness(); 
 				});
 		
 		CALCULATOR_DICTIONARY.put(defaultCritMultiplierCalculator, 
 				(StatCalculator<Float> & Serializable)(c)->{
-					return (c.critMultiplier + c.critMultiplierIncrease) * c.critMultiplierEffectiveness; 
+					return (Creature.BASE_CRIT_MULTIPLIER + c.getCritMultiplierIncrease()) * c.getCritMultiplierEffectiveness(); 
 				});
 		
 		CALCULATOR_DICTIONARY.put(defaultDodgeChanceCalculator, 
 				(StatCalculator<Float> & Serializable)(c)->{
-					return (c.dodgeChance + c.dodgeChanceIncrease) * c.dodgeChanceEffectiveness;
+					return (Creature.BASE_DODGE_CHANCE + c.getDodgeChanceIncrease()) * c.getDodgeChanceEffectiveness();
 				});
 		
 		CALCULATOR_DICTIONARY.put(defaultStabMultiplierCalculator, 
 				(StatCalculator<Float> & Serializable)(c)->{
-					return (c.stabMultiplier + c.stabMultiplierIncrease) * c.stabMultiplierEffectiveness; 
+					return (Creature.BASE_STAB_MULTIPLIER + c.getStabMultiplierIncrease()) * c.getStabMultiplierEffectiveness(); 
 				});
 		
 		CALCULATOR_DICTIONARY.put(defaultHealthCalculator, (StatCalculator<Integer> & Serializable)(c)->{

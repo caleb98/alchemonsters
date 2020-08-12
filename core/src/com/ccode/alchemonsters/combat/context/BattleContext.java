@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.badlogic.gdx.utils.Json;
 import com.ccode.alchemonsters.combat.BattleAction;
 import com.ccode.alchemonsters.combat.BattleAction.BattleActionType;
 import com.ccode.alchemonsters.combat.BattleTeam;
@@ -13,8 +14,8 @@ import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.CreatureTeam;
 import com.ccode.alchemonsters.combat.UnitController;
 import com.ccode.alchemonsters.combat.WeatherType;
-import com.ccode.alchemonsters.combat.ailment.Ailment;
-import com.ccode.alchemonsters.combat.ailment.Effect;
+import com.ccode.alchemonsters.combat.effect.Ailment;
+import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.combat.moves.Move;
 import com.ccode.alchemonsters.combat.moves.MoveAction;
 import com.ccode.alchemonsters.combat.moves.MoveInstance;
@@ -332,7 +333,7 @@ public class BattleContext implements Publisher {
 		
 		publish(new MCombatMovePostCast(moveInstance));
 		
-		moveInstance.source.variables.setVariable("_PREVIOUS_MOVE", moveInstance);
+		moveInstance.source.variables.setVariable("_PREVIOUS_MOVE", moveInstance.move.name);
 	}
 	
 	/**
@@ -767,6 +768,8 @@ public class BattleContext implements Publisher {
 			}
 			
 			if(firstInfo.a.get(firstInfo.b).calcTotalSpeed(this) >= 1.5 * maxSpeed) {
+				variables.setVariable("_PREV_DOUBLE_ATTACK_MON", firstInfo.a.get(firstInfo.b));
+				
 				//There should be a double attack
 				if(firstInfo.a == teamA) {
 					isTeamADoubleAttack = true;
@@ -790,6 +793,8 @@ public class BattleContext implements Publisher {
 			int secondSpeed = secondInfo.a.get(secondInfo.b).calcTotalSpeed(this);
 			
 			if(firstSpeed >= 1.5 * secondSpeed) {
+				variables.setVariable("_PREV_DOUBLE_ATTACK_MON", firstInfo.a.get(firstInfo.b));
+				
 				//There should be a double attack
 				if(firstInfo.a == teamA) {
 					isTeamADoubleAttack = true;
@@ -1014,6 +1019,14 @@ public class BattleContext implements Publisher {
 	
 	public boolean isCombatFinished() {
 		return isCombatFinished;
+	}
+	
+	public void printTeamInfo(boolean showTeamA) {
+		BattleTeam team = showTeamA ? teamA : teamB;
+		Json json = new Json();
+		json.setUsePrototypes(false);
+		String teamString = json.prettyPrint(team);
+		System.out.println(teamString);
 	}
 	
 	private class DelayedMoveInfo {

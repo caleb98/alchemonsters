@@ -2,7 +2,7 @@ package com.ccode.alchemonsters.engine.database;
 
 import java.util.HashMap;
 
-import com.ccode.alchemonsters.combat.ailment.Effect;
+import com.ccode.alchemonsters.combat.effect.Effect;
 
 public class EffectDatabase {
 

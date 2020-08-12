@@ -1,10 +1,12 @@
-package com.ccode.alchemonsters.combat.ailment;
+package com.ccode.alchemonsters.combat.effect;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.context.BattleContext;
 import com.ccode.alchemonsters.creature.Creature;
 
-public abstract class Ailment extends Effect {
+public abstract class Ailment extends Effect implements Json.Serializable {
 
 	/**
 	 * Whether or not this ailment is a "strong" ailment;
@@ -39,6 +41,20 @@ public abstract class Ailment extends Effect {
 		if(state == CombatState.END_PHASE) {
 			lifetime += 1;
 		}
+	}
+	
+	@Override
+	public void write(Json json) {
+		json.writeValue("name", name);
+		json.writeValue("isVisible", isVisible);
+		json.writeValue("isStrong", isStrong);
+		json.writeValue("duration", duration);
+		json.writeValue("lifetime", lifetime);
+	}
+	
+	@Override
+	public void read(Json json, JsonValue jsonData) {
+		//TODO: fix this if needed
 	}
 	
 }

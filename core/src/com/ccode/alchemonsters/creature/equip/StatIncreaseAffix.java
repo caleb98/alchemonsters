@@ -17,55 +17,55 @@ public class StatIncreaseAffix implements Affix {
 		switch(type) {
 
 		case CRIT_CHANCE:
-			c.critChance += increaseAmount;
+			c.addCritChanceIncrease(increaseAmount);
 			break;
 			
 		case CRIT_MULTI:
-			c.critMultiplier += increaseAmount;
+			c.addCritMultiplierIncrease(increaseAmount);
 			break;
 			
 		case DODGE_CHANCE:
-			c.dodgeChance += increaseAmount;
+			c.addDodgeChanceIncrease(increaseAmount);
 			break;
 			
 		case FOCUS:
-			c.focusIncreases += increaseAmount;
+			c.addFocusIncrease((int) increaseAmount);
 			break;
 			
 		case MAGIC_ATK:
-			c.magicAtkIncreases += increaseAmount;
+			c.addMagicAtkIncrease((int) increaseAmount);
 			break;
 			
 		case MAGIC_DEF:
-			c.magicDefIncreases += increaseAmount;
+			c.addMagicDefIncrease((int) increaseAmount);
 			break;
 			
 		case PENETRATION:
-			c.penIncreases += increaseAmount;
+			c.addPenIncrease((int) increaseAmount);
 			break;
 			
 		case PHYS_ATK:
-			c.physAtkIncreases += increaseAmount;
+			c.addPhysAtkIncrease((int) increaseAmount);
 			break;
 			
 		case PHYS_DEF:
-			c.physDefIncreases += increaseAmount;
+			c.addPhysDefIncrease((int) increaseAmount);
 			break;
 			
 		case RESISTANCE:
-			c.resIncreases += increaseAmount;
+			c.addResIncrease((int) increaseAmount);
 			break;
 			
 		case SPEED:
-			c.speedIncreases += increaseAmount;
+			c.addSpeedIncrease((int) increaseAmount);
 			break;
 			
 		case STAB_MULTI:
-			c.stabMultiplier += increaseAmount;
+			c.addStabMultiplierIncrease(increaseAmount);
 			break;
 			
 		case VITAE:
-			c.vitaeIncreases += increaseAmount;
+			c.addVitaeIncrease((int) increaseAmount);
 			break;
 		
 		}
@@ -76,55 +76,55 @@ public class StatIncreaseAffix implements Affix {
 		switch(type) {
 
 		case CRIT_CHANCE:
-			c.critChance -= increaseAmount;
+			c.removeCritChanceIncrease(increaseAmount);
 			break;
 			
 		case CRIT_MULTI:
-			c.critMultiplier -= increaseAmount;
+			c.removeCritMultiplierIncrease(increaseAmount);
 			break;
 			
 		case DODGE_CHANCE:
-			c.dodgeChance -= increaseAmount;
+			c.removeDodgeChanceIncrease(increaseAmount);
 			break;
 			
 		case FOCUS:
-			c.focusIncreases -= increaseAmount;
+			c.removeFocusIncrease((int) increaseAmount);
 			break;
 			
 		case MAGIC_ATK:
-			c.magicAtkIncreases -= increaseAmount;
+			c.removeMagicAtkIncrease((int) increaseAmount);
 			break;
 			
 		case MAGIC_DEF:
-			c.magicDefIncreases -= increaseAmount;
+			c.removeMagicDefIncrease((int) increaseAmount);
 			break;
 			
 		case PENETRATION:
-			c.penIncreases -= increaseAmount;
+			c.removePenIncrease((int) increaseAmount);
 			break;
 			
 		case PHYS_ATK:
-			c.physAtkIncreases -= increaseAmount;
+			c.removePhysAtkIncrease((int) increaseAmount);
 			break;
 			
 		case PHYS_DEF:
-			c.physDefIncreases -= increaseAmount;
+			c.removePhysDefIncrease((int) increaseAmount);
 			break;
 			
 		case RESISTANCE:
-			c.resIncreases -= increaseAmount;
+			c.removeResIncrease((int) increaseAmount);
 			break;
 			
 		case SPEED:
-			c.speedIncreases -= increaseAmount;
+			c.removeSpeedIncrease((int) increaseAmount);
 			break;
 			
 		case STAB_MULTI:
-			c.stabMultiplier -= increaseAmount;
+			c.removeStabMultiplierIncrease(increaseAmount);
 			break;
 			
 		case VITAE:
-			c.vitaeIncreases -= increaseAmount;
+			c.removeVitaeIncrease((int) increaseAmount);
 			break;
 		
 		}

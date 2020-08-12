@@ -283,6 +283,18 @@ public class TestCombatScreen extends GameScreen implements InputProcessor, Scre
 		case Keys.F1:
 			ui.setDebugAll(ui.isDebugAll() ? false : true);
 			return true;
+		
+		case Keys.F2:
+			if(battleContext != null) {
+				battleContext.printTeamInfo(true);
+			}
+			break;
+			
+		case Keys.F3:
+			if(battleContext != null) {
+				battleContext.printTeamInfo(false);
+			}
+			break;
 			
 		}
 		

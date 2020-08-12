@@ -1,4 +1,4 @@
-package com.ccode.alchemonsters.combat.ailment;
+package com.ccode.alchemonsters.combat.effect;
 
 import com.ccode.alchemonsters.combat.CombatState;
 import com.ccode.alchemonsters.combat.context.BattleContext;

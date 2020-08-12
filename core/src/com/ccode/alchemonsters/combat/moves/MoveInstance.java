@@ -61,7 +61,7 @@ public class MoveInstance {
 	
 	public boolean rollCrit() {
 		for(int i = 0; i < getCritStages(); ++i) {
-			if(GameRandom.nextFloat() < source.critChance) {
+			if(GameRandom.nextFloat() < source.calcTotalCritChance(context)) {
 				return true;
 			}
 		}

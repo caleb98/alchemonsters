@@ -3,9 +3,9 @@ package com.ccode.alchemonsters.creature;
 import java.util.ArrayList;
 
 import com.ccode.alchemonsters.combat.WeatherType;
-import com.ccode.alchemonsters.combat.ailment.Ailment;
-import com.ccode.alchemonsters.combat.ailment.Effect;
 import com.ccode.alchemonsters.combat.context.BattleContext;
+import com.ccode.alchemonsters.combat.effect.Ailment;
+import com.ccode.alchemonsters.combat.effect.Effect;
 import com.ccode.alchemonsters.creature.equip.Affix;
 import com.ccode.alchemonsters.creature.equip.Amplifier;
 import com.ccode.alchemonsters.util.DynamicVariables;
@@ -61,25 +61,25 @@ public class Creature {
 	public int speedLearned = 0;
 	
 	//increases used for calculating total stats
-	public float vitaeIncreases = 1f;
-	public float focusIncreases = 1f;
-	public float magicAtkIncreases = 1f;
-	public float magicDefIncreases = 1f;
-	public float physAtkIncreases = 1f;
-	public float physDefIncreases = 1f;
-	public float penIncreases = 1f;
-	public float resIncreases = 1f;
-	public float speedIncreases = 1f;
+	private int vitaeIncreases = 1;
+	private int focusIncreases = 1;
+	private int magicAtkIncreases = 1;
+	private int magicDefIncreases = 1;
+	private int physAtkIncreases = 1;
+	private int physDefIncreases = 1;
+	private int penIncreases = 1;
+	private int resIncreases = 1;
+	private int speedIncreases = 1;
 	
-	public float vitaeEffectiveness = 1f;
-	public float focusEffectiveness = 1f;
-	public float magicAtkEffectiveness = 1f;
-	public float magicDefEffectiveness = 1f;
-	public float physAtkEffectiveness = 1f;
-	public float physDefEffectiveness = 1f;
-	public float penEffectiveness = 1f;
-	public float resEffectiveness = 1f;
-	public float speedEffectiveness = 1f;
+	private float vitaeEffectiveness = 1f;
+	private float focusEffectiveness = 1f;
+	private float magicAtkEffectiveness = 1f;
+	private float magicDefEffectiveness = 1f;
+	private float physAtkEffectiveness = 1f;
+	private float physDefEffectiveness = 1f;
+	private float penEffectiveness = 1f;
+	private float resEffectiveness = 1f;
+	private float speedEffectiveness = 1f;
 	
 	public String totalVitaeCalculator = StatCalculators.defaultTotalVitaeCalculator;
 	public String totalFocusCalculator = StatCalculators.defaultTotalFocusCalculator;
@@ -91,21 +91,16 @@ public class Creature {
 	public String totalPenCalculator = StatCalculators.defaultTotalPenCalculator;
 	public String totalResCalculator = StatCalculators.defaultTotalResCalculator;
 	
-	//secondaries
-	public float critChance = BASE_CRIT_CHANCE;
-	public float critMultiplier = BASE_CRIT_MULTIPLIER;
-	public float dodgeChance = BASE_DODGE_CHANCE;
-	public float stabMultiplier = BASE_STAB_MULTIPLIER;
+	//secondaries	
+	private float critChanceIncrease = 0f;
+	private float critMultiplierIncrease = 0f;
+	private float dodgeChanceIncrease = 0f;
+	private float stabMultiplierIncrease = 0f;
 	
-	public float critChanceIncrease = 0f;
-	public float critMultiplierIncrease = 0f;
-	public float dodgeChanceIncrease = 0f;
-	public float stabMultiplierIncrease = 0f;
-	
-	public float critChanceEffectiveness = 1f;
-	public float critMultiplierEffectiveness = 1f;
-	public float dodgeChanceEffectiveness = 1f;
-	public float stabMultiplierEffectiveness = 1f;
+	private float critChanceEffectiveness = 1f;
+	private float critMultiplierEffectiveness = 1f;
+	private float dodgeChanceEffectiveness = 1f;
+	private float stabMultiplierEffectiveness = 1f;
 	
 	public String critChanceCalculator = StatCalculators.defaultCritChanceCalculator;
 	public String critMultiplieCalculator = StatCalculators.defaultCritMultiplierCalculator;
@@ -241,6 +236,321 @@ public class Creature {
 	}
 	
 	//===========================================
+	//         STAT MODIFIER METHODS
+	//===========================================
+	public int getVitaeIncreases() {
+		return vitaeIncreases;
+	}
+	
+	public void addVitaeIncrease(int value) {
+		vitaeIncreases += value;
+	}
+	
+	public void removeVitaeIncrease(int value) {
+		vitaeIncreases -= value;
+	}
+	
+	public int getFocusIncreases() {
+		return focusIncreases;
+	}
+	
+	public void addFocusIncrease(int value) {
+		focusIncreases += value;
+	}
+	
+	public void removeFocusIncrease(int value) {
+		focusIncreases -= value;
+	}
+	
+	public int getMagicAtkIncreases() {
+		return magicAtkIncreases;
+	}
+	
+	public void addMagicAtkIncrease(int value) {
+		magicAtkIncreases += value;
+	}
+	
+	public void removeMagicAtkIncrease(int value) {
+		magicAtkIncreases -= value;
+	}
+	
+	public int getMagicDefIncreases() {
+		return magicDefIncreases;
+	}
+	
+	public void addMagicDefIncrease(int value) {
+		magicDefIncreases += value;
+	}
+	
+	public void removeMagicDefIncrease(int value) {
+		magicDefIncreases -= value;
+	}
+	
+	public int getPhysAtkIncreases() {
+		return physAtkIncreases;
+	}
+	
+	public void addPhysAtkIncrease(int value) {
+		physAtkIncreases += value;
+	}
+	
+	public void removePhysAtkIncrease(int value) {
+		physAtkIncreases -= value;
+	}
+	
+	public int getPhysDefIncreases() {
+		return physDefIncreases;
+	}
+	
+	public void addPhysDefIncrease(int value) {
+		physDefIncreases += value;
+	}
+	
+	public void removePhysDefIncrease(int value) {
+		physDefIncreases -= value;
+	}
+	
+	public int getPenIncreases() {
+		return penIncreases;
+	}
+	
+	public void addPenIncrease(int value) {
+		penIncreases += value;
+	}
+	
+	public void removePenIncrease(int value) {
+		penIncreases -= value;
+	}
+	
+	public int getResIncreases() {
+		return resIncreases;
+	}
+	
+	public void addResIncrease(int value) {
+		resIncreases += value;
+	}
+	
+	public void removeResIncrease(int value) {
+		resIncreases -= value;
+	}
+	
+	public int getSpeedIncreases() {
+		return speedIncreases;
+	}
+	
+	public void addSpeedIncrease(int value) {
+		speedIncreases += value;
+	}
+	
+	public void removeSpeedIncrease(int value) {
+		speedIncreases -= value;
+	}
+	
+	public float getCritChanceIncrease() {
+		return critChanceIncrease;
+	}
+	
+	public void addCritChanceIncrease(float value) {
+		critChanceIncrease += value;
+	}
+	
+	public void removeCritChanceIncrease(float value) {
+		critChanceIncrease -= value;
+	}
+	
+	public float getCritMultiplierIncrease() {
+		return critMultiplierIncrease;
+	}
+	
+	public void addCritMultiplierIncrease(float value) {
+		critMultiplierIncrease += value;
+	}
+	
+	public void removeCritMultiplierIncrease(float value) {
+		critMultiplierIncrease -= value;
+	}
+	
+	public float getDodgeChanceIncrease() {
+		return dodgeChanceIncrease;
+	}
+	
+	public void addDodgeChanceIncrease(float value) {
+		dodgeChanceIncrease += value;
+	}
+	
+	public void removeDodgeChanceIncrease(float value) {
+		dodgeChanceIncrease -= value;
+	}
+	
+	public float getStabMultiplierIncrease() {
+		return stabMultiplierIncrease;
+	}
+	
+	public void addStabMultiplierIncrease(float value) {
+		stabMultiplierIncrease += value;
+	}
+	
+	public void removeStabMultiplierIncrease(float value) {
+		stabMultiplierIncrease -= value;
+	}
+	
+	public float getVitaeEffectiveness() {
+		return vitaeEffectiveness;
+	}
+	
+	public void increaseVitaeEffectiveness(float value) {
+		vitaeEffectiveness *= value;
+	}
+	
+	public void removeVitaeEffectivenessIncrease(float value) {
+		vitaeEffectiveness /= value;
+	}
+	
+	public float getFocusEffectiveness() {
+		return focusEffectiveness;
+	}
+	
+	public void increaseFocusEffectiveness(float value) {
+		focusEffectiveness *= value;
+	}
+	
+	public void removeFocusEffectivenessIncrease(float value) {
+		focusEffectiveness /= value;
+	}
+	
+	public float getMagicAtkEffectiveness() {
+		return magicAtkEffectiveness;
+	}
+	
+	public void increaseMagicAtkEffectiveness(float value) {
+		magicAtkEffectiveness *= value;
+	}
+	
+	public void removeMagicAtkEffectivenessIncrease(float value) {
+		magicAtkEffectiveness /= value;
+	}
+	
+	public float getMagicDefEffectiveness() {
+		return magicDefEffectiveness;
+	}
+	
+	public void increaseMagicDefEffectiveness(float value) {
+		magicDefEffectiveness *= value;
+	}
+	
+	public void removeMagicDefEffectivenessIncrease(float value) {
+		magicDefEffectiveness /= value;
+	}
+	
+	public float getPhysAtkEffectiveness() {
+		return physAtkEffectiveness;
+	}
+	
+	public void increasePhysAtkEffectiveness(float value) {
+		physAtkEffectiveness *= value;
+	}
+	
+	public void removePhysAtkEffectivenessIncrease(float value) {
+		physAtkEffectiveness /= value;
+	}
+	
+	public float getPhysDefEffectiveness() {
+		return physDefEffectiveness;
+	}
+	
+	public void increasePhysDefEffectiveness(float value) {
+		physDefEffectiveness *= value;
+	}
+	
+	public void removePhysDefEffectivenessIncrease(float value) {
+		physDefEffectiveness /= value;
+	}
+	
+	public float getPenEffectiveness() {
+		return penEffectiveness;
+	}
+	
+	public void increasePenEffectiveness(float value) {
+		penEffectiveness *= value;
+	}
+	
+	public void removePenEffectivenessIncrease(float value) {
+		penEffectiveness /= value;
+	}
+	
+	public float getResEffectiveness() {
+		return resEffectiveness;
+	}
+	
+	public void increaseResEffectiveness(float value) {
+		resEffectiveness *= value;
+	}
+	
+	public void removeResEffectivenessIncrease(float value) {
+		resEffectiveness /= value;
+	}
+	
+	public float getSpeedEffectiveness() {
+		return speedEffectiveness;
+	}
+	
+	public void increaseSpeedEffectiveness(float value) {
+		speedEffectiveness *= value;
+	}
+	
+	public void removeSpeedEffectivenessIncrease(float value) {
+		speedEffectiveness /= value;
+	}
+	
+	public float getCritChanceEffectiveness() {
+		return critChanceEffectiveness;
+	}
+	
+	public void increaseCritChanceEffectiveness(float value) {
+		critChanceEffectiveness *= value;
+	}
+	
+	public void removeCritChanceEffectivenessIncrease(float value) {
+		critChanceEffectiveness /= value;
+	}
+	
+	public float getCritMultiplierEffectiveness() {
+		return critMultiplierEffectiveness;
+	}
+	
+	public void increaseCritMultiplierEffectiveness(float value) {
+		critMultiplierEffectiveness *= value;
+	}
+	
+	public void removeCritMultiplierEffectivenessIncrease(float value) {
+		critMultiplierEffectiveness /= value;
+	}
+	
+	public float getDodgeChanceEffectiveness() {
+		return dodgeChanceEffectiveness;
+	}
+	
+	public void increaseDodgeChanceEffectiveness(float value) {
+		dodgeChanceEffectiveness *= value;
+	}
+	
+	public void removeDodgeChanceEffectivenessIncrease(float value) {
+		dodgeChanceEffectiveness /= value;
+	}
+	
+	public float getStabMultiplierEffectiveness() {
+		return stabMultiplierEffectiveness;
+	}
+	
+	public void increaseStabMultiplierEffectiveness(float value) {
+		stabMultiplierEffectiveness *= value;
+	}
+	
+	public void removeStabMultiplierEffectivenessIncrease(float value) {
+		stabMultiplierEffectiveness /= value;
+	}
+	
+	//===========================================
 	//         STAT RETRIEVAL METHODS
 	//===========================================
 	public int calcTotalVitae() {
@@ -270,8 +580,6 @@ public class Creature {
 			}
 		}
 		
-		total *= mods.getMagicAtkMultiplier();
-		
 		return total;
 	}
 	
@@ -290,8 +598,6 @@ public class Creature {
 			}
 		}
 		
-		total *= mods.getMagicDefMultiplier();
-		
 		return total;
 	}
 	
@@ -308,25 +614,17 @@ public class Creature {
 				}
 			}
 		}
-
-		total *= mods.getPhysAtkMultiplier();
 		
 		return total;
 	}
 	
 	public int calcTotalPhysDef(BattleContext context) {
 		int total = StatCalculators.getIntCalculator(totalPhysDefCalculator).calculateStat(this);
-		
-		total *= mods.getPhysDefMultiplier();
-		
 		return total;
 	}
 	
 	public int calcTotalPen(BattleContext context) {
 		int total = StatCalculators.getIntCalculator(totalPenCalculator).calculateStat(this);
-		
-		total *= mods.getPenMultiplier();
-		
 		return total;
 	}
 	
@@ -344,8 +642,6 @@ public class Creature {
 			}
 		}
 		
-		total *= mods.getResMultiplier();
-		
 		return total;
 	}
 	
@@ -362,9 +658,31 @@ public class Creature {
 					}
 				}
 		}
-		
-		total *= mods.getSpeedMultiplier();
 				
+		return total;
+	}
+	
+	public float calcTotalCritChance(BattleContext context) {
+		float total = StatCalculators.getFloatCalculator(critChanceCalculator).calculateStat(this);
+		
+		return total;
+	}
+	
+	public float calcTotalCritMultiplier(BattleContext context) {
+		float total = StatCalculators.getFloatCalculator(critMultiplieCalculator).calculateStat(this);
+		
+		return total;
+	}
+	
+	public float calcTotalDodgeChance(BattleContext context) {
+		float total = StatCalculators.getFloatCalculator(dodgeChanceCalculator).calculateStat(this);
+		
+		return total;
+	}
+	
+	public float calcTotalStabMultiplier(BattleContext context) {
+		float total = StatCalculators.getFloatCalculator(stabMultiplierCalculator).calculateStat(this);
+		
 		return total;
 	}
 	
@@ -414,15 +732,15 @@ public class Creature {
 	}
 	
 	private void resetStatModifications() {
-		vitaeIncreases = 1f;
-		focusIncreases = 1f;
-		magicAtkIncreases = 1f;
-		magicDefIncreases = 1f;
-		physAtkIncreases = 1f;
-		physDefIncreases = 1f;
-		penIncreases = 1f;
-		resIncreases = 1f;
-		speedIncreases = 1f;
+		vitaeIncreases = 1;
+		focusIncreases = 1;
+		magicAtkIncreases = 1;
+		magicDefIncreases = 1;
+		physAtkIncreases = 1;
+		physDefIncreases = 1;
+		penIncreases = 1;
+		resIncreases = 1;
+		speedIncreases = 1;
 		
 		vitaeEffectiveness = 1f;
 		focusEffectiveness = 1f;
@@ -433,11 +751,6 @@ public class Creature {
 		penEffectiveness = 1f;
 		resEffectiveness = 1f;
 		speedEffectiveness = 1f;
-		
-		critChance = BASE_CRIT_CHANCE;        
-		critMultiplier = BASE_CRIT_MULTIPLIER;
-		dodgeChance = BASE_DODGE_CHANCE;      
-		stabMultiplier = BASE_STAB_MULTIPLIER;
 	}
 	
 }

@@ -41,9 +41,12 @@ public class MoveActionDamage implements MoveAction {
 				isHit = moveInstance.rollHit();
 				isCrit = moveInstance.rollCrit();
 				
-				damage = getDamageAgainst(moveInstance, tar, power, isCrit, isStab);
-				tar.modifyHealth(-damage);
-				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, tar, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+				if(isHit) {
+					damage = getDamageAgainst(moveInstance, tar, power, isCrit, isStab);
+					tar.modifyHealth(-damage);
+					publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, tar, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+				}
+				//TODO: action miss message?
 			}
 			break;
 			
@@ -53,10 +56,12 @@ public class MoveActionDamage implements MoveAction {
 				isHit = moveInstance.rollHit();
 				isCrit = moveInstance.rollCrit();
 				
-				opp = opponentTeam.get(i);
-				damage = getDamageAgainst(moveInstance, opp, power, isCrit, isStab);
-				opp.modifyHealth(-damage);
-				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, opp, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+				if(isHit) {
+					opp = opponentTeam.get(i);
+					damage = getDamageAgainst(moveInstance, opp, power, isCrit, isStab);
+					opp.modifyHealth(-damage);
+					publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, opp, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+				}
 			}
 			break;
 			
@@ -64,9 +69,11 @@ public class MoveActionDamage implements MoveAction {
 			isHit = moveInstance.rollHit();
 			isCrit = moveInstance.rollCrit();
 			
-			damage = getDamageAgainst(moveInstance, moveInstance.source, power, isCrit, isStab);
-			moveInstance.source.modifyHealth(-damage);
-			publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, moveInstance.source, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+			if(isHit) {
+				damage = getDamageAgainst(moveInstance, moveInstance.source, power, isCrit, isStab);
+				moveInstance.source.modifyHealth(-damage);
+				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, moveInstance.source, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+			}
 			break;
 			
 		case SELF_TEAM:
@@ -75,10 +82,12 @@ public class MoveActionDamage implements MoveAction {
 				isHit = moveInstance.rollHit();
 				isCrit = moveInstance.rollCrit();
 				
-				friendly = sourceTeam.get(i);
-				damage = getDamageAgainst(moveInstance, friendly, power, isCrit, isStab);
-				friendly.modifyHealth(-damage);
-				publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, friendly, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+				if(isHit) {
+					friendly = sourceTeam.get(i);
+					damage = getDamageAgainst(moveInstance, friendly, power, isCrit, isStab);
+					friendly.modifyHealth(-damage);
+					publish(new MCombatDamageDealt(moveInstance.context, moveInstance.source, friendly, moveInstance.move.name, moveInstance.getElementType(), damage, isCrit, isStab, false));
+				}
 			}
 			break;
 		
@@ -86,6 +95,8 @@ public class MoveActionDamage implements MoveAction {
 	}
 	
 	public static int getDamageAgainst(MoveInstance moveInstance, Creature target, int power, boolean isCrit, boolean isStab) {
+		//TODO: check for opponent dodge
+		
 		BattleContext context = moveInstance.context;
 		ElementType elementType = moveInstance.getElementType();
 		Creature source = moveInstance.source;
@@ -111,14 +122,12 @@ public class MoveActionDamage implements MoveAction {
 		float actual = Math.max(0, rawDamage);
 		
 		//TODO: apply these buffs before defenses?
-		//TODO: variable crit multiplier values3
 		if(isCrit) {
-			actual *= CRIT_MULTIPLIER;
+			actual *= source.calcTotalCritMultiplier(context);
 		}
 		
-		//TODO: variable stab multiplier values?
 		if(isStab) {
-			actual *= STAB_MULTIPLIER;
+			actual *= source.calcTotalStabMultiplier(context);
 		}
 		
 		//TODO: globalize deluge water damage bonus and fire damage decrease

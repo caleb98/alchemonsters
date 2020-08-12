@@ -1,8 +1,0 @@
-[
-	{
-		"class":"StatModifier",
-		"target":"TARGET",
-		"stat": "SPEED",
-		"amount": 100
-	}
-]
