@@ -10,7 +10,6 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ccode.alchemonsters.creature.StatCalculators;
-import com.ccode.alchemonsters.engine.ProcessManager;
 import com.ccode.alchemonsters.engine.ScriptManager;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.engine.database.AilmentDatabase;
@@ -25,9 +24,6 @@ public class AlchemonstersGame extends Game {
 	private static final int VIRUTAL_SCREEN_HEIGHT = 360;
 	
 	private boolean isExitRequested = false;
-	
-	//Game Process Manager
-	public ProcessManager processManager;
 	
 	//Rendering
 	public SpriteBatch batch;
@@ -45,9 +41,6 @@ public class AlchemonstersGame extends Game {
 		//Initialize and load the asset manager
 		assetManager.load("sprites_packed/packed.atlas", TextureAtlas.class);
 		assetManager.finishLoading();
-		
-		//Init the Process Manager
-		processManager = new ProcessManager();
 		
 		//Connect to game database
 		GameData.initAndLoad();

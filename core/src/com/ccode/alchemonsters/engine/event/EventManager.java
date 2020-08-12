@@ -2,11 +2,13 @@ package com.ccode.alchemonsters.engine.event;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 public class EventManager {
 
 	private static final HashMap<String, Set<Subscriber>> subscribers = new HashMap<>();
+	private static final LinkedList<Message> messageQueue = new LinkedList<>();
 	
 	public static void addSubscriber(String messageId, Subscriber sub) {
 		if(subscribers.containsKey(messageId)) {
