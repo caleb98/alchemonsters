@@ -11,8 +11,8 @@ public class GenericUnitController implements UnitController {
 	private boolean isActionSubmitted = false; 
 	
 	private int chargingMove = -1;
-	private int[] chargingTargets = new int[]{};
-	private boolean doesChargeTargetEnemy = true;
+	private int[] chargingFriendlyTargets = new int[]{};
+	private int[] chargingEnemyTargets = new int[]{};
 	
 	private boolean isRecharging = false;
 	
@@ -78,10 +78,10 @@ public class GenericUnitController implements UnitController {
 	}
 	
 	@Override
-	public void setCharging(int move, int[] targets, boolean doesChargeTargetEnemy) {
+	public void setCharging(int move, int[] friendlyTargets, int[] enemyTargets) {
 		chargingMove = move;
-		chargingTargets = targets;
-		this.doesChargeTargetEnemy = doesChargeTargetEnemy;
+		chargingFriendlyTargets = friendlyTargets;
+		chargingEnemyTargets = enemyTargets;
 	}
 
 	@Override
@@ -93,11 +93,6 @@ public class GenericUnitController implements UnitController {
 	public boolean isCharging() {
 		return chargingMove != -1;
 	}
-	
-	@Override
-	public boolean isChargeTargetingEnemy() {
-		return doesChargeTargetEnemy;
-	}
 
 	@Override
 	public int getCharging() {
@@ -105,8 +100,13 @@ public class GenericUnitController implements UnitController {
 	}
 	
 	@Override
-	public int[] getChargingTargetPos() {
-		return chargingTargets;
+	public int[] getChargingFriendlyTargets() {
+		return chargingFriendlyTargets;
+	}
+	
+	@Override
+	public int[] getChargingEnemyTargets() {
+		return chargingEnemyTargets;
 	}
 
 	@Override

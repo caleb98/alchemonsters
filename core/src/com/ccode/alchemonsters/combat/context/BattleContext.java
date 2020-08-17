@@ -181,66 +181,15 @@ public class BattleContext implements Publisher {
 			Move move = MoveDatabase.getMove(moveName);
 			
 			//Create move instance
-			Creature[] targets;
-			switch(move.targetSelectType) {
-			
-			case ALL:
-				targets = new Creature[sourceTeam.numActives + opponentTeam.numActives];
-				int insert = 0;
-				for(int i = 0; i < sourceTeam.numActives; ++i) {
-					targets[insert++] = sourceTeam.get(i);
-				}
-				for(int i = 0; i < opponentTeam.numActives; ++i) {
-					targets[insert++] = opponentTeam.get(i);
-				}
-				break;
-				
-			case FRIENDLY_TEAM:
-				targets = new Creature[sourceTeam.numActives];
-				for(int i = 0; i < sourceTeam.numActives; ++i) {
-					targets[i] = sourceTeam.get(i);
-				}
-				break;
-				
-			case NONE:
-				targets = new Creature[]{};
-				break;
-				
-			case OPPONENT_TEAM:
-				targets = new Creature[opponentTeam.numActives];
-				for(int i = 0; i < opponentTeam.numActives; ++i) {
-					targets[i] = opponentTeam.get(i);
-				}
-				break;
-				
-			case SELF:
-				targets = new Creature[]{sourceTeam.get(activePos)};
-				break;
-				
-			case SINGLE_ANY:
-				if(action.isTargetingEnemy) {
-					targets = new Creature[]{opponentTeam.get(action.targets[0])};
-				}
-				else {
-					targets = new Creature[]{sourceTeam.get(action.targets[0])};
-				}
-				break;
-				
-			case SINGLE_FRIENDLY:
-				targets = new Creature[]{sourceTeam.get(action.targets[0])};
-				break;
-				
-			case SINGLE_OPPONENT:
-				targets = new Creature[]{opponentTeam.get(action.targets[0])};
-				break;
-				
-			default:
-				targets = null;
-				break;
-			
+			ArrayList<Creature> targetsList = new ArrayList<>();
+			for(int t : action.friendlyTargets) {
+				targetsList.add(sourceTeam.get(t));
+			}
+			for(int t : action.enemyTargets) {
+				targetsList.add(opponentTeam.get(t));
 			}
 			
-			MoveInstance moveInstance = new MoveInstance(move, sourceTeam.get(activePos), targets, this);
+			MoveInstance moveInstance = new MoveInstance(move, sourceTeam.get(activePos), targetsList.toArray(new Creature[targetsList.size()]), this);
 		
 			//Go ahead and subtract the mana cost
 			//FIXME: UNCOMMENT THIS LINE!!!!!!
@@ -261,7 +210,7 @@ public class BattleContext implements Publisher {
 				
 				//If they aren't  charging already, then start the charge
 				else if(!control.isCharging()) {
-					control.setCharging(action.id, action.targets, action.isTargetingEnemy);
+					control.setCharging(action.id, action.friendlyTargets, action.enemyTargets);
 					publish(new MCombatChargeStarted(moveInstance));
 				}
 				
@@ -276,7 +225,7 @@ public class BattleContext implements Publisher {
 				break;
 				
 			case DELAYED:
-				delayedMoves.add(new DelayedMoveInfo(sourceTeam, sourceTeam.get(activePos), move, opponentTeam, action.targets, move.delayAmount));
+				delayedMoves.add(new DelayedMoveInfo(sourceTeam, sourceTeam.get(activePos), move, opponentTeam, action.friendlyTargets, action.enemyTargets, move.delayAmount));
 				break;
 				
 			case RECHARGE:
@@ -291,21 +240,21 @@ public class BattleContext implements Publisher {
 			
 			}
 			
-			//After the move is complete, check to see if this unit has a double attack for
-			//this round. If so, make sure that the target of this move was not killed, as
-			//killing an enemy removes the chance for a second attack.
-			if((sourceTeam == teamA && isTeamADoubleAttack) || (sourceTeam == teamB && isTeamBDoubleAttack)) {
-				if(activePos == doubleAttackPosition) {
-					for(Creature t : targets) {
-						if(t.isDead()) {
-							isTeamADoubleAttack = false;
-							isTeamBDoubleAttack = false;
-							nextState = CombatState.END_PHASE;
-							break;
-						}
-					}
-				}
-			}
+//			//After the move is complete, check to see if this unit has a double attack for
+//			//this round. If so, make sure that the target of this move was not killed, as
+//			//killing an enemy removes the chance for a second attack.
+//			if((sourceTeam == teamA && isTeamADoubleAttack) || (sourceTeam == teamB && isTeamBDoubleAttack)) {
+//				if(activePos == doubleAttackPosition) {
+//					for(Creature t : targets) {
+//						if(t.isDead()) {
+//							isTeamADoubleAttack = false;
+//							isTeamBDoubleAttack = false;
+//							nextState = CombatState.END_PHASE;
+//							break;
+//						}
+//					}
+//				}
+//			}
 			break;
 			
 		case SWITCH:
@@ -517,21 +466,21 @@ public class BattleContext implements Publisher {
 		}
 		//Check for special charging case - we'll need different actions
 		if(control.isCharging()) {
-			actions.add(new BattleAction(BattleActionType.MOVE, control.getCharging(), control.isChargeTargetingEnemy(), control.getChargingTargetPos()));
+			actions.add(new BattleAction(BattleActionType.MOVE, control.getCharging(), control.getChargingFriendlyTargets(), control.getChargingEnemyTargets()));
 			control.setAllActions(actions);
 			return;
 		}
 		
 		if(control.isRecharging()) {
 			//TODO: this uses -1 for target index because the "wait" action doesn't have a logical target, maybe a problem?
-			actions.add(new BattleAction(BattleActionType.WAIT, 0, false));
+			actions.add(new BattleAction(BattleActionType.WAIT, 0, BattleAction.NONE, BattleAction.NONE));
 			control.setAllActions(actions);
 			return;
 		}
 		
 		for(int i = team.numActives; i < CreatureTeam.TEAM_SIZE; ++i) {
 			if(team.get(i) != null && !team.get(i).isDead()) {
-				actions.add(new BattleAction(BattleActionType.SWITCH, i, false));
+				actions.add(new BattleAction(BattleActionType.SWITCH, i, BattleAction.NONE, BattleAction.NONE));
 			}
 		}
 		
@@ -542,24 +491,39 @@ public class BattleContext implements Publisher {
 			BattleTeam enemyTeam = (team == teamA) ? teamB : teamA;
 			
 			switch(move.targetSelectType) {
-				
-			//These moves target more than one mon, so they don't have a logical "single" target
-			//that can be selected.
-			case NONE:
+
 			case ALL:
+				
+				break;
+				
 			case FRIENDLY_TEAM:
+				int[] friendlies = new int[team.numActives];
+				for(int i = 0; i < team.numActives; ++i) {
+					friendlies[i] = i;
+				}
+				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, friendlies, BattleAction.NONE));
+				break;
+				
 			case OPPONENT_TEAM:
-				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, false, new int[]{}));
+				int[] opponents = new int[enemyTeam.numActives];
+				for(int i = 0; i < enemyTeam.numActives; ++i) {
+					opponents[i] = i;
+				}
+				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, BattleAction.NONE, opponents));
+				break;
+				
+			case NONE:
+				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, BattleAction.NONE, BattleAction.NONE));
 				break;
 				
 			case SELF:
-				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, false, position));
+				actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, new int[]{position}, BattleAction.NONE));
 				break;
 				
 			case SINGLE_FRIENDLY:
 				for(int teamIndex = 0; teamIndex < team.numActives; ++teamIndex) {
 					if(!(team.get(teamIndex) == null) && !team.get(teamIndex).isDead()) {
-						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, false, teamIndex));
+						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, new int[]{teamIndex}, BattleAction.NONE));
 					}
 				}
 				break;
@@ -567,7 +531,7 @@ public class BattleContext implements Publisher {
 			case SINGLE_OPPONENT:
 				for(int teamIndex = 0; teamIndex < enemyTeam.numActives; ++teamIndex) {
 					if(!(enemyTeam.get(teamIndex) == null) && !enemyTeam.get(teamIndex).isDead()) {
-						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, true, teamIndex));
+						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, BattleAction.NONE, new int[]{teamIndex}));
 					}
 				}
 				break;
@@ -575,12 +539,12 @@ public class BattleContext implements Publisher {
 			case SINGLE_ANY:
 				for(int teamIndex = 0; teamIndex < team.numActives; ++teamIndex) {
 					if(!(team.get(teamIndex) == null) && !team.get(teamIndex).isDead()) {
-						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, false, teamIndex));
+						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, new int[]{teamIndex}, BattleAction.NONE));
 					}
 				}
 				for(int teamIndex = 0; teamIndex < enemyTeam.numActives; ++teamIndex) {
 					if(!(enemyTeam.get(teamIndex) == null) && !enemyTeam.get(teamIndex).isDead()) {
-						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, true, teamIndex));
+						actions.add(new BattleAction(BattleActionType.MOVE, moveIndex, BattleAction.NONE, new int[]{teamIndex}));
 					}
 				}
 				break;
@@ -588,7 +552,7 @@ public class BattleContext implements Publisher {
 			}
 		}		
 
-		actions.add(new BattleAction(BattleActionType.WAIT, 0, false));
+		actions.add(new BattleAction(BattleActionType.WAIT, -1, BattleAction.NONE, BattleAction.NONE));
 		
 		control.setAllActions(actions);
 	}
@@ -713,11 +677,14 @@ public class BattleContext implements Publisher {
 				Move move = inf.move;
 				
 				//Create move instance
-				Creature[] targets = new Creature[inf.targets.length];
-				for(int i = 0; i < targets.length; ++i) {
-					targets[i] = inf.opponentTeam.get(inf.targets[i]);
+				ArrayList<Creature> targetsList = new ArrayList<>();
+				for(int t : inf.friendlyTargets) {
+					targetsList.add(inf.sourceTeam.get(t));
 				}
-				MoveInstance moveInstance = new MoveInstance(move, inf.sourceCreature, targets, this);
+				for(int t : inf.enemyTargets) {
+					targetsList.add(inf.opponentTeam.get(t));
+				}
+				MoveInstance moveInstance = new MoveInstance(move, inf.sourceCreature, targetsList.toArray(new Creature[targetsList.size()]), this);
 				
 				//Do the action
 				executeMove(moveInstance, inf.sourceTeam, inf.opponentTeam);
@@ -1035,15 +1002,17 @@ public class BattleContext implements Publisher {
 		Creature sourceCreature;
 		Move move;
 		BattleTeam opponentTeam;
-		int[] targets;
+		int[] friendlyTargets;
+		int[] enemyTargets;
 		int delayTurns;
 		
-		public DelayedMoveInfo(BattleTeam team, Creature creature, Move move, BattleTeam target, int[] targets, int turns) {
+		public DelayedMoveInfo(BattleTeam team, Creature creature, Move move, BattleTeam target, int[] friendlyTargets, int[] enemyTargets, int turns) {
 			sourceTeam = team;
 			sourceCreature = creature;
 			this.move = move;
 			opponentTeam = target;
-			this.targets = targets;
+			this.friendlyTargets = friendlyTargets;
+			this.enemyTargets = enemyTargets;
 			delayTurns = turns;
 		}
 		

@@ -2,6 +2,8 @@ package com.ccode.alchemonsters.combat;
 
 public class BattleAction implements Comparable<BattleAction> {
 
+	public static final int[] NONE = new int[]{};
+	
 	public enum BattleActionType {
 		SWITCH,
 		USE,
@@ -10,8 +12,8 @@ public class BattleAction implements Comparable<BattleAction> {
 	}
 	
 	public final BattleActionType type;
-	public final int[] targets;
-	public final boolean isTargetingEnemy;
+	public final int[] friendlyTargets;
+	public final int[] enemyTargets;
 	/**
 	 * Represents various values depending on the BattleActionType of this action.
 	 * For switch: the index of the creature to switch to in the team.
@@ -23,26 +25,16 @@ public class BattleAction implements Comparable<BattleAction> {
 
 	private BattleAction() {
 		type = null;
-		targets = new int[]{};
-		isTargetingEnemy = true;
+		friendlyTargets = new int[]{};
+		enemyTargets = new int[]{};
 		id = -1;
 	}
 	
-	public BattleAction(BattleActionType type, int id, boolean isTargetingEnemy, int... targets) {
+	public BattleAction(BattleActionType type, int id, int[] friendlyTargets, int[] enemyTargets) {
 		this.type = type;
-		this.targets = targets;
-		this.isTargetingEnemy = isTargetingEnemy;
+		this.friendlyTargets = friendlyTargets;
+		this.enemyTargets = enemyTargets;
 		this.id = id;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(obj == null || !(obj instanceof BattleAction)) {
-			return false;
-		}
-		
-		BattleAction other = (BattleAction) obj;
-		return type == other.type && targets == other.targets && isTargetingEnemy == other.isTargetingEnemy && id == other.id;
 	}
 	
 	@Override

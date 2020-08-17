@@ -151,8 +151,8 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (friendly %s: %s)", 
 										thisTeam.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost, 
-										a.targets[0],
-										thisTeam.get(a.targets[0]).personalName));
+										a.friendlyTargets[0],
+										thisTeam.get(a.friendlyTargets[0]).personalName));
 						break;
 						
 					case SINGLE_OPPONENT:
@@ -161,8 +161,40 @@ public class TeamCombatDisplayController extends TeamCombatDisplay {
 										"Use move %s [%s mana] (enemy %s: %s)", 
 										thisTeam.get(teamId).moves[a.id], 
 										MoveDatabase.getMove(moveName).manaCost,
-										a.targets[0],
-										opponentTeam.get(a.targets[0]).personalName));
+										a.enemyTargets[0],
+										opponentTeam.get(a.enemyTargets[0]).personalName));
+						break;
+						
+					case ALL:
+						stringVer.add(
+								String.format(
+										"Use move %s [%s mana] (all units)", 
+										thisTeam.get(teamId).moves[a.id], 
+										MoveDatabase.getMove(moveName).manaCost));
+						break;
+						
+					case SINGLE_ANY:
+						if(a.friendlyTargets.length > 0) {
+							stringVer.add(
+									String.format(
+											"Use move %s [%s mana] (friendly %s: %s)", 
+											thisTeam.get(teamId).moves[a.id], 
+											MoveDatabase.getMove(moveName).manaCost, 
+											a.friendlyTargets[0],
+											thisTeam.get(a.friendlyTargets[0]).personalName));
+						}
+						else {
+							stringVer.add(
+									String.format(
+											"Use move %s [%s mana] (enemy %s: %s)", 
+											thisTeam.get(teamId).moves[a.id], 
+											MoveDatabase.getMove(moveName).manaCost,
+											a.enemyTargets[0],
+											opponentTeam.get(a.enemyTargets[0]).personalName));
+						}
+						break;
+						
+					default:
 						break;				
 					
 					}

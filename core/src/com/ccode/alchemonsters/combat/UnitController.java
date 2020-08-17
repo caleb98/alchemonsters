@@ -69,9 +69,10 @@ public interface UnitController {
 	/**
 	 * Sets the move that this controller is charging
 	 * @param move the index of the charging move in the mon's move list
-	 * @param tar the index of the target on the opposing team
+	 * @param friendlyTargets the targets on friendly team
+	 * @param enemyTargets the targets on enemy team
 	 */
-	public void setCharging(int move, int[] targets, boolean doesChargeTargetEnemy);
+	public void setCharging(int move, int[] friendlyTargets, int[] enemyTargets);
 	public void stopCharging();
 	/**
 	 * Checks to see if a controller is charging any move
@@ -83,13 +84,14 @@ public interface UnitController {
 	 */
 	public int getCharging();
 	/**
-	 * @return an array of indexes the charging move will target
+	 * @return an array of indexes representing friendly targets of the charged action
 	 */
-	public int[] getChargingTargetPos();
+	public int[] getChargingFriendlyTargets();
 	/**
-	 * @return whether or not the currently charging move is targeting an enemy or not
+	 * @return an array of indexes representing enemy targets of the charged action
 	 */
-	public boolean isChargeTargetingEnemy();
+	public int[] getChargingEnemyTargets();
+	
 	
 	// ************************************* 
 	//         RECHARGING FUNCTIONS

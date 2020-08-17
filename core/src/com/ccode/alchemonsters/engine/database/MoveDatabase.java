@@ -57,9 +57,6 @@ public class MoveDatabase {
 			
 			ResultSet moves = GameData.executeQuery("SELECT * FROM Moves");
 			String actionJson;
-			String actionTagJson;
-			String moveTagJson;
-			String metaJson;
 			
 			final Field mName;
 			final Field mDesc;
