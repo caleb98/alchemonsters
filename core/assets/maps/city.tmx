@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2019.09.18" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="42" nextobjectid="63">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="42" nextobjectid="73">
  <properties>
   <property name="isRoot" type="bool" value="true"/>
  </properties>
@@ -41,7 +41,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,52,53,53,53,54,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,62,63,63,63,64,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,62,63,63,63,64,13,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,62,58,73,60,64,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,72,74,0,72,74,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

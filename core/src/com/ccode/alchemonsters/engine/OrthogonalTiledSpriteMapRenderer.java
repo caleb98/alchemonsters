@@ -1,28 +1,18 @@
 package com.ccode.alchemonsters.engine;
 
-import java.util.ArrayList;
-
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.ccode.alchemonsters.entity.RenderSystem;
 
 public class OrthogonalTiledSpriteMapRenderer extends OrthogonalTiledMapRenderer {
-
-	private ArrayList<Sprite> sprites;
 	
-	public OrthogonalTiledSpriteMapRenderer(TiledMap map, SpriteBatch batch) {
+	private RenderSystem renderSystem;
+	
+	public OrthogonalTiledSpriteMapRenderer(TiledMap map, SpriteBatch batch, RenderSystem system) {
 		super(map, batch);
-		sprites = new ArrayList<Sprite>();
-	}
-	
-	public void addSprite(Sprite s) {
-		sprites.add(s);
-	}
-	
-	public void removeSprite(Sprite s) {
-		sprites.remove(s);
+		renderSystem = system;
 	}
 	
 	@Override
@@ -31,9 +21,7 @@ public class OrthogonalTiledSpriteMapRenderer extends OrthogonalTiledMapRenderer
 		for(MapLayer layer : map.getLayers()) {
 			renderMapLayer(layer);
 			if(layer.getName().equals("scene_bg")) {
-				for(Sprite s : sprites) {
-					s.draw(batch);
-				}
+				renderSystem.renderObjects(batch);
 			}
 		}
 		endRender();

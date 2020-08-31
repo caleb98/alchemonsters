@@ -8,14 +8,11 @@ import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -67,9 +64,6 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	private boolean followCamera = true;
 	private boolean printInstanceStack = false;
 	
-	//Rendering
-	private Sprite player;
-	
 	//Player movement
 	private float pv = 128;
 	
@@ -118,8 +112,6 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		InputMultiplexer input = new InputMultiplexer(ui, this);
 		Gdx.input.setInputProcessor(input);
 		
-		player = game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).createSprite("player");
-		
 		switchToMap("city");
 		
 	}
@@ -146,8 +138,6 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		
 		pBody.setLinearVelocity(vx, vy);
 		
-		activeInstance.entityEngine.update(delta);
-		
 		if(followCamera) {
 			game.graphicsCamera.position.set(pBody.getPosition(), 0);
 			correctCamera();
@@ -159,11 +149,10 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		}
 		
 		game.graphicsCamera.update();
-		activeInstance.renderer.setView(game.graphicsCamera);
-		activeInstance.renderer.render();
 		
-		Vector2 playerPos = pBody.getPosition();
-		player.setPosition(playerPos.x, playerPos.y);
+		activeInstance.entityEngine.update(delta);
+		
+		//activeInstance.renderer.render();
 		
 		if(renderDebug) {			
 			collisionDebug.render(activeInstance.boxWorld, game.graphicsCamera.combined);
@@ -409,7 +398,6 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		
 		//Otherwise, load the new instance
 		MapInstance newInstance = MapInstanceLoader.loadMapInstance(game, this, mapName, spawnId);
-		newInstance.renderer.addSprite(player);
 		Object isRootObj = newInstance.map.getProperties().get("isRoot");
 		if(isRootObj != null && isRootObj instanceof Boolean) {
 			boolean isRoot = (boolean) isRootObj;

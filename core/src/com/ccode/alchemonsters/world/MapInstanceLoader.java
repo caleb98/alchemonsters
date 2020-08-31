@@ -2,6 +2,10 @@ package com.ccode.alchemonsters.world;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
@@ -28,11 +32,12 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ShortArray;
 import com.ccode.alchemonsters.AlchemonstersGame;
 import com.ccode.alchemonsters.TestWorldScreen;
-import com.ccode.alchemonsters.engine.OrthogonalTiledSpriteMapRenderer;
+import com.ccode.alchemonsters.entity.AnimationComponent;
 import com.ccode.alchemonsters.entity.BodyComponent;
 import com.ccode.alchemonsters.entity.CollisionComponent;
 import com.ccode.alchemonsters.entity.CollisionSystem;
 import com.ccode.alchemonsters.entity.PhysicsSystem;
+import com.ccode.alchemonsters.entity.RenderSystem;
 import com.ccode.alchemonsters.entity.TransformComponent;
 import com.ccode.alchemonsters.entity.TypeComponent;
 import com.ccode.alchemonsters.entity.TypeComponent.Type;
@@ -44,10 +49,13 @@ public class MapInstanceLoader {
 	private static final EarClippingTriangulator TRIANGULATOR = new EarClippingTriangulator();
 	private static final int ELLIPSE_STEPS = 32;
 	
+	private static final String COLLISION_LAYER_NAME = "collision";
+	private static final String WARPS_LAYER_NAME = "warps";
+	private static final String SPAWN_LAYER_NAME = "spawn";
+	
 	public static MapInstance loadMapInstance(AlchemonstersGame game, TestWorldScreen world, String mapName, String spawnId) {
 		//Load the map
 		TiledMap map = MAP_LOADER.load(String.format("maps/%s.tmx", mapName));
-		OrthogonalTiledSpriteMapRenderer renderer = new OrthogonalTiledSpriteMapRenderer(map, game.batch);
 		
 		//Create box2d world
 		World boxWorld = new World(new Vector2(0, 0), true);
@@ -55,12 +63,13 @@ public class MapInstanceLoader {
 		
 		//Create the entity engine
 		Engine entityEngine = new Engine();
+		entityEngine.addSystem(new RenderSystem(game, map, game.batch));
 		entityEngine.addSystem(new PhysicsSystem(boxWorld));
 		entityEngine.addSystem(new CollisionSystem(world));
 		
 		//Add the collision boxes to the world/entity system
-		if(map.getLayers().get("collision") != null) {
-			for(MapObject o : map.getLayers().get("collision").getObjects()) {
+		if(map.getLayers().get(COLLISION_LAYER_NAME) != null) {
+			for(MapObject o : map.getLayers().get(COLLISION_LAYER_NAME).getObjects()) {
 				
 				createCollisionObject(o, boxWorld, entityEngine);
 				
@@ -68,8 +77,8 @@ public class MapInstanceLoader {
 		}
 		
 		//Add warp area boxes to the world/entity system
-		if(map.getLayers().get("warps") != null) {
-			for(MapObject o : map.getLayers().get("warps").getObjects()) {
+		if(map.getLayers().get(WARPS_LAYER_NAME) != null) {
+			for(MapObject o : map.getLayers().get(WARPS_LAYER_NAME).getObjects()) {
 			
 				createWarpObject(o, boxWorld, entityEngine, mapName);
 				
@@ -79,9 +88,9 @@ public class MapInstanceLoader {
 		//Add player at spawn (to box2d world/entity engine)		
 		Vector2 playerSpawn = new Vector2();
 		boolean spawnFound = false;
-		if(map.getLayers().get("spawn") != null) {
+		if(map.getLayers().get(SPAWN_LAYER_NAME) != null) {
 			
-			MapLayer spawns = map.getLayers().get("spawn");
+			MapLayer spawns = map.getLayers().get(SPAWN_LAYER_NAME);
 			for(MapObject spawn : spawns.getObjects()) {
 				
 				if(spawn instanceof RectangleMapObject && 
@@ -103,6 +112,7 @@ public class MapInstanceLoader {
 		}
 		
 		Entity playerEntity = new Entity();
+		playerEntity.add(new AnimationComponent(new Animation<TextureRegion>(1f, game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).findRegions("player"), PlayMode.LOOP)));
 		
 		BodyDef pBodyDef = new BodyDef();
 		pBodyDef.type = BodyType.DynamicBody;
@@ -124,7 +134,7 @@ public class MapInstanceLoader {
 		pBody.setUserData(playerEntity);
 		
 		//Combine into map instance
-		return new MapInstance(mapName, map, renderer, boxWorld, pBody, entityEngine);
+		return new MapInstance(mapName, map, boxWorld, pBody, entityEngine);
 	}
 	
 	private static void createCollisionObject(MapObject object, World boxWorld, Engine entityEngine) {
