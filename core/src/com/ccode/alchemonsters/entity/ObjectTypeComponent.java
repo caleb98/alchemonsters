@@ -2,18 +2,19 @@ package com.ccode.alchemonsters.entity;
 
 import com.badlogic.ashley.core.Component;
 
-public class TypeComponent implements Component {
+public class ObjectTypeComponent implements Component {
 
-	public Type type;
+	public ObjectType type;
 	
-	public TypeComponent(Type type) {
+	public ObjectTypeComponent(ObjectType type) {
 		this.type = type;
 	}
 	
-	public enum Type {
+	public enum ObjectType {
 		//"real" objects
 		SCENERY,
 		UNIT,
+		PROJECTILE,
 		
 		//"meta" objects
 		WARP_AREA,

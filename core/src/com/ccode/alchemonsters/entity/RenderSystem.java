@@ -18,7 +18,8 @@ public class RenderSystem extends IteratingSystem {
 	private float lifetime = 0;
 	
 	public RenderSystem(AlchemonstersGame game, TiledMap map, SpriteBatch batch) {
-		super(Family.all(AnimationComponent.class, TransformComponent.class).get());
+		super(Family.all(TransformComponent.class)
+				.one(AnimationComponent.class, TextureComponent.class).get());
 		renderer = new OrthogonalTiledSpriteMapRenderer(map, batch, this);
 		this.game = game;
 	}
@@ -38,11 +39,41 @@ public class RenderSystem extends IteratingSystem {
 	
 	public void renderObjects(Batch batch) {
 		for(Entity e : getEntities()) {
-			AnimationComponent animation = Mappers.animationComponent.get(e);
+			
+			TextureRegion texture;
+			float originX, originY;
 			TransformComponent transform = Mappers.transformComponent.get(e);
 			
-			TextureRegion region = animation.animation.getKeyFrame(lifetime);
-			batch.draw(region, transform.position.x, transform.position.y);
+			if(Mappers.textureComponent.has(e)) {
+				TextureComponent text = Mappers.textureComponent.get(e);
+				texture = text.texture;
+				originX = text.originX;
+				originY = text.originY;
+			}
+			else if(Mappers.animationComponent.has(e)) {
+				AnimationComponent anim = Mappers.animationComponent.get(e);
+				originX = anim.originX;
+				originY = anim.originY;
+				texture = anim.animation.getKeyFrame(lifetime);
+			}
+			else {
+				System.out.println("WARN: Attempted to render entity that contained no TextureComponent or AnimationComponent");
+				continue;
+			}
+			
+			batch.draw(
+				texture,
+				transform.position.x - originX,
+				transform.position.y - originY,
+				originX,
+				originY,
+				texture.getRegionWidth(),
+				texture.getRegionHeight(),
+				transform.scale.x,
+				transform.scale.y,
+				(float) (180f / Math.PI * transform.rotation)
+			);
+			
 		}
 	}
 	

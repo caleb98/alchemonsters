@@ -36,11 +36,12 @@ import com.ccode.alchemonsters.entity.AnimationComponent;
 import com.ccode.alchemonsters.entity.BodyComponent;
 import com.ccode.alchemonsters.entity.CollisionComponent;
 import com.ccode.alchemonsters.entity.CollisionSystem;
+import com.ccode.alchemonsters.entity.ObjectTypeComponent;
+import com.ccode.alchemonsters.entity.ObjectTypeComponent.ObjectType;
 import com.ccode.alchemonsters.entity.PhysicsSystem;
+import com.ccode.alchemonsters.entity.PlayerComponent;
 import com.ccode.alchemonsters.entity.RenderSystem;
 import com.ccode.alchemonsters.entity.TransformComponent;
-import com.ccode.alchemonsters.entity.TypeComponent;
-import com.ccode.alchemonsters.entity.TypeComponent.Type;
 import com.ccode.alchemonsters.entity.WarpComponent;
 
 public class MapInstanceLoader {
@@ -112,7 +113,7 @@ public class MapInstanceLoader {
 		}
 		
 		Entity playerEntity = new Entity();
-		playerEntity.add(new AnimationComponent(new Animation<TextureRegion>(1f, game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).findRegions("player"), PlayMode.LOOP)));
+		playerEntity.add(new AnimationComponent(new Animation<TextureRegion>(1f, game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).findRegions("player"), PlayMode.LOOP), 16, 16));
 		
 		BodyDef pBodyDef = new BodyDef();
 		pBodyDef.type = BodyType.DynamicBody;
@@ -121,14 +122,17 @@ public class MapInstanceLoader {
 		Body pBody = boxWorld.createBody(pBodyDef);
 		CircleShape pShape = new CircleShape();
 		pShape.setRadius(16);
-		pShape.setPosition(new Vector2(16, 16));
-		pBody.createFixture(pShape, 0.0f);
+		FixtureDef pFixture = new FixtureDef();
+		pFixture.shape = pShape;
+		pFixture.filter.groupIndex = CollisionSystem.GROUP_WORLD_OBJECT;
+		pBody.createFixture(pFixture);
 		pShape.dispose();
 		
 		playerEntity.add(new BodyComponent(pBody));
 		playerEntity.add(new TransformComponent());
 		playerEntity.add(new CollisionComponent());
-		playerEntity.add(new TypeComponent(Type.UNIT));
+		playerEntity.add(new ObjectTypeComponent(ObjectType.UNIT));
+		playerEntity.add(new PlayerComponent());
 		entityEngine.addEntity(playerEntity);
 		
 		pBody.setUserData(playerEntity);
@@ -164,7 +168,11 @@ public class MapInstanceLoader {
 			
 			PolygonShape colShape = new PolygonShape();
 			colShape.setAsBox(colRect.width / 2, colRect.height / 2);
-			colBody.createFixture(colShape, 0.0f);
+			
+			FixtureDef colFixture = new FixtureDef();
+			colFixture.shape = colShape;
+			colFixture.filter.groupIndex = CollisionSystem.GROUP_COLLISION_BOX;
+			colBody.createFixture(colFixture);
 			colShape.dispose();
 			
 		}
@@ -183,7 +191,10 @@ public class MapInstanceLoader {
 				verts[i] = new Vector2(colEllipse.width / 2 * (float) Math.cos(t), colEllipse.height / 2 * (float) Math.sin(t));
 			}
 			colShape.createLoop(verts);
-			colBody.createFixture(colShape, 0.0f);
+			FixtureDef colFixture = new FixtureDef();
+			colFixture.shape = colShape;
+			colFixture.filter.groupIndex = CollisionSystem.GROUP_COLLISION_BOX;
+			colBody.createFixture(colFixture);
 			colShape.dispose();
 			
 		}
@@ -208,7 +219,10 @@ public class MapInstanceLoader {
 				};
 				
 				colShape.set(triPoints);
-				colBody.createFixture(colShape, 0.0f);
+				FixtureDef colFixture = new FixtureDef();
+				colFixture.shape = colShape;
+				colFixture.filter.groupIndex = CollisionSystem.GROUP_COLLISION_BOX;
+				colBody.createFixture(colFixture);
 			}
 			
 			colShape.dispose();
@@ -224,7 +238,10 @@ public class MapInstanceLoader {
 			
 			ChainShape colShape = new ChainShape();
 			colShape.createChain(colPoly.getVertices());
-			colBody.createFixture(colShape, 0.0f);
+			FixtureDef colFixture = new FixtureDef();
+			colFixture.shape = colShape;
+			colFixture.filter.groupIndex = CollisionSystem.GROUP_COLLISION_BOX;
+			colBody.createFixture(colFixture);
 			colShape.dispose();
 			
 		}
@@ -237,7 +254,7 @@ public class MapInstanceLoader {
 		
 		collisionEntity.add(new BodyComponent(colBody));
 		collisionEntity.add(new TransformComponent());
-		collisionEntity.add(new TypeComponent(Type.COLLISION_BOX));
+		collisionEntity.add(new ObjectTypeComponent(ObjectType.COLLISION_BOX));
 		entityEngine.addEntity(collisionEntity);
 		
 		colBody.setUserData(collisionEntity);
@@ -358,7 +375,7 @@ public class MapInstanceLoader {
 		
 		warpEntity.add(new BodyComponent(warpBody));
 		warpEntity.add(new TransformComponent());
-		warpEntity.add(new TypeComponent(Type.WARP_AREA));
+		warpEntity.add(new ObjectTypeComponent(ObjectType.WARP_AREA));
 		warpEntity.add(new WarpComponent(connectedMap, connectedSpawn));
 		entityEngine.addEntity(warpEntity);
 		
