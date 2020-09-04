@@ -8,7 +8,6 @@ import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
@@ -26,7 +25,6 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -38,12 +36,7 @@ import com.ccode.alchemonsters.engine.GameScreen;
 import com.ccode.alchemonsters.engine.UI;
 import com.ccode.alchemonsters.entity.BodyComponent;
 import com.ccode.alchemonsters.entity.CollisionComponent;
-import com.ccode.alchemonsters.entity.CollisionSystem;
 import com.ccode.alchemonsters.entity.Mappers;
-import com.ccode.alchemonsters.entity.ObjectTypeComponent;
-import com.ccode.alchemonsters.entity.ObjectTypeComponent.ObjectType;
-import com.ccode.alchemonsters.entity.TextureComponent;
-import com.ccode.alchemonsters.entity.TransformComponent;
 import com.ccode.alchemonsters.world.MapInstance;
 import com.ccode.alchemonsters.world.MapInstanceLoader;
 
@@ -131,16 +124,16 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		float vx = 0;
 		
 		//Update
-		if(Gdx.input.isKeyPressed(Keys.UP)) {
+		if(Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W)) {
 			vy += pv;
 		}
-		if(Gdx.input.isKeyPressed(Keys.DOWN)) {
+		if(Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S)) {
 			vy -= pv;
 		}
-		if(Gdx.input.isKeyPressed(Keys.LEFT)) {
+		if(Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
 			vx -= pv;
 		}
-		if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
+		if(Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
 			vx += pv;
 		}
 		
@@ -245,44 +238,6 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		Entity bullet = new Entity();
-		
-		bullet.add(new TextureComponent(game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).findRegion("bullet"), 0, 4));
-		
-		//Calculate world click position
-		Vector2 clickPos = new Vector2(screenX, screenY);
-		game.graphicsView.unproject(clickPos);
-		
-		Vector2 aim = clickPos.cpy().sub(activeInstance.playerBody.getPosition()).nor();
-		Vector2 impulse = aim.cpy().scl(250);
-		Vector2 spawn = activeInstance.playerBody.getPosition().cpy();
-		
-		BodyDef bulletBodyDef = new BodyDef();
-		bulletBodyDef.type = BodyType.DynamicBody;
-		bulletBodyDef.position.set(spawn);
-		bulletBodyDef.angle = aim.angleRad();
-		
-		Body bulletBody = activeInstance.boxWorld.createBody(bulletBodyDef);
-		CircleShape bulletShape = new CircleShape();
-		bulletShape.setRadius(4);
-		
-		FixtureDef bulletFixture = new FixtureDef();
-		bulletFixture.shape = bulletShape;
-		bulletFixture.filter.groupIndex = CollisionSystem.GROUP_WORLD_OBJECT;
-		bulletBody.createFixture(bulletFixture);
-		bulletShape.dispose();
-		bulletBody.setLinearDamping(0.0f);
-		
-		bullet.add(new BodyComponent(bulletBody));
-		bullet.add(new TransformComponent());
-		bullet.add(new CollisionComponent());
-		bullet.add(new ObjectTypeComponent(ObjectType.PROJECTILE));
-		
-		activeInstance.entityEngine.addEntity(bullet);		
-		
-		bulletBody.setUserData(bullet);
-		bulletBody.applyLinearImpulse(impulse, bulletBody.getWorldCenter(), true);
-		
 		return false;
 	}
 
