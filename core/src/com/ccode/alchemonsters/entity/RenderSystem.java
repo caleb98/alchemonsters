@@ -21,7 +21,8 @@ public class RenderSystem extends IteratingSystem {
 	
 	//test
 	private static BitmapFont font = new BitmapFont();
-	private static GlyphLayout layout = new GlyphLayout(font, "E");
+	private static GlyphLayout interactTextLayout = new GlyphLayout(font, "E");
+	private static GlyphLayout dialogueTextLayout = new GlyphLayout();
 	
 	public RenderSystem(AlchemonstersGame game, TiledMap map, SpriteBatch batch) {
 		super(Family.all(TransformComponent.class)
@@ -103,11 +104,22 @@ public class RenderSystem extends IteratingSystem {
 				TransformComponent transform = Mappers.transformComponent.get(e);
 				DialogueComponent dialogue = Mappers.dialogueComponent.get(e);
 				
-				if(dialogue.showDialogue) {		
+				if(dialogue.isDialogueActive) {
+					DialogueSystem dSystem = getEngine().getSystem(DialogueSystem.class);
+					if(dSystem.currentLine != null) {
+						dialogueTextLayout.setText(font, dSystem.currentLine.getText());
+						font.draw(
+								batch, dialogueTextLayout, 
+								transform.position.x + (texture.getRegionWidth() / 2) - (dialogueTextLayout.width / 2), 
+								transform.position.y + dialogueTextLayout.height + (texture.getRegionHeight() / 2)
+							);
+					}
+				}
+				else if(dialogue.showDialogueStartButton) {		
 					font.draw(
-						batch, layout, 
+						batch, interactTextLayout, 
 						transform.position.x + (texture.getRegionWidth() / 2), 
-						transform.position.y + layout.height + (texture.getRegionHeight() / 2)
+						transform.position.y + interactTextLayout.height + (texture.getRegionHeight() / 2)
 					);
 				}
 				

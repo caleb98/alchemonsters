@@ -218,6 +218,7 @@ public class MapInstanceLoader {
 		if(props.containsKey("dialogue")) {
 			//TODO: potentially use global user data variable for all dialogues?
 			Dialogue dialogue = new Dialogue(new UserData(object.getName() + ":" + object.toString()));
+			dialogue.loadFile("dialogue/"+ props.get("dialogue") + ".json");
 			unitEntity.add(new DialogueComponent(dialogue, adjacentFixture));
 		}
 		
