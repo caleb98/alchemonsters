@@ -26,6 +26,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -36,6 +37,8 @@ import com.ccode.alchemonsters.entity.AnimationComponent;
 import com.ccode.alchemonsters.entity.BodyComponent;
 import com.ccode.alchemonsters.entity.CollisionComponent;
 import com.ccode.alchemonsters.entity.CollisionSystem;
+import com.ccode.alchemonsters.entity.DialogueComponent;
+import com.ccode.alchemonsters.entity.DialogueSystem;
 import com.ccode.alchemonsters.entity.ObjectTypeComponent;
 import com.ccode.alchemonsters.entity.ObjectTypeComponent.ObjectType;
 import com.ccode.alchemonsters.entity.PhysicsSystem;
@@ -43,6 +46,8 @@ import com.ccode.alchemonsters.entity.PlayerComponent;
 import com.ccode.alchemonsters.entity.RenderSystem;
 import com.ccode.alchemonsters.entity.TransformComponent;
 import com.ccode.alchemonsters.entity.WarpComponent;
+import com.kyper.yarn.Dialogue;
+import com.kyper.yarn.UserData;
 
 public class MapInstanceLoader {
 
@@ -53,6 +58,7 @@ public class MapInstanceLoader {
 	private static final String COLLISION_LAYER_NAME = "collision";
 	private static final String WARPS_LAYER_NAME = "warps";
 	private static final String SPAWN_LAYER_NAME = "spawn";
+	private static final String NPC_LAYER_NAME = "npc";
 	
 	public static MapInstance loadMapInstance(AlchemonstersGame game, TestWorldScreen world, String mapName, String spawnId) {
 		//Load the map
@@ -64,9 +70,6 @@ public class MapInstanceLoader {
 		
 		//Create the entity engine
 		Engine entityEngine = new Engine();
-		entityEngine.addSystem(new RenderSystem(game, map, game.batch));
-		entityEngine.addSystem(new PhysicsSystem(boxWorld));
-		entityEngine.addSystem(new CollisionSystem(world));
 		
 		//Add the collision boxes to the world/entity system
 		if(map.getLayers().get(COLLISION_LAYER_NAME) != null) {
@@ -112,8 +115,28 @@ public class MapInstanceLoader {
 			System.err.printf("[Warning] No spawn point %s found for map %s.\n", spawnId, mapName);
 		}
 		
+		//Check for npcs to spawn
+		if(map.getLayers().get(NPC_LAYER_NAME) != null) {
+			
+			MapLayer npcs = map.getLayers().get(NPC_LAYER_NAME);
+			for(MapObject npc : npcs.getObjects()) {
+				
+				if(npc instanceof RectangleMapObject) {
+					createUnitEntity(game, (RectangleMapObject) npc, boxWorld, entityEngine);
+				}
+				
+			}
+			
+		}
+		
 		Entity playerEntity = new Entity();
-		playerEntity.add(new AnimationComponent(new Animation<TextureRegion>(1f, game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).findRegions("player"), PlayMode.LOOP), 16, 16));
+		playerEntity.add(new AnimationComponent(
+			new Animation<TextureRegion>(
+				1f, 
+				game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).findRegions("player"), 
+				PlayMode.LOOP), 
+			16, 16
+		));
 		
 		BodyDef pBodyDef = new BodyDef();
 		pBodyDef.type = BodyType.DynamicBody;
@@ -124,7 +147,7 @@ public class MapInstanceLoader {
 		pShape.setRadius(16);
 		FixtureDef pFixture = new FixtureDef();
 		pFixture.shape = pShape;
-		pFixture.filter.groupIndex = CollisionSystem.GROUP_WORLD_OBJECT;
+		pFixture.filter.groupIndex = CollisionSystem.GROUP_UNIT;
 		pBody.createFixture(pFixture);
 		pShape.dispose();
 		
@@ -137,8 +160,75 @@ public class MapInstanceLoader {
 		
 		pBody.setUserData(playerEntity);
 		
+		//Setup engine systems
+		entityEngine.addSystem(new PhysicsSystem(boxWorld));
+		entityEngine.addSystem(new CollisionSystem(world));
+		entityEngine.addSystem(new DialogueSystem(playerEntity));
+		entityEngine.addSystem(new RenderSystem(game, map, game.batch));
+		
 		//Combine into map instance
 		return new MapInstance(mapName, map, boxWorld, pBody, entityEngine);
+	}
+	
+	private static void createUnitEntity(AlchemonstersGame game, RectangleMapObject object, World boxWorld, Engine entityEngine) {
+		
+		MapProperties props = object.getProperties();
+		
+		Entity unitEntity = new Entity();
+		
+		//Add unit animation
+		Animation<TextureRegion> anim = new Animation<>(
+				1f, 
+				game.assetManager.get("sprites_packed/packed.atlas", TextureAtlas.class).findRegions((String) props.get("sprite")), 
+				PlayMode.LOOP
+		);
+		TextureRegion frame = anim.getKeyFrame(1f);
+		int spriteWidth = frame.getRegionWidth();
+		int spriteHeight = frame.getRegionHeight();
+		unitEntity.add(new AnimationComponent(anim, spriteWidth / 2, spriteHeight / 2));
+		
+		//Create unit body
+		BodyDef uBodyDef = new BodyDef();
+		uBodyDef.type = BodyType.DynamicBody;
+		uBodyDef.position.set(object.getRectangle().x, object.getRectangle().y);
+		
+		Body uBody = boxWorld.createBody(uBodyDef);
+		CircleShape uShape = new CircleShape();
+		uShape.setRadius((spriteWidth + spriteHeight) / 4); //average sprite width and height then divide by 2 (so just divide by 4 to combine average and /2)
+		FixtureDef uFixture = new FixtureDef();
+		uFixture.shape = uShape;
+		uFixture.filter.groupIndex = CollisionSystem.GROUP_UNIT;
+		uBody.createFixture(uFixture);
+		uShape.dispose();
+		
+		CircleShape adjacentSensorShape = new CircleShape();
+		adjacentSensorShape.setRadius(32 * 2f);
+		FixtureDef adjacentSensorFixture = new FixtureDef();
+		adjacentSensorFixture.shape = adjacentSensorShape;
+		adjacentSensorFixture.isSensor = true;
+		adjacentSensorFixture.filter.groupIndex = CollisionSystem.GROUP_ADJACENT_SENSOR;
+		Fixture adjacentFixture = uBody.createFixture(adjacentSensorFixture);
+		adjacentSensorShape.dispose();
+		
+		//Link entity/body
+		uBody.setUserData(unitEntity);
+		unitEntity.add(new BodyComponent(uBody));
+		
+		//Add dialogue if present
+		if(props.containsKey("dialogue")) {
+			//TODO: potentially use global user data variable for all dialogues?
+			Dialogue dialogue = new Dialogue(new UserData(object.getName() + ":" + object.toString()));
+			unitEntity.add(new DialogueComponent(dialogue, adjacentFixture));
+		}
+		
+		//Add other components
+		unitEntity.add(new TransformComponent());
+		unitEntity.add(new CollisionComponent());
+		unitEntity.add(new ObjectTypeComponent(ObjectType.UNIT));
+		
+		//Add the new entity to the engine
+		entityEngine.addEntity(unitEntity);
+		
 	}
 	
 	private static void createCollisionObject(MapObject object, World boxWorld, Engine entityEngine) {

@@ -24,6 +24,7 @@ public class OrthogonalTiledSpriteMapRenderer extends OrthogonalTiledMapRenderer
 				renderSystem.renderObjects(batch);
 			}
 		}
+		renderSystem.renderDialogue(batch);
 		endRender();
 	}
 	

@@ -12,5 +12,6 @@ public class Mappers {
 	public static final ComponentMapper<TextureComponent> textureComponent = ComponentMapper.getFor(TextureComponent.class);
 	public static final ComponentMapper<AnimationComponent> animationComponent = ComponentMapper.getFor(AnimationComponent.class);
 	public static final ComponentMapper<PlayerComponent> playerComponent = ComponentMapper.getFor(PlayerComponent.class);
+	public static final ComponentMapper<DialogueComponent> dialogueComponent = ComponentMapper.getFor(DialogueComponent.class);
 	
 }

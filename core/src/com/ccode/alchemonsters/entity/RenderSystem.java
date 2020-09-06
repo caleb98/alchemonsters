@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -11,11 +13,15 @@ import com.ccode.alchemonsters.AlchemonstersGame;
 import com.ccode.alchemonsters.engine.OrthogonalTiledSpriteMapRenderer;
 
 public class RenderSystem extends IteratingSystem {
-
+	
 	private AlchemonstersGame game;
 	
 	private OrthogonalTiledSpriteMapRenderer renderer;
 	private float lifetime = 0;
+	
+	//test
+	private static BitmapFont font = new BitmapFont();
+	private static GlyphLayout layout = new GlyphLayout(font, "E");
 	
 	public RenderSystem(AlchemonstersGame game, TiledMap map, SpriteBatch batch) {
 		super(Family.all(TransformComponent.class)
@@ -27,9 +33,9 @@ public class RenderSystem extends IteratingSystem {
 	@Override
 	public void update(float deltaTime) {
 		lifetime += deltaTime;
-		super.update(deltaTime);
 		renderer.setView(game.graphicsCamera);
 		renderer.render();
+		super.update(deltaTime);
 	}
 	
 	@Override
@@ -74,6 +80,38 @@ public class RenderSystem extends IteratingSystem {
 				(float) (180f / Math.PI * transform.rotation)
 			);
 			
+		}
+	}
+	
+	public void renderDialogue(Batch batch) {
+		for(Entity e : getEntities()) {			
+			if(Mappers.dialogueComponent.has(e)) {
+				
+				TextureRegion texture;
+				if(Mappers.textureComponent.has(e)) {
+					TextureComponent text = Mappers.textureComponent.get(e);
+					texture = text.texture;
+				}
+				else if(Mappers.animationComponent.has(e)) {
+					AnimationComponent anim = Mappers.animationComponent.get(e);
+					texture = anim.animation.getKeyFrame(lifetime);
+				}
+				else {
+					return;
+				}
+				
+				TransformComponent transform = Mappers.transformComponent.get(e);
+				DialogueComponent dialogue = Mappers.dialogueComponent.get(e);
+				
+				if(dialogue.showDialogue) {		
+					font.draw(
+						batch, layout, 
+						transform.position.x + (texture.getRegionWidth() / 2), 
+						transform.position.y + layout.height + (texture.getRegionHeight() / 2)
+					);
+				}
+				
+			}
 		}
 	}
 	

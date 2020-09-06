@@ -1,0 +1,22 @@
+[
+	{
+		"title": "Start",
+		"tags": "tag1 tag2",
+		"body": "Hello, how are you?\n\n[[ Alright |Alright]]",
+		"position": {
+			"x": 904,
+			"y": 500
+		},
+		"colorID": 0
+	},
+	{
+		"title": "Alright",
+		"tags": "",
+		"body": "Glad to hear it!",
+		"position": {
+			"x": 720,
+			"y": 790
+		},
+		"colorID": 0
+	}
+]

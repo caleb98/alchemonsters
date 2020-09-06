@@ -39,6 +39,9 @@ import com.ccode.alchemonsters.entity.CollisionComponent;
 import com.ccode.alchemonsters.entity.Mappers;
 import com.ccode.alchemonsters.world.MapInstance;
 import com.ccode.alchemonsters.world.MapInstanceLoader;
+import com.kyper.yarn.Dialogue;
+import com.kyper.yarn.Dialogue.LineResult;
+import com.kyper.yarn.Dialogue.OptionResult;
 
 public class TestWorldScreen extends GameScreen implements InputProcessor, ContactListener {
 	
@@ -84,13 +87,18 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	float fpsTime = 0.1f;
 	float fpsTimer = fpsTime;
 	
+	//Dialogue vars
+	private Dialogue dialogue;
+	private LineResult line;
+	private OptionResult options;
+	
 	public TestWorldScreen(AlchemonstersGame game) {
 		super(game);
 	}
 	
 	@Override
 	public void show() {
-	
+		
 		ui = new Stage(game.uiView, game.batch);
 		table = new Table();
 		table.setFillParent(true);
@@ -161,6 +169,56 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	@Override
 	public void renderUI(float delta) {
 		
+//		//Dialogue
+//		if(dialogue.isRunning()) {
+//			
+//			//Let the user select a dialogue option
+//			if(options != null) {
+//				
+//				if(keyboard.hasNextInt()) {
+//					options.choose(keyboard.nextInt());
+//					options = null;
+//				}
+//				
+//			}
+//			
+//			//Print the dialogue line
+//			else if(line != null) {
+//				
+//				System.out.println(line.getText());
+//				line = null;
+//				
+//			}
+//			
+//			else {
+//			
+//				if(dialogue.isNextCommand()) {
+//					//TODO:
+//				}
+//				
+//				else if(dialogue.isNextLine()) {
+//					line = dialogue.getNextAsLine();
+//				}
+//				
+//				else if(options == null && dialogue.isNextOptions()) {
+//					options = dialogue.getNextAsOptions();
+//					int i = 0;
+//					for(String option : options.getOptions()) {
+//						System.out.printf("%d - %s%n", i++, option);
+//					}
+//				}
+//				
+//				else if(dialogue.isNextComplete()) {
+//					NodeCompleteResult complete = dialogue.getNextAsComplete();
+//					if(complete.next_node == null) {
+//						dialogue.stop();
+//						System.out.println("Dialogue complete.");
+//					}
+//				}
+//				
+//			}
+//		}
+		
 		//Recalc fps
 		if((fpsTimer -= delta) < 0) {
 			fps = (float) (1.0 / Gdx.graphics.getDeltaTime());
@@ -170,6 +228,7 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 		
 		ui.act(delta);
 		ui.draw();
+		
 	}
 
 	@Override
@@ -451,7 +510,9 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 	@Override
 	public void beginContact(Contact contact) {
 		Fixture a = contact.getFixtureA();
-		Fixture b = contact.getFixtureB();	
+		Fixture b = contact.getFixtureB();
+		
+		
 		
 		if(a.getBody().getUserData() instanceof Entity && b.getBody().getUserData() instanceof Entity) {
 			Entity ea = (Entity) a.getBody().getUserData();
@@ -463,10 +524,10 @@ public class TestWorldScreen extends GameScreen implements InputProcessor, Conta
 			
 			//If the components were present, update the collided entity.
 			if(colA != null) {
-				colA.collisions.add(eb);
+				colA.addCollision(a, b, eb);
 			}
 			if(colB != null) {
-				colB.collisions.add(ea);
+				colB.addCollision(b, a, ea);
 			}
 		}
 	}
